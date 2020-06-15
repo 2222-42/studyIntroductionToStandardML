@@ -1,0 +1,1 @@
+str (chr 91) ^ str (chr 92) ^ str (chr 93) ^ str (chr 94) ^ str (chr 95) ^ str (chr 96);
