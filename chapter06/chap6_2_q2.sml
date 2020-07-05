@@ -30,7 +30,7 @@ expect: bが'a listになっていると型推論すると思うから成功す�
 val L3 = fn : 'a * 'a list -> 'a list
 *)
 
-fun L4 (a, b) = (a::b, b::a);
+(* fun L4 (a, b) = (a::b, b::a); *)
 (* 
 expect: operatorとoperand が一致しない。
 
