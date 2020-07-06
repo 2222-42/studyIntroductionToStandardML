@@ -4,8 +4,7 @@
 fun null x = case x of nil => true
                     | (h::t) => false;
 
-fun hd x = case x of (h::t) => h
-                    | _ => exception Empty;
+fun hd x = case x of (h::t) => h;
 
 fun tl x = case x of (h::t) => t;
 (*
