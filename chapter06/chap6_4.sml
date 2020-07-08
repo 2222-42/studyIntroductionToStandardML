@@ -35,3 +35,33 @@ stdIn:1.2-1.7 Warning: type vars not generalized because of
 uncaught exception Empty
 *)
 
+fun flatten list = case list of nil => []
+                            | (h::t) => h@(flatten t);
+
+(* 複雑な再帰処理を必要とする例 *)
+
+(*
+1. 空リストなら空リストを返す
+2. 1要素のリストなら、そのリストを要素とするリストを返す
+3. 2要素以上のリストなら、リストをh::tに分解し、permutations tを求める。
+   その結果のリストの中の各要素のリストに対して、hを種々の位置に挿入し得られるリストを全て求め、
+   それらリストを1つのリストとして返す
+*)
+fun permutations L = 
+   let fun insert s nil = [[s]]
+         | insert s (h::t) = 
+               let val L = insert s t
+               in (s::(h::t)) :: (map (fn x => h::x)L)
+               end
+   in case L of nil => nil
+            | [x] => [[x]]
+            | (h::t) => 
+               let val Pt = permutations t
+               in flatten (map (fn x => insert h x) Pt)
+               end
+   end;
+(* expected *)
+permutations [1,2,3];
+(* 
+val it = [[1,2,3], [2,1,3], [2,3,1], [1,3,2], [3,1,2], [3,2,1]]: int list list
+*)
