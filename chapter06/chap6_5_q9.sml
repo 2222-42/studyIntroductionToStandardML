@@ -55,3 +55,17 @@ fun permutations L =
    end;
 
 permutations [1,2,3];
+
+
+(* 2 *)
+
+fun exists L P = foldr (fn (h, R) => (P h) orelse R) false L;
+
+fun forall L P = foldr (fn (h, R) => (P h) andalso R) true L;
+
+
+(* 3 *)
+val sumList = foldr (fn (h, R) => h + R) 0;
+(* fun prefixList L = foldr (fn (h, R) => (if R = [[]] then [[h]] else map (fn x => h::x) ([]::R))) [[]] L; *)
+fun prefixSum L = foldr (fn (h, R) => map (fn x => h + x) (0::R)) [] L;
+prefixSum [1,2,3,4,5];
