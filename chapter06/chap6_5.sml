@@ -15,7 +15,7 @@
 *)
 
 fun foldr f Z nil = Z
-    | foldr f Z (h::t) = f(h, foldr f Z t)
+    | foldr f Z (h::t) = f(h, foldr f Z t);
 
 val sumList = foldr (fn (h, R) => h + R) 0;
 
