@@ -22,3 +22,24 @@ val sumList = foldr (fn (h, R) => h + R) 0;
 fun length L = foldr (fn (_, R) => 1 + R) 0 L;
 
 fun L1 @ L2 = foldr (op ::) L2 L1;
+
+(* 関係Rの推移的閉方R+を 作る*)
+
+fun timesRel (R, S) = 
+    foldr (fn ((x,a), r) =>
+            foldr (fn ((b, y), rs) => 
+                if a = b then (x,y)::rs else rs)
+            r S
+            )
+        nil R;
+
+fun powerRel r 1 = r
+    | powerRel r n = timesRel (r, powerRel r (n-1));
+
+fun accumulate h z f n = 
+    if n = 0 then z
+    else h (f (n), accumulate h z f (n-1));
+
+fun tc R = accumulate (op @) nil (powerRel R) (length R);
+
+tc [(1,2), (2,3), (3,4)];
