@@ -90,3 +90,28 @@ fun fromPreOrder s =
           in Node(root, fromPreOrder left, fromPreOrder right)
           end
   end;
+
+(* 
+種々のデータ型を `datatype` 文を使って定義することができる。
+
+構文：
+  datatype typeSpec = 
+            | Con_1 <of type1>
+            | Con_2 <of type2>
+            ...
+            | Con_n <of typen>
+
+typeSpecは定義する型の記述
+  型パラメーターを含まない単層型の場合はその型の名前
+    tid tycon の形で指定
+      tid は 'a などの型変数名
+  多相型の場合は
+    (tid, ..., tid) tycon の形で指定
+
+型の構造の定義は、可能な構造を `|` で区切って列挙する
+
+`Con_i` はデータ構成子と呼ばれる識別子
+
+`of type_i` はデータ構成子が持つ内部構造の記述
+  内部構造がなければ省略する
+*)
