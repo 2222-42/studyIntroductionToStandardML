@@ -51,6 +51,7 @@ fun fromPostOrder s =
           end
   end;
 
+Control.Print.printDepth := 20;
 fromPostOrder "(()()b)((()()d)()c)a";
 (* 
 val it = Node ("a",Node ("b",Empty,Empty),Node ("c",Node #,Empty))

@@ -73,4 +73,7 @@ val it = Node ("a",Node ("b",Empty,Empty),Node ("c",Node #,Empty))
 
 `Node #`ではなく、`Node "d", Empty, Empty` が欲しい
 -> もしかして、深さによって、デフォルトでそうなってる？
+
+Control.Print.printDepth := 20;
+で値を変えると表示される。
 *)
