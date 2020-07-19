@@ -24,7 +24,7 @@ val enter : string * 'a * 'a dict -> 'a dict
   c. 与えられたkeyと等しい、そのまま返す
 *)
 
-fun enter (key, v, dict) = 
+fun enter (key:string, v, dict) = 
     case dict of 
         Empty => Node((key, v), Empty, Empty)
         | Node((key', v'), L, R) =>
@@ -32,7 +32,11 @@ fun enter (key, v, dict) =
             else if key > key' then 
                 Node((key', v'), L, enter (key, v, R))
             else Node((key', v'), enter (key, v, L), R);
-
+(* 
+val enter = fn : int * 'a * (int * 'a) tree -> (int * 'a) tree
+と、期待している型にならない。
+-> key:stringをして、対処
+*)
 
 (* val lookUp : string * 'a dict -> 'a option
 1. Emptyの場合、NONE
@@ -42,10 +46,25 @@ fun enter (key, v, dict) =
   c. 与えられたkeyと等しい、SOME vを返す
 *)
 
-fun lookUp (key, Empty) = NONE
+fun lookUp (key:string, Empty) = NONE
     | lookUp (key, Node((key', v), L, R)) =
         if key = key' then SOME v
         else if key > key' then lookUp(key, R)
         else lookUp(key, L);
 
+(* Q7.10 *)
 
+fun makeDict kVList =
+    case kVList of 
+        nil => Empty
+        | ((string, value)::t) => enter (string, value, makeDict(t));
+
+val testStrList = [("a", 1), ("b", 2), ("c", 3), ("ba", 21), ("bb", 22)];
+
+Control.Print.printDepth := 20;
+
+val testDict = makeDict testStrList;
+(* val updateDict = enter ("d", 5,testDict); *)
+lookUp ("bc", testDict);
+val updateDict = enter ("bc", 5,testDict);
+lookUp ("bc", updateDict);
