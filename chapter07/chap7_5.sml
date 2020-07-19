@@ -18,5 +18,34 @@ R部分木に含まれるキーはkeyより大きい
 val enter : string * 'a * 'a dict -> 'a dict
 実装：
 1. Emptyの場合
+2. Node(key, L, R)の場合
+  a. 与えられたkeyの方が大きいなら、Rに対して拡張処理を行い、 Node(key, L, R')を返す
+  b. 与えられたkeyの方が小さいなら、Lに対して拡張処理を行い、 Node(key, L', R)を返す
+  c. 与えられたkeyと等しい、そのまま返す
+*)
 
-val lookUp : string * 'a dict -> 'a option *)
+fun enter (key, v, dict) = 
+    case dict of 
+        Empty => Node((key, v), Empty, Empty)
+        | Node((key', v'), L, R) =>
+            if key = key' then dict
+            else if key > key' then 
+                Node((key', v'), L, enter (key, v, R))
+            else Node((key', v'), enter (key, v, L), R);
+
+
+(* val lookUp : string * 'a dict -> 'a option
+1. Emptyの場合、NONE
+2. Node(key, L, R)の場合
+  a. 与えられたkeyの方が大きいなら、再帰的にRを探索する
+  b. 与えられたkeyの方が小さいなら、再帰的にLを探索する
+  c. 与えられたkeyと等しい、SOME vを返す
+*)
+
+fun lookUp (key, Empty) = NONE
+    | lookUp (key, Node((key', v), L, R)) =
+        if key = key' then SOME v
+        else if key > key' then lookUp(key, R)
+        else lookUp(key, L);
+
+
