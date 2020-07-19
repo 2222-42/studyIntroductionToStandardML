@@ -48,12 +48,14 @@ fun makeDict kVList =
         | ((k, value)::t) => enter (k, value, makeDict(t));
 
 Control.Print.printDepth := 20;
-val testStrList = [(1, 1), (2, 2), (3, 3), (21, 21), (23, 23)];
+val testStrList = [(1, "a"), (2, "b"), (3,"c"), (21, "ba"), (23, "bc")];
 val testDict = makeDict testStrList;
 
 lookup (0, testDict);
-val updateDict0 = enter (0, 0,testDict);
+val updateDict0 = enter (0, " ",testDict);
 lookup (0, updateDict0);
-val updateDict10 = enter (10, 10,testDict);
-val updateDict22 = enter (22, 22,testDict);
-val updateDict30 = enter (30, 30,testDict);
+val updateDict10 = enter (10, "ca",testDict);
+val updateDict22 = enter (22, "bb",testDict);
+val updateDict30 = enter (30, "z",testDict);
+
+(* Q7.12 *)
