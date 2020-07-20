@@ -52,3 +52,15 @@ fun TAKE 0 l = []
     | TAKE n l = [HD l] @ TAKE (n-1) (TL l);
 
 fun VIEW (n, m) l = TAKE m (DROP n l);
+
+(* 素数の無限リストを作ろう *)
+
+fun SIFT NIL = NIL
+    | SIFT L = 
+        let val a = HD L
+        in CONS(a, fn () =>
+            SIFT (FILTER (fn x => x mod a <> 0) (TL L)))
+        end;
+
+val PRIMES = SIFT (FROMN 2);
+VIEW (100,10) PRIMES;
