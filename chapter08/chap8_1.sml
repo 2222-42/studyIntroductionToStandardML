@@ -65,3 +65,37 @@ xの値は更新されるが、上記式の段階は表示されない *)
 (x := !x + 1; !x);
 (* xの値を取って、それを+1した値をxに入れ、更新されたxの値を評価結果とする *)
 
+(* 問 8.2 *)
+(* 他の構文の評価順序の約束を使って定義しよう *)
+(* 
+(exp1; ...: expn)
+は
+#n (exp1, ..., expn)
+の略記法とみなせる意味で定義となっている
+*)
+
+(* exp1 before exp2
+
+問4.1で作った以下で定義することもできる
+fun op MyBefore(m, ()) = m;
+infix 0 MyBefore;
+
+あまりかっこよくないが、以下のようにletの評価順序を使って、定義することもできる
+*)
+
+fun myBefore (exp1, exp2) =
+    let
+        val returnVal = exp1
+        val result2 = (exp2 = ())
+    in
+        returnVal
+    end;
+
+(* while exp1 do exp2 *)
+(* fun myWhile (exp1, exp2) = 
+    let 
+        fun subDo(exp2) = myWhile(exp1, exp2)
+    in
+        if exp1 then subDo(exp2)
+        else ()
+    end; *)
