@@ -42,3 +42,13 @@ fun FILTER f l = if NULL l then NIL
 (* 問7.13 *)
 
 val evenNumbers = FILTER (fn x => x mod 2 = 0) naturalNumbers;
+
+(* 問7.14 *)
+
+fun DROP 0 l = l 
+    | DROP n l = DROP (n - 1) (TL l);
+
+fun TAKE 0 l = []
+    | TAKE n l = [HD l] @ TAKE (n-1) (TL l);
+
+fun VIEW (n, m) l = TAKE m (DROP n l);
