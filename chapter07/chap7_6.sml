@@ -64,3 +64,52 @@ fun SIFT NIL = NIL
 
 val PRIMES = SIFT (FROMN 2);
 VIEW (100,10) PRIMES;
+
+(* 問7.15 *)
+
+fun Cord n = CONS(FROMN 0, fn () => Cord (n+1))
+val TestCord = Cord 0;
+
+(* 1 *)
+fun point (n, m) listOfList = 
+    let
+        val slice1 = DROP n listOfList
+        val head = HD slice1
+        val tail = DROP m head
+    in
+        HD tail
+    end;
+
+point (100,50) TestCord;
+
+(* 2 *)
+fun graph (f:int * int -> int) =
+    let
+        fun UpSecond (n, m) = CONS(f(n, m), fn () => UpSecond (n, m + 1))
+        fun SubGraph n = CONS(UpSecond(n, 0),fn () => SubGraph (n + 1))
+    in
+        SubGraph 0
+    end;
+
+
+fun testFunc (x, y) = x + y;
+point (10, 15) (graph testFunc);
+(* expected: 25 *)
+
+(* 3 *)
+(* 
+'a inflist inflist -> 'a inflist
+*)
+
+fun enumerate infListOfList = 
+    let
+        fun getNext (n,m) = 
+            if n = 0 then (m + 1, 0)
+            else (n - 1, m + 1)
+        fun SubGraph (n, m) = CONS(point (n,m) infListOfList, fn () => SubGraph (getNext(n,m)))
+    in
+        SubGraph (0,0)
+    end;
+
+val sortedTestCord = enumerate TestCord;
+VIEW (6,10) sortedTestCord;
