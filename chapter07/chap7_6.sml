@@ -38,3 +38,7 @@ fun FILTER f l = if NULL l then NIL
                  else if f (HD l) then
                     CONS (HD l, fn () => (FILTER f (TL l)))
                  else FILTER f (TL l);
+
+(* 問7.13 *)
+
+val evenNumbers = FILTER (fn x => x mod 2 = 0) naturalNumbers;
