@@ -93,9 +93,10 @@ fun myBefore (exp1, exp2) =
 
 (* while exp1 do exp2 *)
 (* fun myWhile (exp1, exp2) = 
-    let 
-        fun subDo(exp2) = myWhile(exp1, exp2)
-    in
-        if exp1 then subDo(exp2)
-        else ()
-    end; *)
+    case exp1 of false => ()
+                 | true => (exp2; myWhile(exp1, exp2)); *)
+
+x := 10;
+while (!x > 0) do (x := !x - 1);
+x := 10;
+(* myWhile((!x > 0), x := !x - 1); *)
