@@ -1,3 +1,7 @@
+(* SML source file. Copyright (c) by 2222-42 2020.
+* Q 2.14
+*)
+
 fun matrixPower (n,a,b,c,d) =
     if n = 0 then (1,0,0,1)
     else let val (x,y,z,w) = matrixPower(n-1,a,b,c,d)
@@ -21,3 +25,14 @@ fun veryFastFib n = let
 in
     y
 end;
+
+fun time f = let
+    val realt = Timer.startRealTimer()
+    val rv = f ()
+    val elapsed = Timer.checkRealTimer realt
+in
+    (Time.toMilliseconds elapsed, Time.toMicroseconds elapsed,Time.toNanoseconds elapsed, rv)
+end;
+
+time (fn () => matrixPower (1000000,1, 0, 0, 1));
+time (fn () => fastMatrixPower (1000000,1, 0, 0, 1));
