@@ -1,3 +1,5 @@
+問2.6
+
 `fun fib n = if n < 2 then n else fib (n - 1) + fib (n - 2);`
 
 - Case1: 入力が0の場合は`fib 0`は0であり、`$F_0$`を計算する。

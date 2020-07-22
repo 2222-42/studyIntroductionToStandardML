@@ -1,3 +1,7 @@
+(* SML source file. Copyright (c) by 2222-42 2020.
+* Q 2.17
+*)
+
 (* f x : real -> real *)
 fun summation' f n = if n <= 0 then 0.0
                      else f n + summation' f (n - 1);

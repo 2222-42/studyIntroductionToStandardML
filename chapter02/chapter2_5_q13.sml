@@ -1,3 +1,7 @@
+(* SML source file. Copyright (c) by 2222-42 2020.
+* Q 2.13
+*)
+
 fun matrixPower (n,a,b,c,d) =
     if n = 0 then (1,0,0,1)
     else let val (x,y,z,w) = matrixPower(n-1,a,b,c,d)

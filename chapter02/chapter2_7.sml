@@ -23,6 +23,17 @@ val g = naiveFibMod 35;
 val h = fastFibMod 35;
 (* (h 1, h 2, h 3, h 4, h 5); *)
 
+fun time f = let
+    val realt = Timer.startRealTimer()
+    val rv = f ()
+    val elapsed = Timer.checkRealTimer realt
+in
+    (Time.toMilliseconds elapsed, Time.toMicroseconds elapsed,Time.toNanoseconds elapsed, rv)
+end;
+
+time (fn () => g 5);
+time (fn () => h 5);
+
 (* 計算の一部が引数の一部のみに依存するような関数の場合、関数式を用いて関数定義を分解し、計算を段階的に行うようにすると、効率がよくなる。 *)
 (* 関数は値を記憶しておくデータ構造としても使用できる *)
 

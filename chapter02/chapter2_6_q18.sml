@@ -17,6 +17,10 @@ fun returnInput x = x;
 fun sumUpTo n = accumulate (op +) 0 returnInput n;
 fun timesUpTo n = accumulate (op *) 1 returnInput n;
 
+(* 筆者の回答。こっちの方が余計な関数を作ってないから、単純。 *)
+fun f1 n = accumulate (fn (x,y) => x + y) 0 (fn x => x) n;
+fun f2 n = accumulate (fn (x,y) => x * y) 1 (fn x => x) n;
+
 fun power m n = if m = 0 then 1
                 else n * power (m - 1) n;
 fun heihou n x = n * (power n x);
