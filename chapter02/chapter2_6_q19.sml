@@ -24,7 +24,6 @@ fun power' m n = Power'(m, n); *)
 
 (* 
 筆者の回答例のように、以下のようにすれば、名前を変えずにすむ。
-
 *)
    val Power = fn (m,n) => power m n
    and power = fn m => fn n => Power(m,n)

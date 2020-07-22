@@ -38,3 +38,20 @@ fun fastMatrixPower(n,a,b,c,d) =
         
     end;
 
+(* 筆者の回答 
+私の回答とあまり違いがないので、まぁいいかな。
+*)
+   (* fun matrixMult (a,b,c,d) (x,y,z,w) = (a*x+b*z,a*y+b*w,c*x+d*z,c*y+d*w)
+   fun fastPower (n,f,v,e) =
+        if n = 0 then e
+        else let val m = n div 2
+                 val k = n mod 2
+             in if m = 0 then v
+                else let val v1 = fastPower(m,f,v,e)
+                          val v2 = f (v1,v1)
+                      in if k = 0 then v2
+                          else f(v,v2)
+                      end
+             end;
+   fun fastMatrixPower(n,a,b,c,d) =
+       fastPower(n, fn (x,y) => matrixMult x y, (a,b,c,d), (1,0,0,1)); *)
