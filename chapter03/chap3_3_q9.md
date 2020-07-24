@@ -28,4 +28,4 @@ Q 3.9
 
 3.9.2
 
-> ` fn x => K x (fn y =>fn z => z (y Eτ) (y x))`
+> ` fn x => K x (fn y => fn z => z (y Eτ) (y x))`
