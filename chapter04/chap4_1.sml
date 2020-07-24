@@ -29,8 +29,21 @@ fun op MyBefore(m, ()) = m;
 infix 0 MyBefore;
 "string"^"_" MyBefore (); 
 (1+1) MyBefore ();
+(1+1) MyBefore print "One\n";
 
 
 fun op MyIgnore a = ();
+fun fib n = if n < 2 then n else fib (n - 1) + fib (n - 2);
 MyIgnore (fib 36);
 (* 実行結果の表示に時間がかかるし、overflowエラーを起こそうと思えば起こせるから、多分これで評価はしているでしょ。 *)
+
+fun authorIgnore e = (fn _ => ()) e;
+
+fun authorBefore (e1,e2) = (fn _ => fn x => x) e1 e2;
+infix 0 authorBefore;
+"string"^"_" authorBefore (); 
+(fib 36) authorBefore print "One\n";
+
+fun authorAndMyBefore (e1,e2) = (fn x => fn () => x) e1 e2;
+infix 0 authorAndMyBefore;
+(fib 36) authorAndMyBefore print "One\n";
