@@ -44,6 +44,7 @@ expect1: 型が正しくない
 f (fn x => x)より、fの引数は関数であり、
 f xより、xは関数になり、
 よって、x = xで、eqtype構成子ではない`->`が含まれることになる。
+筆者の回答: x = xは関数同士の比較となり，型エラーとなる．
 
 result1:
 stdIn:60.10-60.37 Error: operator and operand do not agree [equality type required]
