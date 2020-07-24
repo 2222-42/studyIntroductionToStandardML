@@ -47,3 +47,16 @@ val test2 = fn f => fourTimes twice f;
 test2 addOne 0;
 (* val it = 16 : int *)
 
+ fun printStar () = print "*";
+ twice twice printStar (); 
+twice fourTimes printStar ();
+fourTimes twice printStar ();
+
+(* 筆者の補足
+一般に，関数をm回適用する関数をM， 関数をn回適用する関数を
+NとするとM Nは関数を n^m回適用する関数となる． 以下に
+m = 4，n = 3 の例を示す．
+*)
+
+fun threeTimes f x = f (f (f x));
+fourTimes threeTimes printStar ();
