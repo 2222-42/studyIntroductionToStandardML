@@ -24,6 +24,12 @@ fun lower string =
         implode (mapToLowerChrList chr_list)
     end;
 
+(* 筆者の解答は以下の通り。回答者の解答でletを使っているが、それは必要なかった。 *)
+fun lowerByAuthor s = implode (map toLower (explode s));
+
+(* Strings.mapを使ったシンプルなケース *)
+fun lowerInSimpleWay s = String.map toLower s
+
 fun isLower c =
     let
         val i = ord(c)
@@ -47,3 +53,9 @@ fun upper string =
     in
         implode (mapToUpperChrList chr_list)
     end;
+
+(* 筆者の解答 *)
+fun upperByAuthor s = implode (map toUpper (explode s));
+
+(* Strings.mapを使ったシンプルなケース *)
+fun upperInSimpleWay s = String.map toUpper s
