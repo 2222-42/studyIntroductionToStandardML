@@ -25,14 +25,16 @@ map chr it;
 implode it;
 it < "ML";
 
+(* 回答者のnextStartPosはすごく混乱して書きあげられたものと考えられる。 *)
 fun match s1 s2 = 
     let
         val maxIndex1 = size s1 - 1
         val maxIndex2 = size s2 - 1
-        fun nextStartPos (i, j) =
+        fun nextStartPos (i,j) = if j = maxIndex2 then (i+1,0) else (i,j+1)
+        (* fun nextStartPos (i, j) =
             if j + 1 <= maxIndex2 then (i, j + 1)
             else if i + 1 <= maxIndex1 then (i + 1, 0)
-            else (size s1, size s2)
+            else (size s1, size s2) *)
         
         fun findMatch (from1, from2) (start1, start2, max) = 
             if from1 > maxIndex1 orelse from2 > maxIndex2 then
@@ -60,3 +62,12 @@ match "sssseessse" "ssee";
 match "ssssesssee" "ssee";
 match "ssee" "ssee";
 match "ssee" "aasseepp";
+(* 
+val it = (0,0,5) : int * int * int
+val it = (2,0,4) : int * int * int
+val it = (2,0,3) : int * int * int
+val it = (2,0,4) : int * int * int
+val it = (6,0,4) : int * int * int
+val it = (0,0,4) : int * int * int
+val it = (0,2,4) : int * int * int
+*)
