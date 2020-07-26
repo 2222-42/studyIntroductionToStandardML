@@ -58,6 +58,15 @@
 
 よって、`X_n \subseteq L`となる。
 
+Case nに関する筆者の解答:
+
+- `X_n =  X_{n-1} \cup (A \times X_{n-1})`
+- `X_{n-1} \subseteq L` (帰納法の仮定より)
+- `X_{n-1} \cup (A \times X_{n-1}) \subseteq L \cup (A \times L)`
+- `L \cup (A \times L) \subseteq L`
+
+よって、`X_n \subseteq L`。
+
 #### 2
 
 この系列を用いて、集合Xを以下のように定義する。
@@ -75,3 +84,16 @@
 `X`の任意の要素は`L`に含まれるので、`e`は`Y`に含まれないことになり、`Y`は上記方程式を満たさない集合となる。
 
 よって、`X`は最小解である。
+
+筆者の解答
+
+`X = \bigcup_{i >= 0} X_i`である。
+
+- `X \cup (A \times X) = X \cup A \times (\bigcup_{i >= 0} X_i)`
+- `X \cup A \times (\bigcup_{i >= 0} X_i) = X \cup (\bigcup_{i >= 0} A \times X_i)`
+- `X \cup (\bigcup_{i >= 0} A \times X_i) = X_0 \cup X \cup (\bigcup_{i >= 0} A \times X_i)` (`A \cup (A \cup B )` は `A \cup B` と等しいから)
+- `X_0 \cup X \cup (\bigcup_{i >= 0} A \times X_i) = X_0 \cup (\bigcup_{i >= 0} X_i \cup (A \times X_i))`  (`X = \bigcup_{i >= 0} X_i`であるから)
+- `X_0 \cup (\bigcup_{i >= 0} X_i \cup (A \times X_i)) = X_0 \bigcup_{i >= 1} X_i ` (1より、`X_{i+1} = X_i \cup (A \times X_i)`であるから)
+- `X_0 \bigcup_{i >= 1} X_i = \bigcup_{i >= 0} X_i`
+
+よって、Xは方程式の解である。一方、1の結果から、Xは任意の解に含まれるため、方程式の最小な解である。
