@@ -32,3 +32,7 @@ fun myMap f xs =
             if null xs then [] else (f (hd xs)) :: (myMap f (tl xs));
 
 myMap (fn x => x + 1)[1,2];
+
+(* 筆者の解答を読んでからの感想:
+let ... in ... endを使う必要はなかったな
+*)

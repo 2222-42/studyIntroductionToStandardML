@@ -15,6 +15,11 @@ hとRに特定の演算fを適用し、得られた結果を返す
 演算fは
 - `f h R = h::R` : 'a -> 'a list -> 'a list
 
+### 筆者の解答からの補足
+
+`f = fn (h, R) => f h :: R`
+とfn式にした方がよい
+
 ## @
 
 L1 @ L2
@@ -29,6 +34,11 @@ hとRに特定の演算fを適用し、得られた結果を返す
 
 演算fは
 - `f h R = h :: R` : 'a -> 'a list -> 'a list
+
+### 筆者の解答からの補足
+
+`f = fn (h, R) => h :: R`
+とfn式にした方がよい
 
 ## flatten
 
@@ -45,6 +55,11 @@ hとRに特定の演算fを適用し、得られた結果を返す
 演算fで配列同士を結合する。
 - `f h R = h @ R` : 'a list -> 'a list -> 'a list
 
+### 筆者の解答からの補足
+
+`f = fn (h, R) => h @ R`
+とfn式にした方がよい
+
 ## filter
 
 filter P L
@@ -57,8 +72,15 @@ hとRに特定の演算fを適用し、得られた結果を返す
 - h: 'a
 - R: 'a list
 
+`R`はtをfilterした結果なので。
+
 演算fで先頭の要素hについてPを満たすかどうかを確認し、満たすなら、Rの先頭要素に追加する
-- `f h t = if (P h) then h::(filter P t) else filter P t` : 'a -> 'a list -> 'a list
+- `f h t = if (P h) then h::R else R` : 'a -> 'a list -> 'a list
+
+### 筆者の解答からの補足
+
+`f = fn (h, R) => if (P h) then h::R else filter R`
+とfn式にした方がよい
 
 ## permutations
 
@@ -81,3 +103,10 @@ insert s (h::t) =
 
 演算fで先頭の要素hを、Rのリストのリストの各要素の先頭に追加していく。
 - `f h R = flatten (map (fn x => insert h x) R)`: 'a -> 'a list list -> 'a list list
+
+### 筆者の解答からの補足
+
+`f = fn (h, R) => foldr (fn (a, b) => insert h a @ b) nil R`
+とfoldrを使って、また、fn式にした方がよい
+
+foldrの使い方を学ぶ前にfoldr導入するのはどうなん？となってしまうが、まぁ、良いだろう。

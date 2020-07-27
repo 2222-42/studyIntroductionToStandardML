@@ -14,6 +14,9 @@ stdIn:9.5-9.24 Warning: match nonexhaustive
 
 val L1 = fn : 'a list -> 'b list list
 *)
+(* 筆者の解答: 
+引数aが\<tau>と\<tau> listとして使用されている。
+*)
 
 fun L2 a = a :: [a];
 (* 
@@ -46,6 +49,10 @@ Error: operator and operand do not agree [circularity]
     b :: a
 
 おおよそあっているが、a::bの型推論の結果をそのままb::aに適用して、一致しないことになった。
+*)
+(* 筆者の解答: 
+引数aとbは、 a :: bは、「bの型は\<tau> listで、aの型は \<tau>」であるという関係を 
+b :: aは、「aの型は\<tau>′ listで、bの型は \<tau>′」であるという関係をそれぞれ要求するが、これら条件を同時に満たす （有限の）型は存在しない。
 *)
 
 fun L5 (a,b) = [a] :: b;
