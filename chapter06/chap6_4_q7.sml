@@ -38,7 +38,12 @@ fun prefixListByAuthor nil = nil
     in
        [h] :: map (fn y => h::y) L
     end;
-(* 筆者の解答の場合、長さ1の場合の処理も含めてまとめている *)
+(* 筆者の解答の場合、長さ1の場合の処理も含めてまとめている
+
+問6.9でわかるが、この単純さ、
+    特に計算の対象とするものを外側に押しやる感じは、
+拡張性の観点から見て、すごく実装と理解を単純にする
+*)
 
 (* fun member list x = case list of nil => false
                             | (h::t) => if h = x then true else member t x;
