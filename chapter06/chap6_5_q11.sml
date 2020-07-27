@@ -53,3 +53,13 @@ tc [(1,2), (1,2), (2,3)];
 1->2->3 : 1 -> 3
 1->2->3 : 1 -> 3
 *)
+
+(* 筆者の解答: *)
+fun originalTc R = accumulate (op @) nil (powerRel R) (length R);
+fun normalTc R = unique (originalTc R);
+originalTc [(1,1),(1,2),(2,3)];
+normalTc [(1,1),(1,2),(2,3)];
+
+(* 回答者のコメント:
+筆者もunique使ってるし、大丈夫でしょ
+*)
