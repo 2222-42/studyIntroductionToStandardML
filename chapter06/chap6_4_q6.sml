@@ -79,6 +79,9 @@ Mysplice(["", "home", "ohori", "papers", "mltext"], "/");
 となるのを避けるために、微妙な条件分岐を設けてしまった。
 *)
 
-fun splice (nil, string) = ""
-  | splice ((h::tl), string) = (if null tl then h else h ^ string) ^ (splice (tl,string));
-Mysplice(["", "home", "ohori", "papers", "mltext"], "/");
+(* 筆者の解答 *)
+fun splice (nil,_) = ""
+  | splice ([x],_) = x
+  | splice ((h::t),s) = h ^ s ^ splice (t,s);
+
+splice(["", "home", "ohori", "papers", "mltext"], "/");
