@@ -14,6 +14,10 @@ val testNode = Node (1,Node (2,Empty,Empty),Node (3,Node (4, Empty, Empty),Empty
 
 countNodes testNode;
 
+(* 筆者の解答:case文を使わない場合 *)
+fun nodes Empty = 0
+  | nodes (Node(_, L, R)) = 1 + nodes L + nodes R;
+
 (* 2 *)
 
 fun sumTree Empty = 0
@@ -28,6 +32,10 @@ fun mapTree f t =
             | Node(a, t1, t2) => Node(f(a), mapTree f t1, mapTree f t2);
 
 mapTree (fn x => x + 1) testNode;
+
+(* 筆者の解答: case文を使わない場合 *)
+fun mapTreeByAuthor f Empty = Empty
+  | mapTreeByAuthor f (Node(x, L, R)) = Node(f x, mapTreeByAuthor f L, mapTreeByAuthor f R);
 
 (* 4 *)
 
