@@ -68,3 +68,16 @@ val testDict = makeDict testStrList;
 lookUp ("bc", testDict);
 val updateDict = enter ("bc", 5,testDict);
 lookUp ("bc", updateDict);
+
+(* 筆者の解答: foldrを使うケース *)
+fun makeDict L =
+   foldr
+     (fn ((key, v), dict) => enter(key, v, dict))
+     Empty
+     L;
+
+val testDict = makeDict testStrList;
+(* val updateDict = enter ("d", 5,testDict); *)
+lookUp ("bc", testDict);
+val updateDict = enter ("bc", 5,testDict);
+lookUp ("bc", updateDict);
