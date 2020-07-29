@@ -239,3 +239,83 @@ Control.Print.printDepth := 20;
 preOrderToNewTree testPre;
 inOrderToNewTree testIn;
 postOrderToNewTree testPost;
+
+(* 筆者の解答の改善版 *)
+datatype 'a newTree
+   = Leaf of 'a
+   | Node of 'a * 'a newTree * 'a newTree
+   | NodeL of 'a * 'a newTree
+   | NodeR of 'a * 'a newTree;
+
+datatype decompose
+  = TRIPLE of {root:string, left:string, right:string}
+  | SINGLETON of string;
+
+fun searchLP s p =
+    if substring(s,p,1) = "(" then p
+    else searchLP s (p+1);
+
+fun searchRP s p n =
+    case substring(s,p,1) of
+        "(" => searchRP s (p+1) (n+1)
+       | ")" => if n=0 then p else searchRP s (p+1) (n - 1)
+       | _ => searchRP s (p+1) n;
+
+fun decomposeN s =
+   let val lp1 = searchLP s 0
+       val rp1 = searchRP s (lp1+1) 0
+       val lp2 = searchLP s  rp1
+       val rp2 = searchRP s (lp2+1) 0
+   in 
+    TRIPLE
+      {
+       root=substring (s,rp1+1,lp2-rp1 - 1),
+       left=substring (s,lp1+1,rp1-lp1 -1),
+       right=substring (s,lp2+1,rp2-lp2-1)
+      }
+   end handle Subscript => SINGLETON s;
+
+fun decomposeInN s =
+   let val lp1 = searchLP s 0
+       val rp1 = searchRP s (lp1+1) 0
+       val lp2 = searchLP s  rp1
+       val rp2 = searchRP s (lp2+1) 0
+   in TRIPLE
+      {
+       root=substring (s,rp1+1,lp2-rp1 - 1),
+       left=substring (s,lp1+1,rp1-lp1 -1),
+       right=substring (s,lp2+1,rp2-lp2-1)
+      }
+   end handle Subscript => SINGLETON s;
+
+fun decomposePostN s =
+   let val lp1 = searchLP s 0
+       val rp1 = searchRP s (lp1+1) 0
+       val lp2 = searchLP s  rp1
+       val rp2 = searchRP s (lp2+1) 0
+   in TRIPLE
+      {
+       root=substring (s,rp2+1,size s - rp2 - 1),
+       left=substring (s,lp1+1,rp1-lp1 -1),
+       right=substring (s,lp2+1,rp2 - lp2-1)
+      }
+   end handle Subscript => SINGLETON s;
+
+fun decoposeToNewTree decomp s =
+    case decomp s of
+         SINGLETON s => Leaf s |
+         TRIPLE {root, left, right=""} => NodeL(root, decoposeToNewTree decomp left) |
+         TRIPLE {root, left="", right} => NodeR(root, decoposeToNewTree decomp right) |
+         TRIPLE {root, left, right} => Node(root, decoposeToNewTree decomp left, decoposeToNewTree decomp right)
+
+
+fun preOrderToNewTree s = decoposeToNewTree decomposeN s;
+
+fun inOrderToNewTree s = decoposeToNewTree decomposeInN s;
+
+fun postOrderToNewTree s = decoposeToNewTree decomposePostN s; 
+
+(* Control.Print.printDepth := 20; *)
+preOrderToNewTree testPre;
+inOrderToNewTree testIn;
+postOrderToNewTree testPost;
