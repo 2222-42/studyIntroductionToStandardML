@@ -234,3 +234,9 @@ fun allPermutationsByAuthor L n =
     in foldr (fn (x,y) => permutationsByAuthor x @ y) nil subs
     end;
 allPermutationsByAuthor [1,2,3] 2;
+
+(* 筆者の新たな解答 *)
+   fun allPermutations L n =
+       let val subs = filter (fn x => length x = n) (powerSet L)
+       in flatten (map  permutations subs)
+       end;

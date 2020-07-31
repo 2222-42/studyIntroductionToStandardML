@@ -21,6 +21,30 @@ fun makeEnter operation =
     in
         enter
     end;
+(* これだと以下のように、型が想定しているものと異なることになってしまう
+expected: ('a * 'a -> order) -> 'a * 'b * ('a,'b) dict -> ('a,'b) dict
+result: ('a * 'a -> bool) -> 'a * 'b * ('a * 'b) tree -> ('a * 'b) tree
+*)
+(* val enter = fn dict => makeEnter (op <) dict;  *)
+(* val enter = fn : int * 'a * (int * 'a) tree -> (int * 'a) tree *)
+
+(* 筆者の解答: *)
+fun makeEnter f (k, v, Empty) = Node((k,v),Empty,Empty)
+  | makeEnter f (k, v, dict as Node((k',v'),L,R)) =
+    (case f (k,k') of
+        EQUAL => dict
+      | GREATER => Node((k',v'),L,makeEnter f (k,v,R))
+      | LESS => Node((k',v'),makeEnter f (k,v,L),R));
+(*
+letなどを使わず、単純になっている。 
+as使って第三引数のdict形式を指定している。それだけ考えればいいのだから。 
+また、datatype orderの
+- EQUAL
+- GREATER
+- LESS
+を使うことで内容も分かりやすく、かつ、回答者のどちらかわからない結果ではなくしている。
+*)
+val enter = fn dict => makeEnter Int.compare dict; 
 
 fun makeLookUp operation = 
     let 
@@ -35,17 +59,30 @@ fun makeLookUp operation =
         lookup
     end;
 
-val enter = fn dict => makeEnter (op <) dict; 
+(* これだと以下のように、型が想定しているものと異なることになってしまう
+expected: ('a * 'a -> order) -> 'a * 'b * ('a,'b) dict -> ('a,'b) dict
+result: ('a * 'a -> bool) -> 'a * ('a * 'b) tree -> 'b option
+*)
+
+fun makeLookUp f (k, Empty) = NONE
+  | makeLookUp f (k, dict as Node((k', v'), L, R)) =
+    (case f (k, k') of
+        EQUAL => SOME(v')
+      | GREATER => makeLookUp f (k,L)
+      | LESS => makeLookUp f (k,R));
+
+(* val enter = fn dict => makeEnter  dict;  *)
 (* val enter = makeEnter (op <);  *)
 (* stdIn:18.2-28.11 Warning: type vars not generalized because of
    value restriction are instantiated to dummy types (X1,X2,...)
 val enter = fn : int * ?.X1 * (int * ?.X1) tree -> (int * ?.X1) tree *)
-val lookup = fn dict => makeLookUp (op <) dict;
+val lookup = fn dict => makeLookUp Int.compare dict;
 
-fun makeDict kVList =
-    case kVList of 
-        nil => Empty
-        | ((k, value)::t) => enter (k, value, makeDict(t));
+fun makeDict L =
+   foldr
+     (fn ((key, v), dict) => enter(key, v, dict))
+     Empty
+     L;
 
 Control.Print.printDepth := 20;
 val testStrList = [(1, "a"), (2, "b"), (3,"c"), (21, "ba"), (23, "bc")];

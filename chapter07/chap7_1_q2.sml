@@ -56,6 +56,15 @@ fun fromPreOrder s =
           in Node(root, fromPreOrder left, fromPreOrder right)
           end
   end;
+(* 筆者の解答:
+        fun searchRP s p n =
+            case substring(s,p,1) of
+                "(" => searchRP s (p+1) (n+1)
+              | ")" => if n=0 then p else searchRP s (p+1) (n - 1)
+              | _ => searchRP s (p+1) n
+
+`case exp of ...` の `exp` の部分を上記のように設定する選択はもちろんありうる。
+*)
 
 fromPreOrder "";
 fromPreOrder "a(b()())(c(d()())())";

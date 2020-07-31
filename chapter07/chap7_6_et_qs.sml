@@ -71,7 +71,7 @@ fun Cord n = CONS(FROMN 0, fn () => Cord (n+1))
 val TestCord = Cord 0;
 
 (* 1 *)
-fun point (n, m) listOfList = 
+fun pointByReader (n, m) listOfList = 
     let
         val slice1 = DROP n listOfList
         val head = HD slice1
@@ -80,7 +80,12 @@ fun point (n, m) listOfList =
         HD tail
     end;
 
-point (100,50) TestCord;
+pointByReader (100,50) TestCord;
+
+(* 筆者の解答 *)
+
+fun point(x,y) L = NTH y (NTH x L);
+(* わざわざドロップさせなくてもN番目の要素取るだけだから *)
 
 (* 2 *)
 fun graph (f:int * int -> int) =
@@ -96,12 +101,21 @@ fun testFunc (x, y) = x + y;
 point (10, 15) (graph testFunc);
 (* expected: 25 *)
 
+(* 筆者の解答 *)
+fun graphByAuthor f  =
+    let fun fromx x =
+            let fun fromy y  = CONS(f(x,y),fn () => fromy (y + 1))
+            in CONS(fromy 0,fn () => fromx (x + 1))
+            end
+    in fromx 0
+    end;
+
 (* 3 *)
 (* 
 'a inflist inflist -> 'a inflist
 *)
 
-fun enumerate infListOfList = 
+fun enumerateByReader infListOfList = 
     let
         fun getNext (n,m) = 
             if n = 0 then (m + 1, 0)
@@ -109,6 +123,27 @@ fun enumerate infListOfList =
         fun SubGraph (n, m) = CONS(point (n,m) infListOfList, fn () => SubGraph (getNext(n,m)))
     in
         SubGraph (0,0)
+    end;
+
+val sortedTestCord = enumerateByReader TestCord;
+VIEW (6,10) sortedTestCord;
+
+(* 筆者の解答 *)
+fun enumerateByAuthor f =
+    let fun next (0,a) = (a+1,0)
+          | next (a,b) = (a - 1, b + 1)
+        fun from a = CONS(f a, fn () => from (next a))
+    in from (0,0)
+    end;
+
+(* val enumerateByAuthor = fn : (int * int -> 'a) -> 'a inflist *)
+(* 望んでいるのは、fn : 'a inflist inflist -> 'a inflistなので違う *)
+
+fun enumerate IL =
+    let fun next (0,a) = (a+1,0)
+          | next (a,b) = (a - 1, b + 1)
+        fun from a = CONS(point a IL, fn () => from (next a))
+    in from (0,0)
     end;
 
 val sortedTestCord = enumerate TestCord;

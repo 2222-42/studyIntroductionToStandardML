@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap 7.3
+* Chap 7.3 and Q7.8
 *)
 
 (* 
@@ -26,6 +26,9 @@ Q 7.8
 上記fがtrueを返す2分木は？
 高さ0の2分木もしくは、
 片方の枝だけEmptyということがないような2分木
+*)
+(* 筆者の解答:
+Node(_, Empty, Node _)の形のノードを含まない木、つまり、完全２分木である。
 *)
 
 f (Node (1,Node (2,Empty,Empty),Node (3,Node (4, Empty, Empty),Empty)));
