@@ -90,13 +90,32 @@ fun myBefore (exp1, exp2) =
     in
         returnVal
     end;
+(* もしくは筆者のように *)
+fun authorAndMyBefore (e1,e2) = (fn x => fn () => x) e1 e2;
+
 
 (* while exp1 do exp2 *)
 (* fun myWhile (exp1, exp2) = 
     case exp1 of false => ()
-                 | true => (exp2; myWhile(exp1, exp2)); *)
+                 | true => (exp2; myWhile(exp1, exp2));
+これだと、exp1の内容が更新されるまえの状態で引き継がれてしまうから無限ループ？
+遅延評価させたい。
+いや、(exp1; ...; exp_n)では、exp1からexp_nをこの順に評価していくから、原因は違うのでは？
+でも一個だけexp2は実行されている
+-> 関数の表現段階で実行されている
+*)
 
+fun myWhile() =
+    let
+        val delayedExp1 = fn () => !x > 0
+        val delayedExp2 = fn () => x := !x -1
+        fun f() = if delayedExp1() then (delayedExp2(); f()) else ()
+    in
+        f()
+    end;
 x := 10;
 while (!x > 0) do (x := !x - 1);
-x := 10;
-(* myWhile((!x > 0), x := !x - 1); *)
+x := 10; 
+myWhile();
+
+(* 関数みたいに宣言することはできないのだろうか？ *)
