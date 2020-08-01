@@ -119,3 +119,98 @@ x := 10;
 myWhile();
 
 (* 関数みたいに宣言することはできないのだろうか？ *)
+
+
+(* 問8.3 *)
+(fn f => (print "a\n"; f))
+(fn x => (print "b\n"; x))
+(print "c\n"; 1);
+(* 予測:
+aaaaa...
+
+実際:
+a
+c
+b
+val it = 1: int;
+
+(fn f => (print "a\n"; f))
+(fn x => (print "b\n"; x))
+(print "c\n"; 1);
+=>
+(print "a\n"; (fn x => (print "b\n"; x)))
+(print "c\n"; 1);
+=>
+a (<- print "a\n" が実行)
+
+(fn x => (print "b\n"; x)))
+(print "c\n"; 1);
+=>
+c (<- print "c\n"が実行)
+(fn x => (print "b\n"; x)))
+(1);
+=>
+(print "b\n"; 1)
+=>
+b (<- print "b\n"が実行)
+
+val it = 1: int;
+
+*)
+
+(fn f => (print "a\n"; f))
+((fn x => (print "b\n"; x))
+(print "c\n"; 1));
+
+(* 予測:
+c
+a
+b
+val it = 1
+
+実際:
+c
+a
+b
+val it = 1
+
+(fn f => (print "a\n"; f))
+((fn x => (print "b\n"; x))
+(print "c\n", 1));
+=>
+c (<- print "c\n"が実行)
+
+(fn f => (print "a\n"; f))
+((fn x => (print "b\n"; x))
+1);
+=>
+(fn f => (print "a\n"; f))
+(print "b\n"; 1);
+=>
+b (<- print "b\n"が実行)
+(fn f => (print "a\n"; f))
+1;
+=>
+(print "a\n"; 1)
+=>
+a (<- print "a\n" が実行)
+
+val it = 1
+*)
+
+{S = "S" before print "S\n",
+M = "M" before print "M\n",
+L = "L" before print "L\n"};
+(* 予測:
+S
+M
+L
+{S="S", M="M", L="L"}
+
+result:
+S
+M
+L
+val it = {L="L",M="M",S="S"} : {L:string, M:string, S:string}
+
+*)
