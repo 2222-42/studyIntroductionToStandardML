@@ -46,3 +46,22 @@ val testCharList = [#"S", #"M", #"L"];
 val test = makeGensym testCharList;
 test();
 test();
+
+(* 筆者の回答 *)
+fun makeGenSym L =
+    let val seed = ref [0]
+        fun next nil = [0]
+        | next (h::t) = if h = (length L - 1) then 0::(next t) else (h+1)::t
+        fun toString s = implode (map (fn x => List.nth (L,x)) (rev s))
+    in
+    fn () => toString (!seed) before seed := next (!seed)
+    end;
+
+val test = makeGensym testCharList;
+test();
+test();
+(* List.nth を使っているが、これはまだ本では導入されていなかったと思う。 *)
+(* 
+beforeを使うか;を使うか、
+- `exp1 before exp2`: exp1とexp2を評価し、exp1の値を返す
+- `(exp1; exp2)`: exp1とexp2を評価し、exp2の値を返す *)
