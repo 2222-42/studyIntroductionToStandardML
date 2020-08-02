@@ -10,9 +10,39 @@
 内部表現を文字列に変換する関数 toString
 *)
 
-(* local
-    val state = 
-    fun toString =
-    fun next s =
+local
+    val state = ref nil : int list ref
+    fun toString L = implode (map chr (rev L))
+    fun next nil = [ord #"a"]
+      | next (h::t) = if h = ord #"z" then
+                        ord #"a" :: (next t)
+                      else (h+1::t)
 in fun gensym() = (state:=next (!state); toString(!state))
-end *)
+end;
+
+fun last [a] = a
+  | last (_::t) = last t;
+
+fun drop 0 l = l 
+    | drop n l = drop (n - 1) (tl l);
+
+fun take n l = hd (drop n l);
+
+fun makeGensym CharList =
+    let
+        val state = ref nil : int list ref
+        (* val firstChr = hd testCharList
+        val lastChr = last CharList *)
+        fun toString L = implode (map (fn x => take x CharList) (rev L))
+        fun next nil = [0]
+          | next (h::t) = if h = (length CharList - 1) then
+                              0 :: (next t)
+                          else (h+1::t)
+    in
+        fn () => (state:=next (!state); toString(!state))
+    end;
+val testCharList = [#"S", #"M", #"L"];
+
+val test = makeGensym testCharList;
+test();
+test();
