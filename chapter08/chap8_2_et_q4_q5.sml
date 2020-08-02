@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap 8.2
+* Chap 8.2 Q8.4 Q8.5
 *)
 
 (* 履歴に依存するプログラム *)
