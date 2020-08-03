@@ -134,8 +134,8 @@ test;
 deleteDlist test;
 test;
 
-(* fromListToDlist : 'a list -> 'a dlist*)
 
+(* fromListToDlist : 'a list -> 'a dlist*)
 fun fromListToDlist list = foldr (fn (h, R) => (insertDlist h R; R)) (ref NIL) list;
 (* 
 - fun fromListToDlist list = foldl (fn (h, R) => insertDlist h R) (ref NIL) list;
@@ -163,15 +163,15 @@ dataDlist (leftDlist listTest);
 (* Q8.8 *)
 fun concatDlist dlist1 dlist2 =
     case (dlist1, dlist2) of
-            (ref NIL, _) => dlist2
-          | (_, ref NIL) => dlist1
+            (ref NIL, _) => (dlist1 := !dlist2)
+          | (_, ref NIL) => (dlist2 := !dlist1)
           | (d1 as ref (CELL {right=r1 as ref (CELL{right=r11,...}), left=l1 as ref (CELL {right=r12,...}),...}),
             d2 as ref (CELL {right=r2 as ref (CELL{right=r21,...}), left=l2 as ref (CELL {right=r22,...}),...}) )
                 => let 
                     val previousL1 = !l1
                     val previousR11 = !r11
                    in
-                    (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11; d1)
+                    (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11)
                    end;
 
 (* (l1 := !l2; l2 := !l1; )
@@ -186,35 +186,58 @@ fun concatDlist dlist1 dlist2 =
 これだと思ったような形式にならない。
 -> 中身の参照を変えないといけないから、以下のようにした。
         (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11; d1)
+
+以下のように定義すると、まず型が意図しているものと違うという問題が生じる。
+            (ref NIL, _) => dlist2
+          | (_, ref NIL) => dlist1
+          | ...
+                    (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11; d1)
+                   end;
+val concatDlist = fn : 'a cell ref -> 'a cell ref -> 'a cell ref
+
+次に、両方の連結リストを更新するということも、片方がref NILの場合に満たせていない。
 *)
+val test = (ref NIL: int dlist);
 val test0 = singletonDlist 0;
-val test1 = singletonDlist 1;
-val result = concatDlist test0 test1;
-dataDlist result; 
-(* expected: 0 *)
-dataDlist (rightDlist result); 
+concatDlist test0 test;
+val test11 = singletonDlist 1;
+concatDlist test0 test11;
+dataDlist test0; 
 (* expected: 1 *)
+dataDlist (rightDlist test0); 
+(* expected: 0 *)
+dataDlist (rightDlist(rightDlist test0));
+(* expected: 1 *)
+dataDlist test; 
+(* expected: 0 *)
+dataDlist (rightDlist test); 
+(* expected: 1 *)
+dataDlist (rightDlist(rightDlist test));
+(* expected: 0 *)
+
 
 val test2 = singletonDlist 2;
 val test3 = singletonDlist 3;
-val result2 = concatDlist test2 test3;
-dataDlist result2; 
-(* expected: 1 *)
-dataDlist (rightDlist result2); 
-
-val concatResult = concatDlist result result2;
-dataDlist concatResult; 
+concatDlist test2 test3;
+dataDlist test2; 
 (* expected: 3 *)
-dataDlist (rightDlist concatResult); 
+dataDlist (rightDlist test2); 
 (* expected: 2 *)
-dataDlist (rightDlist (rightDlist concatResult)); 
+
+concatDlist test0 test2;
+dataDlist test0; 
+(* expected: 3 *)
+dataDlist (rightDlist test0); 
+(* expected: 2 *)
+dataDlist (rightDlist (rightDlist test0)); 
 (* expected: 1 *)
-dataDlist (leftDlist concatResult); 
+dataDlist (leftDlist test0); 
 (* expected: 0 *)
-dataDlist (leftDlist (leftDlist concatResult)); 
+dataDlist (leftDlist (leftDlist test0)); 
 (* expected: 1 *)
 
 (* 
+確認したこと
 fun concatDlist dlist1 dlist2 =
     case (dlist1, dlist2) of
             (ref NIL, _) => dlist2
@@ -239,3 +262,48 @@ val it = 2 : int
                     (l1 := !l2; r1 := !r2; l2 := previousL1; r2 := previousR1; d1)
 評価順序を変えても変わらない
 *)
+
+(* 筆者の回答 *)
+   fun concatDlist D1 D2 =
+       case (D1, D2) of
+         (ref NIL, _) => (D1 := !D2; D1)
+        | (_, ref NIL) => (D2 := !D1; D1)
+        | (ref (CELL{left=d1l as ref (CELL{right=d1lr,...}),...}),
+           ref (CELL{left=d2l as ref (CELL{right=d2lr,...}),...})) =>
+           let
+             val d1lCell = !d1l
+             val d1lrCell = !d1lr
+           in
+             (d1l := !d2l;
+              d1lr := !d2lr;
+              d2l := d1lCell;
+              d2lr := d1lrCell;
+              D1)
+           end;
+(* 回答者のコメント:
+回答者の回答はref NILの場合にいずれの循環リストも更新する実装になっていなかった。
+筆者の回答は、問で検討している型と異なる。回答者の型も問題文で意図しているものと違う。
+    改善点: 型を正しくしよう。
+回答者の回答はrightの中のrightを置き換えているが、必ずしもそれは必要ではなく、leftの中のrightを置き換えるだけで十分である。
+*)
+
+val test = (ref NIL: int dlist);
+val test0 = singletonDlist 0;
+concatDlist test0 test;
+
+(* 改善案 *)
+   fun concatDlist D1 D2 =
+       case (D1, D2) of
+         (ref NIL, _) => (D1 := !D2)
+        | (_, ref NIL) => (D2 := !D1)
+        | (ref (CELL{left=d1l as ref (CELL{right=d1lr,...}),...}),
+           ref (CELL{left=d2l as ref (CELL{right=d2lr,...}),...})) =>
+           let
+             val d1lCell = !d1l
+             val d1lrCell = !d1lr
+           in
+             (d1l := !d2l;
+              d1lr := !d2lr;
+              d2l := d1lCell;
+              d2lr := d1lrCell)
+           end;
