@@ -161,4 +161,81 @@ dataDlist (leftDlist listTest);
 (* expected: true *)
 
 (* Q8.8 *)
-(* fun concatDlist dlist1 dlist2 = *)
+fun concatDlist dlist1 dlist2 =
+    case (dlist1, dlist2) of
+            (ref NIL, _) => dlist2
+          | (_, ref NIL) => dlist1
+          | (d1 as ref (CELL {right=r1 as ref (CELL{right=r11,...}), left=l1 as ref (CELL {right=r12,...}),...}),
+            d2 as ref (CELL {right=r2 as ref (CELL{right=r21,...}), left=l2 as ref (CELL {right=r22,...}),...}) )
+                => let 
+                    val previousL1 = !l1
+                    val previousR11 = !r11
+                   in
+                    (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11; d1)
+                   end;
+
+(* (l1 := !l2; l2 := !l1; )
+としたいけれど、問8.1で見たように参照型で、評価順序によって値が変わるので、保存しておく必要がある。
+-> 以下のようにしてみた
+    => let 
+        val previousL1 = !l1
+        val previousR1 = !r1
+        in
+        (l1 := !l2; l2 := previousL1; r1 := !r2; r2 := previousR1; d1)
+        end;
+これだと思ったような形式にならない。
+-> 中身の参照を変えないといけないから、以下のようにした。
+        (l1 := !l2; l2 := previousL1; r11 := !r21; r21 := previousR11; d1)
+*)
+val test0 = singletonDlist 0;
+val test1 = singletonDlist 1;
+val result = concatDlist test0 test1;
+dataDlist result; 
+(* expected: 0 *)
+dataDlist (rightDlist result); 
+(* expected: 1 *)
+
+val test2 = singletonDlist 2;
+val test3 = singletonDlist 3;
+val result2 = concatDlist test2 test3;
+dataDlist result2; 
+(* expected: 1 *)
+dataDlist (rightDlist result2); 
+
+val concatResult = concatDlist result result2;
+dataDlist concatResult; 
+(* expected: 3 *)
+dataDlist (rightDlist concatResult); 
+(* expected: 2 *)
+dataDlist (rightDlist (rightDlist concatResult)); 
+(* expected: 1 *)
+dataDlist (leftDlist concatResult); 
+(* expected: 0 *)
+dataDlist (leftDlist (leftDlist concatResult)); 
+(* expected: 1 *)
+
+(* 
+fun concatDlist dlist1 dlist2 =
+    case (dlist1, dlist2) of
+            (ref NIL, _) => dlist2
+          | (_, ref NIL) => dlist1
+          | (d1 as ref (CELL {right=r1 as ref (CELL{right=r11,...}), left=l1 as ref (CELL {right=r12,...}),...}),
+            d2 as ref (CELL {right=r2 as ref (CELL{right=r21,...}), left=l2 as ref (CELL {right=r22,...}),...}) )
+                => let 
+                    val previousL1 = !l1
+                    val previousR1 = !r1
+                   in
+                    (l1 := !l2; l2 := previousL1; r1 := !r2; r2 := previousR1; d1)
+                   end;
+- dataDlist concatResult; 
+val it = 1 : int
+- dataDlist (rightDlist concatResult); 
+val it = 2 : int
+- dataDlist (leftDlist concatResult); 
+val it = 2 : int
+
+期待しているものと違う
+
+                    (l1 := !l2; r1 := !r2; l2 := previousL1; r2 := previousR1; d1)
+評価順序を変えても変わらない
+*)
