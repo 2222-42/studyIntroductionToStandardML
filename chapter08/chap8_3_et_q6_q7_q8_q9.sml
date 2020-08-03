@@ -28,7 +28,6 @@ fun rightDlist (ref (CELL{right,...})) = right;
 
 fun leftDlist (ref (CELL{left,...})) = left;
 
-
 fun insertDlist a dlist =
     case dlist of
         ref (CELL{left=l1 as ref (CELL{right=r1,...}),...}) =>
@@ -63,4 +62,77 @@ dataDlist (rightDlist test);
 dataDlist (leftDlist test); 
 (* expected: 0 *)
 
+(* Q8.7 *)
+fun deleteDlist dlist =
+    case dlist of
+        ref (CELL {right=r as ref (CELL{left=l1,...}), left=l as ref (CELL {right=r2,...}),...}) 
+            => if !l = !dlist then dlist := NIL
+               else (dlist := !r; r2 := !r; l1 := !l)
+      | ref NIL => ();
+(* 
+以下は消す方針での実装
+        ref (CELL {right=r1 as ref (CELL{data=a,right=r2,left=l2}),...}) =>
+            let
+                val cell = CELL{data=a, right=ref(!r2), left=ref(!dlist)}
+            in
+                (dlist:=cell; l2:= cell; r1:= cell)
+            end
+上記だとうまく消せない
+-> 右と左をつなげる、でやろう
+
+fun deleteDlist dlist =
+    case dlist of
+        ref (CELL {right=r as ref (CELL{right=r1,left=l1,...}), left=l as ref (CELL {right=r2,left=l2,...}),...}) 
+            => (dlist :=!r; r := !r1; l := !l2)
+      | ref NIL => ();
+以下の怒られ
+  rule domain: 'Z cell ref
+  object: _ -> 'Z cell ref -> 'Y
+  in expression:
+    (case dlist
+      of ref
+           (CELL
+             {left=l as ref (CELL {left=l2,right=r2,...}),
+              right=r as ref (CELL {left=l1,right=r1,...}),...}) =>
+           ((dlist <errorvar>) r; r := ! r1; l := ! l2)
+       | ref NIL => ())
+逆になってる
+
+fun deleteDlist dlist =
+    case dlist of
+        ref (CELL {right=r as ref (CELL{left=l1,...}), left=l as ref (CELL {right=r2,...}),...}) 
+            => (dlist := !r; r2 := !r; l1 := !l)
+      | ref NIL => ();
+これだと、空にならない。
+
+val test = singletonDlist 0;
+insertDlist 1 test;
+val r1 = rightDlist test;
+test = r1;
+deleteDlist test;
+val r1 = rightDlist test;
+test = r1;
+deleteDlist test;
+
+val test = singletonDlist 0;
+insertDlist 0 test;
+val r1 = rightDlist test;
+val l1 = leftDlist test;
+test = r1;
+test = l1;
+r1 = l1;
+!test = !r1;
+!test = !l1;
+!r1 = !l1;
+*)
+
+deleteDlist test;
+deleteDlist test;
+test;
+deleteDlist test;
+test;
+
+(* fromListToDlist *)
+
+(* Q8.8 *)
 (* fun concatDlist dlist1 dlist2 = *)
