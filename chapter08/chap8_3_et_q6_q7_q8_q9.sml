@@ -126,13 +126,39 @@ r1 = l1;
 !r1 = !l1;
 *)
 
+test;
 deleteDlist test;
+test;
 deleteDlist test;
 test;
 deleteDlist test;
 test;
 
-(* fromListToDlist *)
+(* fromListToDlist : 'a list -> 'a dlist*)
+
+fun fromListToDlist list = foldr (fn (h, R) => (insertDlist h R; R)) (ref NIL) list;
+(* 
+- fun fromListToDlist list = foldl (fn (h, R) => insertDlist h R) (ref NIL) list;
+stdIn:18.28-18.79 Error: operator and operand do not agree [tycon mismatch]
+  operator domain: 'Z * 'Z cell ref -> 'Z cell ref
+  operand:         'Z * 'Z cell ref -> unit
+  in expression:
+    foldl (fn (h,R) => (insertDlist h) R)
+
+insertDlistの返り値はunit。
+
+singletonDlist の実装を参考にしてみよう。
+*)
+
+
+val listTest = fromListToDlist [1,2,3];
+dataDlist listTest; 
+(* expected: 1 *)
+dataDlist (rightDlist listTest); 
+(* expected: 2 *)
+dataDlist (leftDlist listTest); 
+(* expected: 3 *)
+(* expected: true *)
 
 (* Q8.8 *)
 (* fun concatDlist dlist1 dlist2 = *)
