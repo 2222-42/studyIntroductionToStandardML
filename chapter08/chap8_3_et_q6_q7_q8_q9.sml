@@ -307,3 +307,67 @@ concatDlist test0 test;
               d2l := d1lCell;
               d2lr := d1lrCell)
            end;
+
+
+(* 循環構造だから、空になるまで処理を繰り替えすということはできない。 *)
+
+fun member x list = case list of nil => false
+                            | (h::t) => if h = x then true else member x t;
+
+fun dlistToList L = 
+    let fun f l visited = 
+        if member l visited then nil 
+        else (dataDlist l)::(f (rightDlist l) (l::visited))
+    in f (rightDlist (leftDlist L)) nil 
+    end;
+
+(* 問8.9 *)
+fun copyDlist DL = 
+    let val list = dlistToList DL
+    in fromListToDlist list
+    end;
+
+(* fun mapDlist g L =
+    let fun f l visited = 
+        if member l visited then ()
+        else (case l of
+                (ref NIL) => ()
+              | (ref (CELL{data=d,...})) => (d := g(!d))
+            );(f (rightDlist l) (l::visited))
+    in f (rightDlist (leftDlist L)) nil 
+    end;
+
+val test = fromListToDlist [1,2,3];
+dataDlist test; 
+dataDlist (rightDlist test); 
+dataDlist (rightDlist (rightDlist test)); 
+dataDlist (rightDlist (rightDlist (rightDlist test))); 
+
+mapDlist (fn x => x + 1) test; *)
+(* 
+fun mapDlist g L =
+    let fun f l visited = 
+        if member l visited then nil 
+        else (concatDlist 
+        (singletonDlist (g (dataDlist l))) 
+        (deleteDlist l;l);
+        (f (rightDlist l) (l::visited)))
+    in f (rightDlist (leftDlist L)) nil 
+    end;
+これだと止まらなくなっちゃう。
+*)
+(* 
+fun mapDlist g L =
+    let fun f l visited = 
+        if member l visited then ()
+        else (case l of
+                (ref NIL) => ()
+              | (ref (CELL{data=d,...})) => (d := g(!d))
+            );(f (rightDlist l) (l::visited))
+    in f (rightDlist (leftDlist L)) nil 
+    end;
+val it = fn : ('a -> 'a) -> 'a ref cell ref -> unit
+となってしまう。
+
+これだと、他のポインタに反映されていない。
+*)
