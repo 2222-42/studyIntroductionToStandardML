@@ -463,23 +463,66 @@ fun mapDlist g L =
 fun copyDlistByAuthor d = mapDlist (fn x => x) d;
 
 (* fun foldr f Z nil = Z
-    | foldr f Z (h::t) = f(h, foldr f Z t) *)
+    | foldr f Z (h::t) = f(h, foldr f Z t) 
+val foldr = fn : ('a * 'b -> 'b) -> 'b -> 'a list -> 'b    
+*)
 
 fun foldrDlist F Z d = 
     let 
-        fun f dlist Z visited =
+        fun folder dlist Z visited =
             if member dlist visited then Z
-            else F (dataDlist dlist, f (rightDlist dlist) Z (dlist::visited))
-    in f (rightDlist (leftDlist d)) nil 
+            else F (dataDlist dlist, folder (rightDlist dlist) Z (dlist::visited))
+    in folder (rightDlist (leftDlist d)) Z nil
     end;
+(* val foldrDlist = fn : ('a * 'b -> 'b) -> 'b -> 'a cell ref -> 'b *)
+(* 
+fun foldrDlist F Z d = 
+    let 
+        fun folder dlist Z visited =
+            if member dlist visited then Z
+            else F (dataDlist dlist, folder (rightDlist dlist) Z (dlist::visited))
+    in folder (rightDlist (leftDlist d)) nil 
+    end;
+val foldrDlist = fn
+  : ('a * 'b list -> 'b list)
+    -> 'c -> 'a cell ref -> 'a cell ref list -> 'b list *)
+
+(* 筆者の解答 *)
+   fun foldrDlist F z d =
+       let
+         fun member x nil = false
+           | member x (h::t) = x = h orelse member x t
+         fun f d z visited =
+             if member d visited then z
+             else F (dataDlist d, f (rightDlist d) z (d::visited))
+       in f (rightDlist (leftDlist d)) z nil
+       end;
+(* val foldrDlist = fn : ('a * 'b -> 'b) -> 'b -> 'a cell ref -> 'b *)
 
 (* fun foldl f Z nil = Z
-    | foldl f Z (h::t) = foldl f (f(h, Z)) t; *)
+    | foldl f Z (h::t) = foldl f (f(h, Z)) t;
+val foldl = fn : ('a * 'b -> 'b) -> 'b -> 'a list -> 'b
+*)
 
 fun foldlDlist F Z d = 
     let 
-        fun f dlist Z visited =
+        fun folder dlist Z visited =
             if member dlist visited then Z
-            else F(f (rightDlist dlist) Z (dlist::visited), dataDlist dlist)
-    in f (rightDlist (leftDlist d)) nil 
+            else folder (rightDlist d) (F (dataDlist d, Z)) (dlist::visited)
+    in folder (rightDlist (leftDlist d)) Z nil 
     end;
+(* val foldlDlist = fn
+  : ('a list * 'b -> 'a list)
+    -> 'c -> 'b cell ref -> 'b cell ref list -> 'a list *)
+
+(* 筆者の解答 *)
+   fun foldlDlist F z d =
+       let
+         fun member x nil = false
+           | member x (h::t) = x = h orelse member x t
+         fun f d z visited =
+             if member d visited then z
+             else f (rightDlist d) (F (dataDlist d, z)) (d::visited)
+       in f (rightDlist (leftDlist d)) z nil
+       end;
+(* val foldlDlist = fn : ('a * 'b -> 'b) -> 'b -> 'a cell ref -> 'b *)
