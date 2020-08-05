@@ -327,15 +327,68 @@ fun copyDlist DL =
     in fromListToDlist list
     end;
 
+(* val it = fn : ('a -> 'b) -> 'a ref cell -> 'b ref cell *)
 (* fun mapDlist g L =
-    let fun f l visited = 
-        if member l visited then ()
-        else (case l of
-                (ref NIL) => ()
-              | (ref (CELL{data=d,...})) => (d := g(!d))
-            );(f (rightDlist l) (l::visited))
-    in f (rightDlist (leftDlist L)) nil 
+    let 
+        fun f l visited = 
+            if member l visited then l
+            else (case l of
+                    (ref NIL) => l
+                  | (ref (CELL{data=d, left, right})) => 
+                        let
+                            val newL = ref NIL
+                            val visited = l::visited
+                            val le = f left visited
+                            val ri = f right visited
+                        in
+                            (newL := CELL{left = le, right = ri, data = g d};
+                            newL)
+                        end
+                )
+    in 
+        f (rightDlist (leftDlist L)) nil 
+    end; *)
+(* GIVE UP *)
+(* 筆者の回答：
+これら関数の適切な定義には、以下の点を含む種々の注意深い考察が必要である。
+
+- 循環構造を辿る際の終了条件の適切な判定
+- leftおよびrightフィールドをたどると自分自身に戻ってくる CELLへの参照型データの作成
+*)
+
+fun mapDlist f d =
+    let
+        (* 回答者のコメント:
+        newElemを使って、終了条件を判定している。
+        そして、ただ真偽を判定するのではなく、結果に渡すべきDlistも出している。*)
+        fun newElem x nil = NONE
+        | newElem x ((h,newH)::t) =
+            if x = h then SOME newH
+            else newElem x t
+        fun copy l copied =
+            case l of
+            ref NIL => ref NIL
+            | ref (CELL{left, right, data}) =>
+            (case newElem l copied of
+                NONE =>
+                let
+                    val newL = ref NIL
+                    (* 空のnewLを入れておいて、inの中で更新している *)
+                    val copied = (l, newL)::copied
+                    val l = copy left copied
+                    val r = copy right copied
+                in
+                    (newL := CELL{left = l, right = r, data = f data};
+                    newL)
+                end
+            | SOME newL => newL
+            )
+    in
+        copy d nil
     end;
+(* なんでこれが思いつくのかが全く分からない。
+筋は通っている。
+*)
 
 val test = fromListToDlist [1,2,3];
 dataDlist test; 
@@ -343,8 +396,15 @@ dataDlist (rightDlist test);
 dataDlist (rightDlist (rightDlist test)); 
 dataDlist (rightDlist (rightDlist (rightDlist test))); 
 
-mapDlist (fn x => x + 1) test; *)
+val result = mapDlist (fn x => x + 1) test; 
+dataDlist result; 
+dataDlist (rightDlist result); 
+dataDlist (rightDlist (rightDlist result)); 
+dataDlist (rightDlist (rightDlist (rightDlist result))); 
+dataDlist (rightDlist (rightDlist (rightDlist (rightDlist result)))); 
+
 (* 
+try1:
 fun mapDlist g L =
     let fun f l visited = 
         if member l visited then nil 
@@ -357,6 +417,7 @@ fun mapDlist g L =
 これだと止まらなくなっちゃう。
 *)
 (* 
+try2:
 fun mapDlist g L =
     let fun f l visited = 
         if member l visited then ()
@@ -370,4 +431,27 @@ val it = fn : ('a -> 'a) -> 'a ref cell ref -> unit
 となってしまう。
 
 これだと、他のポインタに反映されていない。
+*)
+(* 
+try3:
+fun mapDlist g L =
+    let 
+        fun f l visited = 
+            if member l visited then l
+            else (case l of
+                    (ref NIL) => l
+                  | (ref (CELL{data=d, left, right})) => 
+                        let
+                            val newL = ref NIL
+                            val visited = l::visited
+                            val le = f left visited
+                            val ri = f right visited
+                        in
+                            (newL := CELL{left = le, right = ri, data = g d};
+                            newL)
+                        end
+                )
+    in 
+        f (rightDlist (leftDlist L)) nil 
+    end;
 *)
