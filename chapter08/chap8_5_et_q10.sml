@@ -63,3 +63,17 @@ stdIn:1.6-10.12 Error: operator and operand do not agree [overload conflict]
   in expression:
     (((fn <pat> => <exp>) f) 1) 1
 *)
+
+(* 筆者の解答:
+fは、整数値と、整数nと値vを受け取りn+1vへの参照を返す関数、の組。 
+gは、値vを受け取り2とvへの参照を返す関数dである。
+*)
+
+(* 筆者の補足:
+なお、これら関数は、ランク１多相性の下では、値多相性制約を保ったまま、 多相型を与えることができる。以下は、SML#での評価結果である。
+
+   # val f = ((fn x => x) 1, fn x => fn y => (x + 1,ref y));
+   val f = (1, fn) : int * (int -> [’a. ’a -> int * ’a ref])
+   # val g = (#2 f) 1;
+   val g = fn : [’a. ’a -> int * ’a ref]
+*)
