@@ -461,3 +461,25 @@ fun mapDlist g L =
 
 (* 筆者の回答: mapDlistを使ったケース *)
 fun copyDlistByAuthor d = mapDlist (fn x => x) d;
+
+(* fun foldr f Z nil = Z
+    | foldr f Z (h::t) = f(h, foldr f Z t) *)
+
+fun foldrDlist F Z d = 
+    let 
+        fun f dlist Z visited =
+            if member dlist visited then Z
+            else F (dataDlist dlist, f (rightDlist dlist) Z (dlist::visited))
+    in f (rightDlist (leftDlist d)) nil 
+    end;
+
+(* fun foldl f Z nil = Z
+    | foldl f Z (h::t) = foldl f (f(h, Z)) t; *)
+
+fun foldlDlist F Z d = 
+    let 
+        fun f dlist Z visited =
+            if member dlist visited then Z
+            else F(f (rightDlist dlist) Z (dlist::visited), dataDlist dlist)
+    in f (rightDlist (leftDlist d)) nil 
+    end;
