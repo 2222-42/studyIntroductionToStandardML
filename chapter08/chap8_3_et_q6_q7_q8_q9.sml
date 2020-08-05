@@ -384,6 +384,9 @@ fun mapDlist f d =
             | SOME newL => newL
             )
     in
+        (* 以下のように、最初の要素の重複を避けるためにリンク内のポインタからスタートするようにしていないのはなぜだろうか？
+            copy (rightDlist (leftDlist d)) nil
+        *)
         copy d nil
     end;
 (* なんでこれが思いつくのかが全く分からない。
