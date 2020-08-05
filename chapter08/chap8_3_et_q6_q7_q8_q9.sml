@@ -455,3 +455,6 @@ fun mapDlist g L =
         f (rightDlist (leftDlist L)) nil 
     end;
 *)
+
+(* 筆者の回答: mapDlistを使ったケース *)
+fun copyDlistByAuthor d = mapDlist (fn x => x) d;
