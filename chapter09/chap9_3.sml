@@ -40,3 +40,15 @@ fun enter (key, v, dict) =
             else if key > key' then 
                 Node((key', v'), L, enter (key, v, R))
             else Node((key', v'), enter (key, v, L), R);
+
+(* 筆者の解答:
+   fun enter (key,v,dict) =
+       case dict of
+            Empty => Node((key,v),Empty,Empty)
+          | Node((key',v'),L,R) =>
+              if key = key' then raise DuplicateEntry
+              else if key > key' then
+                   Node((key',v'),L, enter (key,v,R))
+              else Node((key',v'),enter (key,v,L),R)
+完全一致
+*)
