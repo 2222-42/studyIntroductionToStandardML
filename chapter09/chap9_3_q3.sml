@@ -17,3 +17,20 @@ val testList2 = [2,3,0,5];
 multipleMulti testList1;
 multipleMulti testList2;
 
+(* 筆者の解答 *)
+   fun prodList L =
+     let
+       exception Zero
+       fun f nil r = r
+         | f (0::t) r = raise Zero
+         | f (h::t) r = f t (h * r)
+     in
+       f L 1
+       handle Zero => 0
+     end;
+
+(* 回答者のコメント:
+これの方が、よりMLらしさのある感じがした。
+*)
+prodList testList1;
+prodList testList2;
