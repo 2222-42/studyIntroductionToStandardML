@@ -11,5 +11,7 @@
 exception Found of 'a
 raise Found 1 handle Found C => chr((ord C) + 1) 
 
+(* 筆者の解答は回答者のコメントと等しいので省略 *)
+
 (* ただし、多相型を持つ例外も定義し利用することができる
 多相型の値式への制限があるから。 *)
