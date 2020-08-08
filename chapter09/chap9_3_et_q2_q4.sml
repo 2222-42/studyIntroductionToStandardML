@@ -148,9 +148,21 @@ Windows環境でのSML#のインストールやSMLのコンパイルのMLtonの�
    user    0m3.380s
    sys     0m0.000s
 
+自分で試した結果
+$ time ./memoFib.out
+real    0m7.147s
+user    0m7.128s
+sys     0m0.008s
+
    $ smlsharp -o fastFib fastFib.sml
    $ time fastFib
    real    0m0.002s
    user    0m0.000s
    sys     0m0.000s
+
+自分で試した結果
+$ time ./fastFib.out
+real    0m0.003s
+user    0m0.000s
+sys     0m0.003s
 *)
