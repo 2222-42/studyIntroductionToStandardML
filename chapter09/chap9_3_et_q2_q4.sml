@@ -139,3 +139,18 @@ time (fn () => soFastFib 43);
 (* val it = (0,0,0,433494437) : IntInf.int * IntInf.int * IntInf.int * int *)
 time (fn () => veryFastFib 43);
 (* val it = (0,0,0,433494437) : IntInf.int * IntInf.int * IntInf.int * int *)
+
+(* 筆者の解答は、SML#でのコンパイル時間や実行時間で計測している。
+Windows環境でのSML#のインストールやSMLのコンパイルのMLtonのインストールが難しいのであとで調査する。
+   $ smlsharp -o memoFib memoFib.sml
+   $ time memoFib
+   real    0m3.380s
+   user    0m3.380s
+   sys     0m0.000s
+
+   $ smlsharp -o fastFib fastFib.sml
+   $ time fastFib
+   real    0m0.002s
+   user    0m0.000s
+   sys     0m0.000s
+*)
