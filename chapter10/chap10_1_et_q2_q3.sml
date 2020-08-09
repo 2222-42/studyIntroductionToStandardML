@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap 10.1 Q10.2
+* Chap 10.1 Q10.2 Q10.3
 *)
 
 structure IntQueue = struct
