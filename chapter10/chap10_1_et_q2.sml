@@ -82,6 +82,7 @@ structure FastIntQueue = struct
       | dequeue (a,b as ref (h::t)) = (b := t; h)
 end
 
+(* Q10.2 *)
 val q = FastIntQueue.newQueue();
 astIntQueue.enqueue(0,q);
 map (fn x => FastIntQueue.enqueue(x,q)) [1,3,5];
@@ -93,3 +94,47 @@ FastIntQueue.enqueue(7,q);
 (* val it = (ref [7],ref [3,5]) : FastIntQueue.queue *)
 (* val it = (ref [7],ref [5]) : FastIntQueue.queue *)
 (* val it = (ref [7],ref []) : FastIntQueue.queue *)
+
+(* Q10.3 *)
+(* enqueueとdequeueがランダムに行われる場合の、dequeueの平均の実行時間を見積もれ *)
+(* 
+    fun enqueue (i, (a,b)) = a := i :: (!a)
+enqueueは
+  cost 1?
+
+    fun dequeue (ref[], ref[]) = raise EmptyQueue
+      | dequeue (a as ref L, b as ref []) = 
+          let val (h::t) = rev L
+          in (a:=nil; b:=t; h)
+          end
+      | dequeue (a,b as ref (h::t)) = (b := t; h)
+
+- oldList が空でなければ
+  - その先頭を取り除き
+    - cost 1
+  - 取り除いた値を返す
+    - cost 1 or 0?
+- oldItemsが空でかつnewItemsが空でなければ、
+  - newItemsの逆順のリストを作成し、
+    - それの先頭要素を取り除き、
+      - cost 1
+    - 取り除いたリストを新たにoldItemsにし、
+      - cost (n - 1) or 1?　
+  - newItemsを空にし
+    - cost 1
+  - 取り除いた値を返す
+    - cost 1 or 0?
+- 両方からだったら、EmptyQueue例外を発生させる。
+  - cost 1?
+
+cost 1 or 2
+cost (n + 2) or (n + 3) or 3 or 4
+cost 1 or 2
+
+enqueue の回数をp
+dequeue の回数をqとする
+
+常にp >= qとする。さもなくば、その時点でerrorが起きて、0回目の計算と同じになるから。
+p + q*(1 + 3 + 1)/3
+おおよそ、p+2q?
+*)
