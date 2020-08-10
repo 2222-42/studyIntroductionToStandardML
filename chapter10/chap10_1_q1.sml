@@ -46,6 +46,7 @@ end
 
 val q = ImperativeIntQueue.newQueue();
 map (fn x => ImperativeIntQueue.enqueue(x,q)) [1,3,5];
+q;
 ImperativeIntQueue.dequeue q;
 (* 
 - ImperativeIntQueue.dequeue q;
