@@ -26,7 +26,7 @@ structure DList =
            let val newcell = CELL{data=a,
                                   right=ref (!dlist),
                                   left=ref (!l1)}
-           in (l1:=newcell; r1:=newcell)
+           in (dlist:=newcell; l1:=newcell; r1:=newcell)
            end
          | ref NIL =>
            let
@@ -42,9 +42,8 @@ structure DList =
          | ref (CELL{left=l1  as ref (CELL{right=r2,left=l2,...}),
                      right=r1 as ref (CELL{right=r3,left=l3,...}),
                      ...}) =>
-           (dlist := !r1;
-            r2 := !r1;
-            l3 := !l1)
+                if !l1 = !dlist then (dlist := NIL)
+                else (dlist := !r1; r2 := !r1; l3 := !l1)
          | _ => raise EMPTY_DLIST
      fun toList L =
          let fun f l visited =
@@ -135,16 +134,21 @@ structure ImperativeIntQueue =
 
 val q = ImperativeIntQueue.newQueue();
 map (fn x => ImperativeIntQueue.enqueue(x,q)) [1,3,5];
+q;
+(* 1,3,5 *)
 ImperativeIntQueue.dequeue q;
 (* expected: 1 *)
 ImperativeIntQueue.dequeue q;
 (* expected: 3 *)
 ImperativeIntQueue.dequeue q;
 (* expected: 5 *)
-ImperativeIntQueue.dequeue q;
-(* expected: exception EmptyQueue *)
+(* ImperativeIntQueue.dequeue q; *)
+(* expected: exception EmptyQueue
+-> solved by fixing deleteDlist *)
 
 (* 回答者のコメント:
 まず、DListモジュールを定義して、DListモジュールを使ってImperativeIntQueueを定義しているのは、便利なので、
 それは導入しようと思った。
+
+次に、DListモジュールのexception EMPTY_DLISTを定義して、その例外をhandleすることによって、処理しているのもよいと思った。
 *)
