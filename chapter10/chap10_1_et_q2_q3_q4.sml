@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap 10.1 Q10.2 Q10.3
+* Chap 10.1 Q10.2 Q10.3 Q10.4
 *)
 
 structure IntQueue = struct
@@ -84,7 +84,7 @@ end
 
 (* Q10.2 *)
 val q = FastIntQueue.newQueue();
-astIntQueue.enqueue(0,q);
+FastIntQueue.enqueue(0,q);
 map (fn x => FastIntQueue.enqueue(x,q)) [1,3,5];
 (* val it = (ref [5,3,1,0],ref []) : FastIntQueue.queue *)
 FastIntQueue.dequeue q;
@@ -138,3 +138,30 @@ dequeue の回数をqとする
 p + q*(1 + 3 + 1)/3
 おおよそ、p+2q?
 *)
+
+(* Q10.4 *)
+
+(* local *)
+  (* structure Q = IntQueue *)
+  structure Q = FastIntQueue
+(* in *)
+(* stdIn:40.1-41.6 Error: syntax error: deleting  END LOCAL *)
+  val testq = Q.newQueue();
+  map (fn x => Q.enqueue(x,testq)) [1,3,5];
+  Q.dequeue testq;
+  testq;
+(* end *)
+(* 回答者補足: 
+- local in endであると、参照できない？？？
+- let in endでも参照できない。
+-> 記述の仕方の間違え。
+*)
+
+local
+  (* structure Q = IntQueue *)
+  structure Q = FastIntQueue
+in
+  val test2 = Q.newQueue();
+  val result = (map (fn x => Q.enqueue(x,test2)) [1,3,5]; Q.dequeue test2; test2)
+end;
+
