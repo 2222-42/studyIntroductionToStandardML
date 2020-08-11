@@ -10,7 +10,7 @@ signature POLY_QUEUE = sig
     val newQueue: unit -> queue
     val enqueue: (elem*queue) -> unit
     val dequeue: queue -> elem
-end
+end;
 
 (* 再帰だと深さ優先探索は簡単に作れるが、幅優先探索はうまく実現できない。 *)
 
@@ -41,7 +41,7 @@ structure BF = struct
                 ) handle Q.EmptyQueue => nil
         in (Q.enqueue (t, queue); loop() )
         end
-end
+end;
 
 (* 問10.6 *)
 fun fromPreOrder s =
@@ -73,7 +73,7 @@ fun fromPreOrder s =
           end
   end;
 
-BF.bf (fromPreOrder "1(2(3()())(4()()))(5()())")
+BF.bf (fromPreOrder "1(2(3()())(4()()))(5()())");
 
 (* expect:
 実際には参照型を使った循環2重リンクリストであるが省略している
@@ -142,3 +142,80 @@ handle Q.EmptyQueue => nil
 result: 
 val it = ["1","2","5","3","4"] : string list
 *)
+
+(* Q10.7 *)
+(* signature POLY_QUEUE2 = sig
+    exception EmptyQueue
+    type elem
+    type queue
+    val newQueue: unit -> queue
+    val enqueue: (elem*queue) -> unit
+    val dequeue: queue -> elem
+end *)
+
+structure ITQueue :> POLY_QUEUE where type elem = int tree = struct
+    exception EmptyQueue
+    type elem = int tree
+    type queue = elem list ref * elem list ref
+    fun newQueue() = (ref [], ref []) : queue
+    fun enqueue (i, (a,b)) = a := i :: (!a)
+    fun dequeue (ref[], ref[]) = raise EmptyQueue
+      | dequeue (a as ref L, b as ref []) = 
+          let val (h::t) = rev L
+          in (a:=nil; b:=t; h)
+          end
+      | dequeue (a,b as ref (h::t)) = (b := t; h)
+end;
+
+structure BFI = struct
+    structure Q = ITQueue
+    fun bf t = 
+        let val queue = Q.newQueue()
+            fun loop() = 
+                (case Q.dequeue queue of
+                    Node(data, l, r) => (Q.enqueue (l, queue); Q.enqueue(r, queue); data::loop())
+                  | Empty => loop()
+                ) handle Q.EmptyQueue => nil
+        in (Q.enqueue (t, queue); loop() )
+        end
+end;
+
+fun fromIntPreOrder s =
+  let fun decompose s = 
+      let 
+        fun searchLP s p = 
+          if substring(s, p, 1) = "(" then p
+          else searchLP s (p+1)
+        fun searchRP s p n = 
+          case (substring(s, p, 1), n) 
+          of (")", 0) => p
+          | (")", n) => searchRP s (p+1) (n-1)
+          | ("(", n) => searchRP s (p+1) (n + 1)
+          | (_, n) => searchRP s (p + 1) n
+        val lp1 = searchLP s 0
+        val rp1 = searchRP s (lp1 + 1) 0
+        val lp2 = searchLP s (rp1 + 1)
+        val rp2 = searchRP s (lp2 + 1) 0
+      in
+        (
+          substring (s, 0, lp1),
+          substring (s, lp1 + 1, rp1-lp1-1),
+          substring (s, lp2 + 1, rp2-lp2-1)
+        )
+      end
+  in if s = "" then Empty
+     else let
+            val (root, left, right) = decompose s
+            val SOME data = Int.fromString(root)
+          in Node(data, fromIntPreOrder left, fromIntPreOrder right)
+          end
+  end;
+
+fromIntPreOrder "1(2(3()())(4()()))(5()())";
+(* val it = Node (SOME 1,Node (SOME #,Node #,Node #),Node (SOME #,Empty,Empty))
+  : int option tree 
+Int.fromString : string -> int option
+だから。
+*)
+
+BFI.bf (fromIntPreOrder "1(2(3()())(4()()))(5()())");
