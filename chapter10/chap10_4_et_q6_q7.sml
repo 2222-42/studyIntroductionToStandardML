@@ -166,6 +166,7 @@ structure ITQueue :> POLY_QUEUE where type elem = int tree = struct
           end
       | dequeue (a,b as ref (h::t)) = (b := t; h)
 end;
+(* 筆者の解答:　同じだったので省略 *)
 
 structure BFI = struct
     structure Q = ITQueue
@@ -179,6 +180,7 @@ structure BFI = struct
         in (Q.enqueue (t, queue); loop() )
         end
 end;
+(* 筆者の解答は、同じだったので省略 *)
 
 fun fromIntPreOrder s =
   let fun decompose s = 
@@ -210,6 +212,14 @@ fun fromIntPreOrder s =
           in Node(data, fromIntPreOrder left, fromIntPreOrder right)
           end
   end;
+
+(* 筆者の解答: 同じ。ただし、decomposeを関数の外に定義していることだけ違う *)
+   (* fun fromIntPreOrder s =
+       if s = "" then Empty
+       else let val {root,left,right} = decompose s
+                val SOME data = Int.fromString root
+            in Node(data, fromIntPreOrder left, fromIntPreOrder right)
+            end *)
 
 fromIntPreOrder "1(2(3()())(4()()))(5()())";
 (* val it = Node (SOME 1,Node (SOME #,Node #,Node #),Node (SOME #,Empty,Empty))

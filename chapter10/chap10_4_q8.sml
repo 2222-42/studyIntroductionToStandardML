@@ -141,8 +141,11 @@ stdIn:208.18-210.37 Error: case object and rules do not agree [tycon mismatch]
 *)
 
 BFF.bf (fromPreOrder "1(2(3()())(4()()))(5()())");
-(* 全くわからない *)
+(* 全くわからない -> わかった。#25 *)
 
+(* 筆者の回答例については、疑惑があるので、ここへの記載は省略。
+理由は、関数型待ち行列の定義をどうするか、にあるからである。
+*)
 
 
 (* 単純なリストによって、string treeを要素とする待ち行列を作れ *)
@@ -165,6 +168,7 @@ structure SimpleSTQueue :> POLY_QUEUE where type elem = string tree = struct
         in (queue:=rest; last)
         end
 end
+(* 筆者の解答は同じだったの省略 *)
 
 structure BFSST = struct
     structure Q = SimpleSTQueue
@@ -178,5 +182,7 @@ structure BFSST = struct
         in (Q.enqueue (t, queue); loop() )
         end
 end;
+  
+(* 筆者の解答は同じだったの省略 *)
 
 BFSST.bf (fromPreOrder "1(2(3()())(4()()))(5()())");
