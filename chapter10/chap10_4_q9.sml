@@ -89,3 +89,31 @@ foldr (fn (h, R) => ((h = "5") orelse R)) false (BF.bf t);
 
 BF.bffold (fn (h, R) => ((h = "0") orelse R)) false t;
 foldr (fn (h, R) => ((h = "0") orelse R)) false (BF.bf t);
+
+(* 筆者の解答 *)
+   structure BF = struct
+      structure Q = STQueue
+      fun bffold f z t =
+        let val queue = Q.newQueue()
+            fun loop () =
+                (case Q.dequeue queue of
+                       Node(data,r,l) => (Q.enqueue (r,queue);
+                                          Q.enqueue (l,queue);
+                                          f (data, loop()))
+                     | Empty => loop())
+                handle Q.EmptyQueue => z
+        in (Q.enqueue (t,queue); loop())
+        end
+      fun bf t = bffold (op ::) nil t
+   end
+
+val a = BF.bf (fromPreOrder "1(2(3()())(4()()))(5()())");
+val b = BF.bffold (op ::) nil (fromPreOrder "1(2(3()())(4()()))(5()())");
+val c = BF.bffold (op ^) "" (fromPreOrder "1(2(3()())(4()()))(5()())");
+val d = foldr (op ^) "" (BF.bf (fromPreOrder "1(2(3()())(4()()))(5()())"));
+
+(* 回答者のコメント:
+bfについてもbffoldを使って定義している。
+「bfとbffoldはほぼ同一の構造をもち、かつ前者は後者を使って簡単に定義できるため、 以下の例では、bfの定義をbffoldを使って定義してある。」
+という理由なので、簡単さのためには理解できる、設定か。
+*)
