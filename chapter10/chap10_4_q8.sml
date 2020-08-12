@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap Q10.8
+* Q10.8
 *)
 datatype 'a tree = Empty | Node of 'a * 'a tree * 'a tree;
 
@@ -75,11 +75,10 @@ end;
 (* cf: https://www.cs.cornell.edu/courses/cs3110/2012sp/recitations/rec07.html *)
 (* 参照型がないと、値の更新ができないからダメじゃね？ *)
 
-(* signature FUNCTIONAL_POLY_QUEUE = sig
+signature FUNCTIONAL_POLY_QUEUE = sig
     exception EmptyQueue
     type elem
     type queue
-    val isEmpty: queue -> bool
     val newQueue: unit -> queue
     val enqueue: (elem*queue) -> queue
     val dequeue: queue -> (elem*queue)
@@ -89,17 +88,15 @@ structure FunctionalQueue :> FUNCTIONAL_POLY_QUEUE where type elem = string tree
     exception EmptyQueue
     type elem = string tree
     type queue = elem list * elem list 
-    fun isEmpty([], []) = true
-      | isEmpty(_, _) = false
-    fun newQueue() = ([], []) : queue
-    fun enqueue ((i:elem), ((a,b):queue)) = (i::a,b)
+    fun newQueue() = ([], [])
+    fun enqueue (i, (a,b)) = (i::a, b)
     fun dequeue ([], []) = raise EmptyQueue
-      | dequeue (a, []) = 
-          let val (h::t) = rev a
+      | dequeue (list, []) = 
+          let val (h::t) = rev list
           in (h, ([], t))
           end
-      | dequeue (a,(h::t)) = (h, (a, t))
-end; *)
+      | dequeue (list,(h::t)) = (h, (list, t))
+end;
 (* 
 - open FunctionQueue;
 opening FunctionQueue
@@ -112,29 +109,25 @@ opening FunctionQueue
   val dequeue : queue -> elem * queue
 *)
 
-(* structure BFF = struct
+structure BFF = struct
     structure Q = FunctionalQueue
     fun bf t = 
-        let 
-          val emptyQueue = Q.newQueue()
-          val queue = Q.enqueue (t, queue)
-          fun loop(queue) = 
-              let 
-                val (data, (l, r)) = Q.dequeue queue
-                val nextQueue = Q.enqueue (r, l)
-              in 
-                (case Q.dequeue queue of
-                  (data, (l, r)) => 
-                    data::loop(nextQueue)
-                | (_, _) => loop(nextQueue)
-                ) 
-                
-              end
-              handle Q.EmptyQueue => nil
-        in 
-          loop(queue)
-        end
-end; *)
+      let 
+        val emptyQueue = Q.newQueue()
+        val firstQueue = Q.enqueue(t, emptyQueue)
+        fun loop(queue) = 
+          let
+            val (target, q) = Q.dequeue(queue)
+          in
+            (case target of 
+                Node(data, l, r) => data::(loop(Q.enqueue(r,Q.enqueue(l, q))))
+              | Empty => loop(q)
+            )handle Q.EmptyQueue => nil
+          end
+      in 
+        loop(firstQueue)
+      end
+end;
 (* 
 stdIn:208.18-210.37 Error: case object and rules do not agree [tycon mismatch]
   rule domain: elem * (elem * elem)
@@ -147,7 +140,7 @@ stdIn:208.18-210.37 Error: case object and rules do not agree [tycon mismatch]
        | (_,_) => loop ())
 *)
 
-(* BFF.bf (fromPreOrder "1(2(3()())(4()()))(5()())"); *)
+BFF.bf (fromPreOrder "1(2(3()())(4()()))(5()())");
 (* 全くわからない *)
 
 
