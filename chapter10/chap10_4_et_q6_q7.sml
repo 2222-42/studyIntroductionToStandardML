@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap 10.4 Q10.6
+* Chap 10.4 Q10.6 Q10.7
 *)
 datatype 'a tree = Empty | Node of 'a * 'a tree * 'a tree;
 
