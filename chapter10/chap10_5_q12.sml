@@ -66,3 +66,17 @@ chapter10\chap10_5_q12.sml:44.22-44.33 Error: operator and operand do not agree 
   in expression:
     ch := queue
 *)
+
+(* 筆者の解答:
+   functor BufferFUN(structure FQueue : FUNQUEUE)
+           :> BUFFER =
+   struct
+    exception EndOfBuffer
+    type channel = char FQueue.queue
+    fun openBuffer () = FQueue.newQueue()
+    fun input ch = FQueue.dequeue ch
+                   handle FQueue.EmptyQueue => raise EndOfBuffer
+    fun output(ch,c) = FQueue.enqueue (ch,c)
+   end
+これだと、上述の通り、ストラクチャの値の型でspecとの不一致が起きる。
+*)

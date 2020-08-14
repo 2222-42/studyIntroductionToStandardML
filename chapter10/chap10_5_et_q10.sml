@@ -27,6 +27,12 @@ functor QueueFUN(type elem) :> POLY_QUEUE where type elem = elem = struct
       | dequeue (a,b as ref (h::t)) = (b := t; h)
 end;
 
+(* 筆者の解答： 
+  functor QueueFun(type ty) :> POLY_QUEUE where type elem = ty = 
+...
+としており、elemとtyとタイプの名前を変えているので、可読性があがっているようだ。
+*)
+
 structure ITQueue = QueueFUN(type elem = int tree);
 structure STQueue = QueueFUN(type elem = string tree);
 
@@ -61,6 +67,23 @@ structure BFI = struct
     end
     fun bf t = bffold (op ::) nil t
 end;
+(* 筆者の解答:
+   structure BF = struct
+     structure Q = STQueue
+     fun bf t =
+       let val queue = Q.newQueue()
+           fun loop () =
+               (case Q.dequeue queue of
+                      Node(data,r,l) => (Q.enqueue (r,queue);
+                                         Q.enqueue (l,queue);
+                                         data::loop())
+                    | Empty => loop())
+               handle Q.EmptyQueue => nil
+       in (Q.enqueue (t,queue); loop())
+       end
+   end
+bffoldを使っていないだけで回答に違いはない。
+*)
 
 (* check *)
 
