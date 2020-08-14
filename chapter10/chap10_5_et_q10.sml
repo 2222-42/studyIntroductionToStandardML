@@ -131,3 +131,44 @@ fun fromIntPreOrder s =
 
 val ai = BFI.bf (fromIntPreOrder "1(2(3()())(4()()))(5()())");
 val bi = BFI.bffold (op ::) nil (fromIntPreOrder "1(2(3()())(4()()))(5()())");
+(* End of Q10.10 *)
+
+
+(* structure CQueue :> POLY_QUEUE where type elem = char = struct
+    exception EmptyQueue
+    type elem = char
+    type queue = elem list ref
+    fun newQueue() = ref nil : queue
+    fun enqueue (item, queue) = queue := item :: (!queue)
+    fun removeLast nil = raise EmptyQueue
+      | removeLast [x] = (nil, x)
+      | removeLast (h::t) =
+        let val (t',last) = removeLast t
+        in (h::t',last)
+        end
+    fun dequeue queue =
+        let val (rest, last) = removeLast (!queue)
+        in (queue:=rest; last)
+        end
+end; *)
+
+signature BUFFER = sig
+  exception EndOfBuffer
+  type channel
+  val openBuffer :unit -> channel
+  val input : channel -> char
+  val output : channel * char -> unit
+end
+
+functor BufferFUN(structure CQueue : POLY_QUEUE where type elem = char) :> BUFFER = 
+struct
+  exception EndOfBuffer
+  type channel = CQueue.queue
+  fun openBuffer () = CQueue.newQueue()
+  fun input ch = CQueue.dequeue ch
+                 handle CQueue.EmptyQueue => raise EndOfBuffer
+  fun output(ch,c) = CQueue.enqueue (c, ch)
+end
+
+structure CQueue = QueueFUN(type elem = char);
+structure Buffer = BufferFUN(structure CQueue = CQueue);
