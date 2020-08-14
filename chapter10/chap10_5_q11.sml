@@ -3,12 +3,13 @@
 *)
 
 signature FUNQUEUE = sig
-    (* exception EmptyQueue *)
+    exception EmptyQueue
     type 'a queue
     val newQueue: unit -> 'a queue
     val enqueue: 'a * 'a queue -> 'a queue
     val dequeue: 'a queue -> 'a * 'a queue
 end;
+(* 筆者はテキストと異なり、exceptionを導入しているので、こちらでも導入。 *)
 
 (* 第一の方針: 直接定義する *)
 (* 1-1: 不透明なシグネチャ制約 *)
@@ -49,7 +50,7 @@ stdIn:1.2-161.4 Error: value type in structure does not match signature spec
 -> 問題文が、「汎用の待ち行列ストラクチャを作成せよ」だったので、もしかして'aと型変数にしたままでよい？
 *)
 
-structure IntQueue : FUNQUEUE = struct
+structure IntQueue :> FUNQUEUE = struct
     exception EmptyQueue
     type 'a queue = 'a list 
 (* = type int queue = int list
@@ -68,6 +69,22 @@ stdIn:193.10-193.21 Error: syntax error: deleting  IDA IDA EQUALOP *)
         end
 end;
 
+(* 筆者の解答: *)
+   structure Queue :> FUNQUEUE =
+   struct
+     exception EmptyQueue
+     type 'a queue = 'a list
+     fun newQueue() = nil : 'a queue
+     fun enqueue (item,queue) = item :: queue
+     fun dequeue nil = raise EmptyQueue
+       | dequeue [x] = (x, nil)
+       | dequeue (h::t) =
+         let val (last, t') =  dequeue t
+         in (last, h::t')
+         end
+   end
+
+
 (* val q = IntQueue.newQueue();
 (* structure IntQueue :> FUN_QUEUE where type 'a queue = 'a list = struct
 ...
@@ -76,7 +93,10 @@ stdIn:1.6-1.29 Warning: type vars not generalized because of
    value restriction are instantiated to dummy types (X1,X2,...) *)
  *)
 val q = IntQueue.newQueue() : int IntQueue.queue;
-(* これでええんか？ *)
+(* これでええんか？
+-> 筆者の解答を見ると、これでいいらしい。
+ただし、IntQueueが必ずしもint型に限定されていない、型変数のままなので、どうにかしないといけない。
+*)
 val q = IntQueue.enqueue(1,q)
 val q = IntQueue.enqueue(2,q)
 val q = IntQueue.enqueue(3,q)
@@ -95,6 +115,22 @@ structure FastIntQueue :> FUNQUEUE = struct
           end
       | dequeue (list,(h::t)) = (h, (list, t))
 end;
+
+(* 筆者の解答: *)
+   structure FastQueue :> FUNQUEUE = struct
+     exception EmptyQueue
+     type 'a queue = 'a list * 'a list
+     fun newQueue () = ([],[]) : 'a queue
+     fun enqueue (i,(a,b))  = (i :: a, b)
+     fun dequeue ([],[]) = raise EmptyQueue
+       | dequeue (L, []) =
+           let
+               val (h::t) = rev L
+           in
+              (h, ([], t))
+           end
+      | dequeue (a,h::t) = (h, (a,t))
+   end
 
 val q = FastIntQueue.newQueue() : int FastIntQueue.queue;
 val q = FastIntQueue.enqueue(1,q)
