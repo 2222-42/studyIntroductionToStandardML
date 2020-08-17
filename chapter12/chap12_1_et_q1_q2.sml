@@ -14,6 +14,9 @@ signature Math = MATH;
 fun convBase f r x = 
     (f x)/(f r);
 
+(* 筆者の解答 : 同じだったからこれでOK*)
+(* fun convBase f b x = f x / f b *)
+
 val log2 = convBase Math.log10 2.0;
 
 log2 1024.0;
