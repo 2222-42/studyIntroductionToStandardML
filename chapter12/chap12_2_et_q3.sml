@@ -23,3 +23,17 @@ fun catchAll f x E =
 
 catchAll (fn (x, y) => x div y) (1,0) 999;
 catchAll (fn x => (chr x)) 1000 #" ";
+
+(* 筆者の解答例: *)
+fun catchAllByAuthor f x z =
+         f x handle en => (print (exnName en ^ "\n"); z);
+
+(* 問題文では
+> 以下の汎用エラー処理関数を定義せよ． 関数とその引数，さらにエラーの場合に返す値を受け取り，関数を引数に適用すると ともに，上記の基本演算のエラーをキャッチしエラーメッセージを表示した後，エ ラーの場合の値を返す，
+
+と記載されているから、`exnName`で引数として指定された例外の外部名を返す関数ではなく
+例外を表示するためのメッセージを生成する関数であるところの`exnMessage`を使った方がいいのでは？
+ *)
+
+fun catchAll f x z =
+         f x handle en => (print (exnMessage en ^ "\n"); z);
