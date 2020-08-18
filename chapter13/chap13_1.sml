@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap13.1 Chap13.2
+* Chap13.1
 *)
 
 (* 
