@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap13.2 Q13.1 Q13.2
+* Chap13.2 Q13.1 Q13.2 Q13.3
 *)
 
 (* signature ARRAY_2015 =
