@@ -58,9 +58,31 @@ structure ArrayQuickSort : SORT = struct
                             (* Q13.2 *)
                             val pivot = 
                                 let
-                                    val pivot = sub(array,(i+j) div 2)
+                                    val d = (j - i) div 4
+                                    val i1 = i + d
+                                    val i2 = i + d * 2
+                                    val i3 = i + d * 3
+                                    val (position, value) = 
+                                    (* ((i+j) div 2, sub(array, (i+j) div 2)) *)
+                                        case (comp(sub(array, i1), sub(array, i2))) of
+                                            GREATER => 
+                                                (case (comp(sub(array, i2), sub(array, i3))) of
+                                                    GREATER => (i2, sub(array, i2))
+                                                  | _ => (case (comp(sub(array, i1), sub(array, i3))) of
+                                                        GREATER => (i1, sub(array, i1))
+                                                      | _ => (i3, sub(array, i3))
+                                                    )
+                                                )
+                                         | _ =>
+                                                (case (comp(sub(array, i2), sub(array, i3))) of
+                                                    GREATER => (case (comp(sub(array, i1), sub(array, i3))) of
+                                                        GREATER => (i1, sub(array, i1))
+                                                      | _ => (i3, sub(array, i3))
+                                                    )
+                                                  | _ => (i2, sub(array, i2)) 
+                                                )
                                 in
-                                    (Array.update(array, (i+j) div 2, sub(array, i));Array.update(array, i, pivot);pivot)
+                                    (Array.update(array, position, sub(array, i));Array.update(array, i, value);value)
                                 end
                             (* Q13.3 *)
                             fun partition(a,b) = 
@@ -106,3 +128,22 @@ val it = [|2,12,40,3,10,8,42,100,405|] : int array
 - target;
 val it = [|2,3,8,10,12,40,42,100,405|] : int array
 *)
+val target123 = Array.fromList [1,2,3];
+ArrayQuickSort.sort(target123, Int.compare);
+val target132 = Array.fromList [1,3, 2];
+ArrayQuickSort.sort(target132, Int.compare);
+val target213 = Array.fromList [2,1,3];
+ArrayQuickSort.sort(target213, Int.compare);
+val target231 = Array.fromList [2,3,1];
+ArrayQuickSort.sort(target231, Int.compare);
+val target312 = Array.fromList [3,1,2];
+ArrayQuickSort.sort(target312, Int.compare);
+val target321 = Array.fromList [3,2,1];
+ArrayQuickSort.sort(target321, Int.compare);
+
+target123;
+target132;
+target213;
+target231;
+target312;
+target321;
