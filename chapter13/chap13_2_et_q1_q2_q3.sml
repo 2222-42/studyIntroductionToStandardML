@@ -89,6 +89,17 @@ structure ArrayQuickSort : SORT = struct
                                 in
                                     (Array.update(array, position, sub(array, i));Array.update(array, i, value);value)
                                 end
+                            (* 筆者の解答: なんか問題文の設定とだいぶ異なる。これでも動くけれど、 *)
+                            (* val pivot =
+                                if (j-i) < 10 then sub(array,i)
+                                else
+                                let
+                                    val pivot =sub(array,(i+j) div 2)
+                                in
+                                    (update(array,(i+j) div 2,sub(array,i));
+                                    update(array,i,pivot);
+                                    pivot)
+                                end *)
                             (* Q13.3 *)
                             fun partition(a,b) = 
                                 if b < a then (a-1)
