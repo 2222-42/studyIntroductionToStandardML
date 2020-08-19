@@ -112,6 +112,7 @@ structure ArrayQuickSort : SORT = struct
                                             case comp(sub(array, a), pivot) of
                                                 GREATER => a
                                               | _ => scanRight (a + 1)
+                                        (* 筆者の解答は同じだったので省略 *)
                                         val a = scanRight a
                                         fun scanLeft b = 
                                             if b < a then b
@@ -119,6 +120,7 @@ structure ArrayQuickSort : SORT = struct
                                             case comp(sub(array, b), pivot) of
                                                 GREATER => scanLeft (b - 1)
                                               | _ => b
+                                        (* 筆者の解答は同じだったので省略 *)
                                         val b = scanLeft b
                                     in
                                         if b < a then (a - 1)
