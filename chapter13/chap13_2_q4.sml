@@ -68,7 +68,7 @@ structure ArrayQuickSort : SORT = struct
                     case comp(sub(array, i), sub(array, j)) of
                         GREATER => swap (i, j)
                         | _ => ()
-                fun threeSort array i =
+                fun threeSort i =
                     case (comp(sub(array, i), sub(array, i + 1)), comp(sub(array, i), sub(array, i + 2))) 
                     of (LESS, LESS) => 
                                 ( case comp(sub(array, i+1),sub(array, i + 2)) of
@@ -89,7 +89,7 @@ structure ArrayQuickSort : SORT = struct
                 fun qsort (i, j) = 
                     if j <= i + 1 then ()
                     else if j = i + 2 then twoSort array i (i+1)
-                    else if j = i + 3 then threeSort array i
+                    else if j = i + 3 then threeSort i
                     else 
                         let 
                             (* Q13.2 *)
