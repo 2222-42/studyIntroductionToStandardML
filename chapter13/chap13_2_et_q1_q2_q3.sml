@@ -44,12 +44,17 @@ structure ArrayQuickSort : SORT = struct
         fun sort (array, comp) = 
             let 
                 (* Q13.1 *)
-                fun swap (i, j) = 
+                (* fun swap (i, j) = 
                     let
                         val valueOfI = Array.sub(array, i)
                         val valueOfJ = Array.sub(array, j)
                     in
                         (Array.update(array, i, valueOfJ); Array.update(array, j, valueOfI))
+                    end *)
+                (* 筆者の解答: 一時的に値を保存しておくのはiの値だけで十分 *)
+                fun swap (i,j) =
+                    let val temp = sub(array,i)
+                    in (update(array,i,sub(array,j)); update(array,j,temp))
                     end
                 fun qsort (i, j) = 
                     if j <= i + 1 then ()
