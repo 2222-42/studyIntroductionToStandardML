@@ -44,41 +44,48 @@ structure ArrayQuickSort : SORT = struct
         fun sort (array, comp) = 
             let 
                 (* Q13.1 *)
-                fun swap (i, j) = 
+                fun swap (i,j) =
+                    let val temp = sub(array,i)
+                    in (update(array,i,sub(array,j)); update(array,j,temp))
+                    end
+                fun getPivot (i,j) =
                     let
-                        val valueOfI = Array.sub(array, i)
-                        val valueOfJ = Array.sub(array, j)
+                        val delta = (j-i) div 4
+                        val i = i + delta
+                        val j = i + delta * 3
+                        val mid = i + (j-i) div 2
+                        val ie = sub(array,i)
+                        val je = sub(array,j)
+                        val me = sub(array,mid)
                     in
-                        (Array.update(array, i, valueOfJ); Array.update(array, j, valueOfI))
+                        case (comp(ie,me),comp(me, je))
+                        of (LESS, LESS) => (mid,me)
+                        | (LESS, _) => (case comp(ie, je) of LESS => (j,je) | _ => (i,ie))
+                        | (_, GREATER) => (mid,me)
+                        | _ => (case comp(ie, je) of LESS => (i,ie) | _ => (j,je))
                     end
                 fun twoSort array i j = 
                     case comp(sub(array, i), sub(array, j)) of
                         GREATER => swap (i, j)
                         | _ => ()
                 fun threeSort array i =
-                    case comp(sub(array, i), sub(array, i + 1)) of
-                        GREATER => (case comp(sub(array, i),sub(array, i + 2)) of
-                                    GREATER => ( case comp(sub(array, i+1),sub(array, i + 2)) of
-                                            (* 3,2,1 *)
-                                            GREATER => swap(i, i+2)
-                                            (* 3,1,2 *)
-                                          | _ => (swap(i, i+1); swap(i+1, i+2))
-                                        )
-                                  | _ => (swap(i, i+1))
-                                            (* 2,1,3 *)
-                                )
-                      | _ => (case comp(sub(array, i), sub(array,i + 2)) of
-                                (* 2,3,1 *)
-                                GREATER => (swap(i, i + 2); swap (i+1, i+2))
-                              | _ => 
-                              (* twoSort array (i+1) (i+2) *)
+                    case (comp(sub(array, i), sub(array, i + 1)), comp(sub(array, i), sub(array, i + 2))) 
+                    of (LESS, LESS) => 
                                 ( case comp(sub(array, i+1),sub(array, i + 2)) of
                                     (* 1,3,2 *)
                                     GREATER => swap(i+1, i+2)
                                     (* 1,2,3 *)
                                   | _ => ()
                                 )
-                              )
+                    | (LESS, _) => (swap(i, i + 2); swap (i+1, i+2))
+                    | (_, GREATER) => 
+                                ( case comp(sub(array, i+1),sub(array, i + 2)) of
+                                            (* 3,2,1 *)
+                                            GREATER => swap(i, i+2)
+                                            (* 3,1,2 *)
+                                          | _ => (swap(i, i+1); swap(i+1, i+2))
+                                )
+                    | _ => (swap(i, i+1))
                 fun qsort (i, j) = 
                     if j <= i + 1 then ()
                     else if j = i + 2 then twoSort array i (i+1)
@@ -86,35 +93,13 @@ structure ArrayQuickSort : SORT = struct
                     else 
                         let 
                             (* Q13.2 *)
-                            val pivot = 
-                                let
-                                    val d = (j - i) div 4
-                                    val i1 = i + d
-                                    val i2 = i + d * 2
-                                    val i3 = i + d * 3
-                                    val (position, value) = 
-                                        if (j - i) < 30 then (i,sub(array,i))
+                            val pivot = if (j-i) < 30 then sub(array,i)
                                         else
-                                            case (comp(sub(array, i1), sub(array, i2))) of
-                                                GREATER => 
-                                                    (case (comp(sub(array, i2), sub(array, i3))) of
-                                                        GREATER => (i2, sub(array, i2))
-                                                    | _ => (case (comp(sub(array, i1), sub(array, i3))) of
-                                                            GREATER => (i1, sub(array, i1))
-                                                        | _ => (i3, sub(array, i3))
-                                                        )
-                                                    )
-                                            | _ =>
-                                                    (case (comp(sub(array, i2), sub(array, i3))) of
-                                                        GREATER => (case (comp(sub(array, i1), sub(array, i3))) of
-                                                            GREATER => (i1, sub(array, i1))
-                                                        | _ => (i3, sub(array, i3))
-                                                        )
-                                                    | _ => (i2, sub(array, i2)) 
-                                                    )
-                                in
-                                    (Array.update(array, position, sub(array, i));Array.update(array, i, value);value)
-                                end
+                                            let val (pi,pivot) = getPivot(i,j-1)
+                                            in update(array,pi,sub(array,i));
+                                                update(array,i,pivot);
+                                                pivot
+                                            end
                             (* Q13.3 *)
                             fun partition(a,b) = 
                                 if b < a then (a-1)
