@@ -56,13 +56,35 @@ structure ArrayQuickSort : SORT = struct
                     let val temp = sub(array,i)
                     in (update(array,i,sub(array,j)); update(array,j,temp))
                     end
+                (* Q13.2の回答の修正。問13.4の回答例より。 *)
+                fun getPivot (i,j) =
+                    let
+                        val delta = (j-i) div 4
+                        val i = i + delta
+                        val j = i + delta * 3
+                        val mid = i + (j-i) div 2
+                        val ie = sub(array,i)
+                        val je = sub(array,j)
+                        val me = sub(array,mid)
+                    in
+                        case (comp(ie,me),comp(me, je))
+                        of (LESS, LESS) => (mid,me)
+                        | (LESS, _) => (case comp(ie, je) of LESS => (j,je) | _ => (i,ie))
+                        | (_, GREATER) => (mid,me)
+                        | _ => (case comp(ie, je) of LESS => (i,ie) | _ => (j,je))
+                    end
                 fun qsort (i, j) = 
                     if j <= i + 1 then ()
                     else 
                         let 
                             (* Q13.2 *)
                             val pivot = 
-                                let
+                                let val (pi,pivot) = getPivot(i,j-1)
+                                in update(array,pi,sub(array,i));
+                                    update(array,i,pivot);
+                                    pivot
+                                end
+                                (* let
                                     val d = (j - i) div 4
                                     val i1 = i + d
                                     val i2 = i + d * 2
@@ -88,7 +110,7 @@ structure ArrayQuickSort : SORT = struct
                                                 )
                                 in
                                     (Array.update(array, position, sub(array, i));Array.update(array, i, value);value)
-                                end
+                                end *)
                             (* 筆者の解答: なんか問題文の設定とだいぶ異なる。これでも動くけれど、 *)
                             (* val pivot =
                                 if (j-i) < 10 then sub(array,i)
