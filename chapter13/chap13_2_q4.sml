@@ -135,7 +135,7 @@ structure ArrayQuickSort : SORT = struct
     end
 end;
 
-val target = Array.fromList [100,10,2,405,3,12,8,40,42];
+(* val target = Array.fromList [100,10,2,405,3,12,8,40,42];
 ArrayQuickSort.sort(target, Int.compare);
 (*
 val it = () : unit
@@ -189,4 +189,4 @@ val test1 = Array.fromList (randomList 20);
 ArrayQuickSort.sort(test1, Int.compare);
 
 val test2 = Array.fromList (randomList 50);
-ArrayQuickSort.sort(test2, Int.compare);
+ArrayQuickSort.sort(test2, Int.compare); *)
