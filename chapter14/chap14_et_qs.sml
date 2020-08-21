@@ -102,3 +102,12 @@ fun checkTime n =
   in expression:
     tm / nlogn n *)
 (* val checkTime = fn : int -> int * int * real *)
+
+(* Q14.3 *)
+fun testSort n = 
+  let 
+    fun printResult (n, tm, ratio) = 
+      print ("size="^Int.toString(n)^", milli-secs= "^Int.toString(tm)^", micro-secs/n log(n)="^Real.toString(ratio)^"\n")
+  in 
+    printResult(checkTime n)
+  end;
