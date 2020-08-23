@@ -111,3 +111,33 @@ fun testSort n =
   in 
     printResult(checkTime n)
   end;
+
+(* Q14.4 *)
+fun padString str = 
+  if String.size(str) < 20 then 
+    let
+      val length = 20 - String.size(str)
+      fun addEmp (length, string) = 
+        if length <= 0 then string
+        else addEmp(length - 1, " "^string)
+    in
+      addEmp(length, str)
+    end
+  else str;
+
+fun printLine (i1, i2, r) =
+  print(padString(Int.toString(i1))^padString(Int.toString(i2))^padString(Real.toString(r))^"\n");
+
+fun evalSort list = 
+  let 
+    val results = map checkTime list
+    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+  in
+    print(padString("array size")^padString("milli-sec.")^padString("micro s./(n log(n))")^"\n");
+    map printLine results;
+    print("---------------------------------------------------------------\n");
+    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
+  end;
+
+val test_list = [10000,100000,1000000,10000000];
+evalSort test_list;
