@@ -192,7 +192,7 @@ fun evalCompare list =
     val results = map checkTimePerCompare list
     val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
   in
-    print(padString("array size")^padString("milli-sec.")^padString("micro s./(n log(n))")^"\n");
+    print(padString("array size")^padString("milli-sec.")^padString("micro s./h)")^"\n");
     map printLine results;
     print("---------------------------------------------------------------\n");
     print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
@@ -202,3 +202,17 @@ val test_list = [500000,1000000,5000000];
 (* evalSort test_list; *)
 
 
+(* Q14.7 *)
+(* fun normalEvalSort list = 
+  let 
+    val results = map checkTime list
+    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+    val compareResults = map checkTimePerCompare list
+    val compareAverage = (foldr(fn ((a,b,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
+  in
+    print(padString("array size")^padString("time in cunit")^padString("T/(n log(n))")^"\n");
+    map printLine results;
+    print("---------------------------------------------------------------\n");
+    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
+    print(padString("The estimated sort time function: T(n) = ")^padString(Real.toString(real(Real.trunc(average*10.0))/10.0);)^" n log (n)\n")
+  end; *)
