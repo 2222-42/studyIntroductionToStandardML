@@ -140,7 +140,7 @@ fun evalSort list =
   end;
 
 val test_list = [10000,100000,1000000];
-evalSort test_list;
+(* evalSort test_list; *)
 
 
 (* Q14.5 *)
@@ -162,3 +162,43 @@ fun eval {prog, input, size, base} =
 (* eval {prog=(ArrayQuickSort.sort:int array * (int * int -> order) -> unit), input=(test_list, Int.compare), size=(length:int list -> int), base=nlogn};
 ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも汎用ケース。
 *)
+
+(* Q14.6 *)
+
+fun compareElementsOfArray array = 
+  let 
+    val n = Array.length(array)
+    val p = Array.sub(array, 0)
+    val m = n div 2
+    fun compare x = if x <= m then ()
+                    else (Int.compare(Array.sub(array, n - x), p);
+                          Int.compare(Array.sub(array, x - 1), p);
+                          compare(x-1)
+                          )
+  in
+    compare n
+  end
+
+
+fun checkTimePerCompare n = 
+  let 
+    val array = genArray n
+  in
+    eval {prog=compareElementsOfArray, input=array, size=Array.length, base=real}
+  end
+
+fun evalCompare list =
+  let 
+    val results = map checkTimePerCompare list
+    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+  in
+    print(padString("array size")^padString("milli-sec.")^padString("micro s./(n log(n))")^"\n");
+    map printLine results;
+    print("---------------------------------------------------------------\n");
+    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
+  end;
+
+val test_list = [500000,1000000,5000000];
+(* evalSort test_list; *)
+
+
