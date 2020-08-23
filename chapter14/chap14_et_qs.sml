@@ -139,5 +139,26 @@ fun evalSort list =
     print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
   end;
 
-val test_list = [10000,100000,1000000,10000000];
+val test_list = [10000,100000,1000000];
 evalSort test_list;
+
+
+(* Q14.5 *)
+fun eval {prog, input, size, base} =
+  let
+    val tm = timeRun prog input
+    val (n: int) = size input
+    val ratio = Real.fromInt tm / base n
+  in
+    (n, tm div 1000, ratio)
+  end;
+(* val eval = fn
+  : {base:'a -> real, input:'b, prog:'b -> 'c, size:'b -> 'a}
+     -> 'a * int * real *)
+(* val eval = fn
+  : {base:int -> real, input:'a, prog:'a -> 'b, size:'a -> int}
+     -> int * int * real *)
+
+(* eval {prog=(ArrayQuickSort.sort:int array * (int * int -> order) -> unit), input=(test_list, Int.compare), size=(length:int list -> int), base=nlogn};
+ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも汎用ケース。
+*)

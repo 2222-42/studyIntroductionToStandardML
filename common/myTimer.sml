@@ -19,3 +19,33 @@ fun timeRun f x =
         val ut = Time.toMicroseconds (#usr tm)
     in LargeInt.toInt ut
     end
+
+fun convBase f r (x: real) = f x / f r;
+
+fun nlogn n = 
+  (Real.fromInt n) * (convBase Math.log10 2.0 (Real.fromInt n));
+
+fun padString str = 
+  if String.size(str) < 20 then 
+    let
+      val length = 20 - String.size(str)
+      fun addEmp (length, string) = 
+        if length <= 0 then string
+        else addEmp(length - 1, " "^string)
+    in
+      addEmp(length, str)
+    end
+  else str;
+
+fun printLine (i1, i2, r) =
+  print(padString(Int.toString(i1))^padString(Int.toString(i2))^padString(Real.toString(r))^"\n");
+
+
+fun eval {prog, input, size, base} =
+  let
+    val tm = timeRun prog input
+    val (n: int) = size input
+    val ratio = Real.fromInt tm / base n
+  in
+    (n, tm div 1000, ratio)
+  end;
