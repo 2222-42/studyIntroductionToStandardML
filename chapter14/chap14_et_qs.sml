@@ -376,7 +376,15 @@ val normalEvalSort = fn : int list -> unit
 ---------------------------------------------------------------
                                  average       3.60205010028
 
-
+実行時間が桁で変わったぞ、何だ何が変わったんだ？-> NormalEvalSortよりも、他のcheckTimePerCompare の変更の影響が大きいことがわかった。
+- normalEvalSort test_list;
+          array size       time in cunit        T/(n log(n))
+              500000                 319          0.38676730
+             1000000                 652          0.37542379
+             5000000                3922          0.40453397
+---------------------------------------------------------------
+                                 average          0.38890835
+The estimated sort time function: T(n) = 0.39 n log (n)
 *)
 
 (* 筆者の解答: *)
