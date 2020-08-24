@@ -135,7 +135,7 @@ SMLではDYNAMICなるものはなさそうなので、SML#で実行して確か
 *)
 (* --end Q14.3 *)
 
-(* Q14.4 *)
+(* Q14.4 --start *)
 fun padString str = 
   if String.size(str) < 20 then 
     let
@@ -148,23 +148,62 @@ fun padString str =
     end
   else str;
 
+fun formatReal r = (Real.fmt (StringCvt.FIX (SOME 8)) r)
 fun printLine (i1, i2, r) =
-  print(padString(Int.toString(i1))^padString(Int.toString(i2))^padString(Real.toString(r))^"\n");
+  print(padString(Int.toString(i1))
+        ^padString(Int.toString(i2))
+        ^padString(formatReal r)
+        ^"\n");
 
 fun evalSort list = 
   let 
     val results = map checkTime list
     val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
   in
-    print(padString("array size")^padString("milli-sec.")^padString("micro s./(n log(n))")^"\n");
+    print(padString("array size")
+         ^padString("milli-sec.")
+         ^padString("micro s./(n log(n))")
+         ^"\n");
     map printLine results;
     print("---------------------------------------------------------------\n");
-    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
+    print(padString(" ")
+         ^padString("average")
+         ^padString(formatReal(average))
+         ^"\n")
   end;
+
+(* 筆者の解答: 
+- padStringを定義する代わりに、StringCvtストラクチャの padLeft関数を使用している。
+- 小数点以下8桁を表示するようにfmtを使っている
+*)
+fun evalSortByAuthor L =
+    let
+      val L' = map checkTime L
+      val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+      val title = (StringCvt.padLeft #" " 20 "array size")
+                  ^ (StringCvt.padLeft #" " 20 "milli-sec.")
+                  ^ (StringCvt.padLeft #" " 20 "micro s./nlogn")
+                  ^ "\n"
+      fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+      fun printLine (n,a,c) =
+          let
+            val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+            val sa =  StringCvt.padLeft #" " 20 (Int.toString a)
+            val sc = formatReal c
+          in
+            print (ns ^ sa ^ sc ^ "\n")
+          end
+    in
+      (print title;
+        map printLine L';
+        print "------------------------------------------------------------\n";
+        print ("                                 avarage" ^ (formatReal av));
+        print "\n")
+    end
 
 val test_list = [10000,100000,1000000];
 (* evalSort test_list; *)
-
+(* --end Q14.4 *)
 
 (* Q14.5 *)
 fun eval {prog, input, size, base} =
@@ -214,6 +253,7 @@ fun evalCompare list =
   let 
     val results = map checkTimePerCompare list
     val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+    
   in
     print(padString("array size")^padString("milli-sec.")^padString("micro s./h)")^"\n");
     map printLine results;
