@@ -113,7 +113,7 @@ fun checkTime n =
 (* 筆者の解答は同じ *)
 (* end Q14.2 *)
 
-(* Q14.3 *)
+(* Q14.3 --start *)
 fun testSort n = 
   let 
     fun printResult (n, tm, ratio) = 
@@ -121,6 +121,19 @@ fun testSort n =
   in 
     printResult(checkTime n)
   end;
+
+(* 筆者の解答では、Dynamic.ppという以下のような汎用の清書関数を使って
+   # Dynamic.pp;
+   val it = fn : [’a#reify. ’a -> unit]
+、次のように定義している:
+   fun printResult (n, tm, ratio) =
+       Dynamic.pp
+        {"size" = n, "milli-secs" = tm, "micro-secs/n long(n)" = ratio}
+   fun testSort n = printResult (checkTime n)
+。文字列に変換してくれているようなので、確かに便利そう。
+SMLではDYNAMICなるものはなさそうなので、SML#で実行して確かめるしかない？
+*)
+(* --end Q14.3 *)
 
 (* Q14.4 *)
 fun padString str = 
