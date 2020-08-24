@@ -230,43 +230,115 @@ ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも�
 
 (* Q14.6 *)
 
-fun compareElementsOfArray array = 
-  let 
-    val n = Array.length(array)
-    val p = Array.sub(array, 0)
-    val m = n div 2
-    fun compare x = if x <= m then ()
-                    else (Int.compare(Array.sub(array, n - x), p);
-                          Int.compare(Array.sub(array, x - 1), p);
-                          compare(x-1)
-                          )
-  in
-    compare n
-  end
-
 
 fun checkTimePerCompare n = 
   let 
+    (* n入れて、arrayにして、またnにしているから無駄がある。 *)
+    fun compSub n = 
+      let 
+        val array = genArray n
+        val p = Array.sub(array, 0)
+        val m = n div 2
+        fun compare x = if x <= m then ()
+                        else (Int.compare(Array.sub(array, n - x), p);
+                              Int.compare(Array.sub(array, x - 1), p);
+                              compare(x-1)
+                              )
+      in
+        compare n
+      end
+  in
+    eval {prog=compSub, input=n, size= fn x => x, base=real}
+  end
+(* fun checkTimePerCompare n = 
+  let 
+    (* n入れて、arrayにして、またnにしているから無駄がある。 *)
     val array = genArray n
+    fun compareElementsOfArray array = 
+      let 
+        val n = Array.length(array)
+        val p = Array.sub(array, 0)
+        val m = n div 2
+        fun compare x = if x <= m then ()
+                        else (Int.compare(Array.sub(array, n - x), p);
+                              Int.compare(Array.sub(array, x - 1), p);
+                              compare(x-1)
+                              )
+      in
+        compare n
+      end
   in
     eval {prog=compareElementsOfArray, input=array, size=Array.length, base=real}
-  end
+  end 
+
+上記のだと実行時間がとても少ないがなぜだろうか
+- evalCompare test_list;
+          array size          milli-sec.         micro s./h)
+              500000                   5          0.01000000
+             1000000                   8          0.00800000
+             5000000                  59          0.01180000
+---------------------------------------------------------------
+                                 average          0.00993333  
+*)
 
 fun evalCompare list =
   let 
     val results = map checkTimePerCompare list
-    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
-    
+    val average = (foldr(fn ((_,_,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+    fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
   in
-    print(padString("array size")^padString("milli-sec.")^padString("micro s./h)")^"\n");
+    print(padString("array size")
+         ^padString("milli-sec.")
+         ^padString("micro s./n)")^"\n");
     map printLine results;
     print("---------------------------------------------------------------\n");
-    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n")
+    print(padString(" ")
+         ^padString("average")
+         ^padString(formatReal average)^"\n")
   end;
 
 val test_list = [500000,1000000,5000000];
 (* evalSort test_list; *)
 
+(* 筆者の解答 *)
+fun evalCompareByAuthor L =
+    let
+      fun comp n =
+          let
+            val array = genArray n
+            val p = Array.sub(array, 0)
+            val m = n div 2
+            fun  loop x = if x <= m then ()
+                          else (Int.compare (Array.sub(array, n - x), p);
+                                Int.compare (Array.sub(array, x - 1), p);
+                                loop (x -1))
+          in
+            loop n
+          end
+      fun evalN n = eval {prog = comp, input = n, size = fn x => x, base = real}
+      val L' = map evalN L
+      val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+      val title = (StringCvt.padLeft #" " 20 "array size")
+                  ^ (StringCvt.padLeft #" " 20 "milli-sec.")
+                  ^ (StringCvt.padLeft #" " 20 "micro s./n")
+                  ^ "\n"
+      fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+      fun printLine (n,a,c) =
+          let
+            val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+            val sa =  StringCvt.padLeft #" " 20 (Int.toString a)
+            val sc = formatReal c
+          in
+            print (ns ^ sa ^ sc ^ "\n")
+          end
+    in
+      (print title;
+      map printLine L';
+      print "------------------------------------------------------------\n";
+      print ("                                 avarage" ^ (formatReal av));
+      print "\n")
+    end
+(* evalCompareByAuthor test_list; *)
 
 (* Q14.7 *)
 
