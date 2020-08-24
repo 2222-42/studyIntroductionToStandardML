@@ -45,6 +45,7 @@ fun currentTime() =
      offset=SOME (TIME {usec=578254988000000}),second=42,wday=Fri,yday=234,
      year=2020} : Date.date *)
 currentTime(); 
+(* 筆者の解答はfmtかけずにそのまんま *)
 (* end Q14.1 *)
 
 (* signature TIMER =
