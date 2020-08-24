@@ -345,23 +345,25 @@ fun evalCompareByAuthor L =
 fun normalEvalSort list = 
   let 
     val compareResults = map checkTimePerCompare list
-    val constant = (foldr(fn ((a,b,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
-    fun localCheckTime n = 
+    val constant = (foldr(fn ((_,_,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
+    (* eval使った方がいい *)
+    fun sort n = 
       let 
         val array = genArray n
-        val tm = timeRun ArrayQuickSort.sort (array, Int.compare)
-        val nlognRatio = Real.fromInt(tm) / (constant * (nlogn n))
       in
-        (n, tm div 1000, nlognRatio)
+        ArrayQuickSort.sort (array, Int.compare)
       end
-    val results = map localCheckTime list
+    fun base n = constant * nlogn n
+    fun evalN n = eval {prog = sort, input = n, size = fn x => x, base = base}
+    val results = map evalN list
     val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+    fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
   in
     print(padString("array size")^padString("time in cunit")^padString("T/(n log(n))")^"\n");
     map printLine results;
     print("---------------------------------------------------------------\n");
-    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n");
-    print("The estimated sort time function: T(n) = "^(Real.toString(real(Real.trunc(average*10.0))/10.0))^" n log (n)\n")
+    print(padString(" ")^padString("average")^padString(formatReal average)^"\n");
+    print("The estimated sort time function: T(n) = "^(Real.fmt (StringCvt.FIX (SOME 2)) average)^" n log (n)\n")
   end;
 
 (* 
@@ -373,7 +375,65 @@ val normalEvalSort = fn : int list -> unit
              5000000                2702       3.64257362441
 ---------------------------------------------------------------
                                  average       3.60205010028
+
+
 *)
+
+(* 筆者の解答: *)
+   fun evalCompareN L =
+       let
+         fun comp n =
+             let
+               val array = genArray n
+               val p = Array.sub(array, 0)
+               val m = n div 2
+               fun  loop x = if x <= m then ()
+                             else (Int.compare (Array.sub(array, n - x), p);
+                                   Int.compare (Array.sub(array, x - 1), p);
+                                   loop (x -1))
+             in
+               loop n
+             end
+         fun evalN n = eval {prog = comp, input = n, size = fn x => x, base = real}
+         val L' = map evalN L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+       in
+         av
+       end
+   fun evalSortN c L =
+       let
+         fun sort n =
+             let
+               val array = genArray n
+             in
+               ArrayQuickSort.sort (array, Int.compare)
+             end
+         fun base n = c * nlogn n
+         fun evalN n = eval {prog = sort, input = n, size = fn x => x, base = base}
+         val L' = map evalN L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L') / (Real.fromInt (List.length L'))
+         val title = (StringCvt.padLeft #" " 20 "array size")
+                     ^ (StringCvt.padLeft #" " 20 "time in cunit")
+                  ^ (StringCvt.padLeft #" " 20 "C/nlogn")
+                  ^ "\n"
+         fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+         fun printLine (n,a,c) =
+            let
+              val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+              val sa =  StringCvt.padLeft #" " 20 (Int.toString (Real.floor (real a * 1000.0/ c)))
+              val sc = formatReal c
+            in
+              print (ns ^ sa ^ sc ^ "\n")
+            end
+         val C = Real.fmt (StringCvt.FIX (SOME 2)) av
+       in
+         (print title;
+          map printLine L';
+          print "------------------------------------------------------------\n";
+          print ("                                 avarage" ^ (formatReal av) ^ "\n");
+          print ("The estimated sort time function: T(n) = " ^ C ^ " n log(n)\n"))
+       end
+   fun normalEvalSortByAuthor L = evalSortN (evalCompareN L) L
 
 (* Q14.8 *)
 
