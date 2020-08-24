@@ -205,7 +205,7 @@ val test_list = [10000,100000,1000000];
 (* evalSort test_list; *)
 (* --end Q14.4 *)
 
-(* Q14.5 *)
+(* --start Q14.5 *)
 fun eval {prog, input, size, base} =
   let
     val tm = timeRun prog input
@@ -224,6 +224,9 @@ fun eval {prog, input, size, base} =
 (* eval {prog=(ArrayQuickSort.sort:int array * (int * int -> order) -> unit), input=(test_list, Int.compare), size=(length:int list -> int), base=nlogn};
 ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも汎用ケース。
 *)
+(* 筆者の解答は同じなので省略 *)
+(* --end Q14.5 *)
+
 
 (* Q14.6 *)
 
