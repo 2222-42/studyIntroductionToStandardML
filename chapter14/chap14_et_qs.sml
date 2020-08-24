@@ -225,3 +225,49 @@ fun normalEvalSort list =
     print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n");
     print("The estimated sort time function: T(n) = "^(Real.toString(real(Real.trunc(average*10.0))/10.0))^" n log (n)\n")
   end;
+
+(* 
+val normalEvalSort = fn : int list -> unit
+- normalEvalSort test_list;
+          array size       time in cunit        T/(n log(n))
+              500000                 226       3.58131972804
+             1000000                 476        3.5822569484
+             5000000                2702       3.64257362441
+---------------------------------------------------------------
+                                 average       3.60205010028
+*)
+
+(* Q14.8 *)
+
+fun checkTimeByDefault base n = 
+  let 
+    val array = genArray n
+  in
+    eval {prog=(ArrayQSort.sort Int.compare), input=array, size=Array.length, base=base}
+  end;
+
+
+fun compareWithDefault list = 
+  let 
+    val compareResults = map checkTimePerCompare list
+    val constant = (foldr(fn ((a,b,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
+    fun base n = constant * nlogn n
+    val results = map (checkTimeByDefault base) list
+    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+  in
+    print(padString("array size")^padString("time in cunit")^padString("T/(n log(n))")^"\n");
+    map printLine results;
+    print("---------------------------------------------------------------\n");
+    print(padString(" ")^padString("average")^padString(Real.toString(average))^"\n");
+    print("The estimated sort time function: T(n) = "^(Real.toString(real(Real.trunc(average*10.0))/10.0))^" n log (n)\n")
+  end;
+(* 
+- compareWithDefault test_list;
+          array size       time in cunit        T/(n log(n))
+              500000                 276       2.84003058539
+             1000000                 550       2.68776781843
+             5000000                3202       2.80300324564
+---------------------------------------------------------------
+                                 average       2.77693388315
+The estimated sort time function: T(n) = 2.7 n log (n)
+*)
