@@ -376,7 +376,7 @@ val normalEvalSort = fn : int list -> unit
 ---------------------------------------------------------------
                                  average       3.60205010028
 
-実行時間が桁で変わったぞ、何だ何が変わったんだ？-> NormalEvalSortよりも、他のcheckTimePerCompare の変更の影響が大きいことがわかった。
+処理性能が桁で変わったぞ、何だ何が変わったんだ？-> NormalEvalSortよりも、他のcheckTimePerCompare の変更の影響が大きいことがわかった。
 - normalEvalSort test_list;
           array size       time in cunit        T/(n log(n))
               500000                 319          0.38676730
@@ -476,4 +476,48 @@ fun compareWithDefault list =
 ---------------------------------------------------------------
                                  average       2.77693388315
 The estimated sort time function: T(n) = 2.7 n log (n)
+
+The effects are derived from the modification of `checkTimePerCompare`.
+- compareWithDefault test_list;
+          array size       time in cunit        T/(n log(n))
+              500000                 354          0.43019002
+             1000000                 682          0.39360134
+             5000000                2994          0.30952604
+---------------------------------------------------------------
+                                 average      0.377772465668
+*)
+
+fun compareWithDefaultModified list = 
+  let 
+    val compareResults = map checkTimePerCompare list
+    val constant = (foldr(fn ((_,_,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
+    (* eval使った方がいい *)
+    fun sort n = 
+      let 
+        val array = genArray n
+      in
+        ArrayQSort.sort Int.compare
+      end
+    fun base n = constant * nlogn n
+    fun evalN n = eval {prog = sort, input = n, size = fn x => x, base = base}
+    val results = map evalN list
+    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
+    fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+  in
+    print(padString("array size")^padString("time in cunit")^padString("T/(n log(n))")^"\n");
+    map printLine results;
+    print("---------------------------------------------------------------\n");
+    print(padString(" ")^padString("average")^padString(formatReal average)^"\n");
+    print("The estimated sort time function: T(n) = "^(Real.fmt (StringCvt.FIX (SOME 2)) average)^" n log (n)\n")
+  end;
+(* 
+- compareWithDefaultModified test_list;
+          array size       time in cunit        T/(n log(n))
+              500000                  42          0.05220039
+             1000000                  83          0.04899116
+             5000000                 395          0.04176475
+---------------------------------------------------------------
+                                 average          0.04765210
+The estimated sort time function: T(n) = 0.05 n log (n)
+val it = () : unit
 *)
