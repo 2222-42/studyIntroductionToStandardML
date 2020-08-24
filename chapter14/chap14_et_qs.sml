@@ -88,6 +88,12 @@ fun convBase f r (x: real) = f x / f r;
 (* Q14.2 *)
 fun nlogn n = 
   (Real.fromInt n) * (convBase Math.log10 2.0 (Real.fromInt n));
+(* 筆者の解答:
+   fun log2 x = Math.log10 x / (Math.log10 2.0)
+   fun nlogn n = ((Real.fromInt n) * (log2 (Real.fromInt n)))
+
+convBaseを改めて作っているだけ。
+*)
 
 fun checkTime n = 
   let 
@@ -103,6 +109,9 @@ fun checkTime n =
   in expression:
     tm / nlogn n *)
 (* val checkTime = fn : int -> int * int * real *)
+
+(* 筆者の解答は同じ *)
+(* end Q14.2 *)
 
 (* Q14.3 *)
 fun testSort n = 
