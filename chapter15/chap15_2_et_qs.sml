@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap5.2
+* Chap5.2 Q15.1 Q15.2
 *)
 
 (* 
@@ -111,3 +111,23 @@ fun cat infList outf =
 val fileList = ["E:/SMLProject/studyIntroductionToStandardML/chapter15/test.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test2.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test3.txt"] 
 (* cat fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy.txt" *)
 
+(* Q15.2 *)
+fun wc inf =
+    let val ins = openIn inf
+        val countOfLine = ref 0
+        val countOfString = ref 0
+        fun getLine ins = 
+                case inputLine(ins) of
+                        SOME v => (countOfLine := !countOfLine + 1; 
+                                   countOfString := !countOfString + size v;
+                                   getLine ins)
+                      | NONE => ()
+    in (
+            getLine ins;
+            print ("countOfLine is: "^Int.toString(!countOfLine)^".\n");
+            print ("countOfString is: "^Int.toString(!countOfString)^".\n");
+            closeIn ins
+    )
+    end;
+
+(* wc "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml";  *)
