@@ -233,7 +233,6 @@ ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも�
 
 fun checkTimePerCompare n = 
   let 
-    (* n入れて、arrayにして、またnにしているから無駄がある。 *)
     val array = genArray n
     fun compSub array = 
       let 
@@ -589,29 +588,39 @@ The effects are derived from the modification of `checkTimePerCompare`.
                                  average      0.377772465668
 *)
 
-fun compareWithDefaultModified list = 
-  let 
-    val compareResults = map checkTimePerCompare list
-    val constant = (foldr(fn ((_,_,c),R) => c+R ) 0.0 compareResults)/Real.fromInt(length list)
-    (* eval使った方がいい *)
-    fun sort n = 
-      let 
-        val array = genArray n
-      in
-        ArrayQSort.sort Int.compare
-      end
-    fun base n = constant * nlogn n
-    fun evalN n = eval {prog = sort, input = n, size = fn x => x, base = base}
-    val results = map evalN list
-    val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
-    fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
-  in
-    print(padString("array size")^padString("time in cunit")^padString("T/(n log(n))")^"\n");
-    map printLine results;
-    print("---------------------------------------------------------------\n");
-    print(padString(" ")^padString("average")^padString(formatReal average)^"\n");
-    print("The estimated sort time function: T(n) = "^(Real.fmt (StringCvt.FIX (SOME 2)) average)^" n log (n)\n")
-  end;
+   fun evalDefaultSort c L =
+       let
+         fun sort array =
+               ArrayQSort.sort Int.compare array
+         fun base n = c * nlogn n
+         fun evalN n = 
+           let val array = genArray n
+           in eval {prog = sort, input = array, size = Array.length, base = base}
+           end
+         val L' = map evalN L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L') / (Real.fromInt (List.length L'))
+         val title = (StringCvt.padLeft #" " 20 "array size")
+                     ^ (StringCvt.padLeft #" " 20 "time in cunit")
+                  ^ (StringCvt.padLeft #" " 20 "C/nlogn")
+                  ^ "\n"
+         fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+         fun printLine (n,a,c) =
+            let
+              val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+              val sa =  StringCvt.padLeft #" " 20 (Int.toString (Real.floor (real a * 1000.0/ c)))
+              val sc = formatReal c
+            in
+              print (ns ^ sa ^ sc ^ "\n")
+            end
+         val C = Real.fmt (StringCvt.FIX (SOME 2)) av
+       in
+         (print title;
+          map printLine L';
+          print "------------------------------------------------------------\n";
+          print ("                                 avarage" ^ (formatReal av) ^ "\n");
+          print ("The estimated sort time function: T(n) = " ^ C ^ " n log(n)\n"))
+       end
+   fun compareWithDefaultModified L = evalDefaultSort (evalCompareNModified L) L
 (* 
 - compareWithDefaultModified test_list;
           array size       time in cunit        T/(n log(n))
@@ -622,4 +631,16 @@ fun compareWithDefaultModified list =
                                  average          0.04765210
 The estimated sort time function: T(n) = 0.05 n log (n)
 val it = () : unit
+
+- compareWithDefaultModified test_list;
+          array size       time in cunit             C/nlogn
+              500000               62474          3.02524997
+             1000000              131548          3.04830879
+             5000000              734365          3.55272734
+------------------------------------------------------------
+                                 avarage          3.20876204
+The estimated sort time function: T(n) = 3.21 n log(n)
+val it = () : unit
+
+自作の方が、デフォルトで提供されているものより良いけれど、これはいいのだろうか？
 *)
