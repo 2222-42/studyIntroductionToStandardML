@@ -234,9 +234,9 @@ ArrayQuickSort.sortとは型がどうしても一致しない。あくまでも�
 fun checkTimePerCompare n = 
   let 
     (* n入れて、arrayにして、またnにしているから無駄がある。 *)
-    fun compSub n = 
+    val array = genArray n
+    fun compSub array = 
       let 
-        val array = genArray n
         val p = Array.sub(array, 0)
         val m = n div 2
         fun compare x = if x <= m then ()
@@ -248,7 +248,7 @@ fun checkTimePerCompare n =
         compare n
       end
   in
-    eval {prog=compSub, input=n, size= fn x => x, base=real}
+    eval {prog=compSub, input=array, size=Array.length, base=real}
   end
 (* fun checkTimePerCompare n = 
   let 
@@ -298,7 +298,7 @@ fun evalCompare list =
   end;
 
 val test_list = [500000,1000000,5000000];
-(* evalSort test_list; *)
+(* evalCompare test_list; *)
 
 (* 筆者の解答 *)
 fun evalCompareByAuthor L =
@@ -339,6 +339,49 @@ fun evalCompareByAuthor L =
       print "\n")
     end
 (* evalCompareByAuthor test_list; *)
+
+fun evalCompareModified L =
+    let
+      fun comp array =
+          let
+            val n = Array.length(array)
+            val p = Array.sub(array, 0)
+            val m = n div 2
+            fun  loop x = if x <= m then ()
+                          else (Int.compare (Array.sub(array, n - x), p);
+                                Int.compare (Array.sub(array, x - 1), p);
+                                loop (x -1))
+          in
+            loop n
+          end
+      fun evalN n = 
+        let val array = genArray n
+        in eval {prog = comp, input = array, size = Array.length, base = real}
+        end
+      val L' = map evalN L
+      val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+      val title = (StringCvt.padLeft #" " 20 "array size")
+                  ^ (StringCvt.padLeft #" " 20 "milli-sec.")
+                  ^ (StringCvt.padLeft #" " 20 "micro s./n")
+                  ^ "\n"
+      fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+      fun printLine (n,a,c) =
+          let
+            val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+            val sa =  StringCvt.padLeft #" " 20 (Int.toString a)
+            val sc = formatReal c
+          in
+            print (ns ^ sa ^ sc ^ "\n")
+          end
+    in
+      (print title;
+      map printLine L';
+      print "------------------------------------------------------------\n";
+      print ("                                 avarage" ^ (formatReal av));
+      print "\n")
+    end
+
+(* evalCompareModified test_list; *)
 
 (* Q14.7 *)
 
