@@ -486,7 +486,7 @@ The estimated sort time function: T(n) = 0.39 n log (n)
    fun normalEvalSortByAuthor L = evalSortN (evalCompareN L) L
 
 (* 筆者の解答の修正 *)
-(* 筆者の解答: *)
+
    fun evalCompareNModified L =
        let
          fun comp array =
