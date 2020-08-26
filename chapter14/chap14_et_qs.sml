@@ -486,6 +486,65 @@ The estimated sort time function: T(n) = 0.39 n log (n)
        end
    fun normalEvalSortByAuthor L = evalSortN (evalCompareN L) L
 
+(* 筆者の解答の修正 *)
+(* 筆者の解答: *)
+   fun evalCompareNModified L =
+       let
+         fun comp array =
+             let
+               val n = Array.length(array)
+               val p = Array.sub(array, 0)
+               val m = n div 2
+               fun  loop x = if x <= m then ()
+                             else (Int.compare (Array.sub(array, n - x), p);
+                                   Int.compare (Array.sub(array, x - 1), p);
+                                   loop (x -1))
+             in
+               loop n
+             end
+        fun evalN n = 
+          let val array = genArray n
+          in eval {prog = comp, input = array, size = Array.length, base = real}
+          end
+         val L' = map evalN L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+       in
+         av
+       end
+   fun evalSortNModified c L =
+       let
+         fun sort array =
+               ArrayQuickSort.sort (array, Int.compare)
+         fun base n = c * nlogn n
+         fun evalN n = 
+           let val array = genArray n
+           in eval {prog = sort, input = array, size = Array.length, base = base}
+           end
+         val L' = map evalN L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L') / (Real.fromInt (List.length L'))
+         val title = (StringCvt.padLeft #" " 20 "array size")
+                     ^ (StringCvt.padLeft #" " 20 "time in cunit")
+                  ^ (StringCvt.padLeft #" " 20 "C/nlogn")
+                  ^ "\n"
+         fun formatReal a = StringCvt.padLeft #" " 20 (Real.fmt (StringCvt.FIX (SOME 8)) a)
+         fun printLine (n,a,c) =
+            let
+              val ns =  StringCvt.padLeft #" " 20 (Int.toString n)
+              val sa =  StringCvt.padLeft #" " 20 (Int.toString (Real.floor (real a * 1000.0/ c)))
+              val sc = formatReal c
+            in
+              print (ns ^ sa ^ sc ^ "\n")
+            end
+         val C = Real.fmt (StringCvt.FIX (SOME 2)) av
+       in
+         (print title;
+          map printLine L';
+          print "------------------------------------------------------------\n";
+          print ("                                 avarage" ^ (formatReal av) ^ "\n");
+          print ("The estimated sort time function: T(n) = " ^ C ^ " n log(n)\n"))
+       end
+   fun normalEvalSortModified L = evalSortNModified (evalCompareNModified L) L
+
 (* Q14.8 *)
 
 fun checkTimeByDefault base n = 
