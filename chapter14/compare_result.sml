@@ -126,6 +126,7 @@ map checkTimePerCompare3 test_list;
     val (n1: int) = size 5000000
     val ratio1 = Real.fromInt tm1 / real n1 *)
 
+    val tmGenArray = timeRun genArray 5000000
     val array2 = genArray 5000000
     val tm2 = timeRun compareElementsOfArray array2
     (* val (n2: int) = Array.length(array2) 
