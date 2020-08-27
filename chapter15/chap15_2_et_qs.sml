@@ -155,3 +155,17 @@ fun toLower c =
 fun lowerFile inf outf = filterFile toLower inf outf;
 
 (* lowerFile "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
+
+(* Q15.4 *)
+
+fun echo() = (
+    print("?");
+    let 
+        val inputData = inputLine stdIn
+    in
+        if isSome inputData then (print(valOf inputData)) else ()
+    end;
+    echo()
+)
+(* stdIn:1.2-1.8 Warning: type vars not generalized because of
+   value restriction are instantiated to dummy types (X1,X2,...) *)
