@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap5.2 Q15.1 Q15.2
+* Chap5.2 Q15.1 Q15.2 Q15.3
 *)
 
 (* 
@@ -144,6 +144,7 @@ fun filterFile f inf outf =
     in (filterStream f ins outs; closeIn ins; closeOut outs)
     end
 
+(* Q15.3 *)
 fun isUpper c = #"A" <= c andalso c <= #"Z"
 
 fun toLower c =
@@ -151,6 +152,6 @@ fun toLower c =
     then chr (ord #"a" + (ord c - ord #"A"))
     else c;
 
-fun lower s = implode (map toLower (explode s));
+fun lowerFile inf outf = filterFile toLower inf outf;
 
-(* filterFile toLower "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
+(* lowerFile "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
