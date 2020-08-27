@@ -131,3 +131,26 @@ fun wc inf =
     end;
 
 (* wc "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml";  *)
+
+fun filterStream f ins outs = 
+    if endOfStream ins then ()
+    else case input1 ins of 
+                SOME c => (output1(outs, f c); filterStream f ins outs)
+              | NONE => filterStream f ins outs
+
+fun filterFile f inf outf = 
+    let val ins = openIn inf
+        val outs = openOut outf
+    in (filterStream f ins outs; closeIn ins; closeOut outs)
+    end
+
+fun isUpper c = #"A" <= c andalso c <= #"Z"
+
+fun toLower c =
+    if isUpper c
+    then chr (ord #"a" + (ord c - ord #"A"))
+    else c;
+
+fun lower s = implode (map toLower (explode s));
+
+(* filterFile toLower "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
