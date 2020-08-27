@@ -108,8 +108,24 @@ fun cat infList outf =
         (map (copySub outs) infList; closeOut outs)
     end;
 
-val fileList = ["E:/SMLProject/studyIntroductionToStandardML/chapter15/test.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test2.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test3.txt"] 
-(* cat fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy.txt" *)
+(* 筆者の解答:まとめてオープンして、それを出力先にcopyStreamして、まとめてcloseする方針。
+回答者の回答は1つずつ実施している。
+*)
+fun catByAuthor L out =
+    let
+        val sources = map openIn L
+        val sink = openOut out
+    in
+        (foldl (fn (x,_) => copyStream x sink) () sources;
+        map closeIn sources;
+        closeOut sink)
+    end
+
+val fileList = ["E:/SMLProject/studyIntroductionToStandardML/chapter15/test1.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test2.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test3.txt"] 
+(* 
+cat fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy1.txt" 
+catByAuthor fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy1.txt" 
+*)
 
 (* Q15.2 *)
 fun wc inf =
