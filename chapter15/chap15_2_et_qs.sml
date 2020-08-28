@@ -233,14 +233,14 @@ fun filterFile f inf outf =
     end
 
 (* Q15.3 *)
-fun isUpper c = #"A" <= c andalso c <= #"Z"
+(* fun isUpper c = #"A" <= c andalso c <= #"Z"
 
 fun toLower c =
     if isUpper c
     then chr (ord #"a" + (ord c - ord #"A"))
-    else c;
+    else c; *)
 
-fun lowerFile inf outf = filterFile toLower inf outf;
+fun lowerFile inf outf = filterFile Char.toLower inf outf;
 
 (* lowerFile "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
 
