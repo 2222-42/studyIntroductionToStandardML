@@ -247,7 +247,7 @@ fun lowerFile inf outf = filterFile Char.toLower inf outf;
 (* Q15.4 *)
 
 fun echo() = (
-    print("?");
+    print("? ");
     let 
         val inputData = inputLine stdIn
     in
@@ -257,3 +257,43 @@ fun echo() = (
 )
 (* stdIn:1.2-1.8 Warning: type vars not generalized because of
    value restriction are instantiated to dummy types (X1,X2,...) *)
+
+fun echoModified() = 
+    (print("? ");
+    if endOfStream stdIn then ()
+    else
+        case inputLine stdIn of
+            SOME string => (print string;echoModified())
+            | NONE => echoModified())
+(* これだとWarningが出ない *)
+
+fun echoModified2() = 
+    (print("? ");
+    let 
+        val inputData = inputLine stdIn
+    in
+        case inputLine stdIn of
+            SOME string => (print string;echoModified())
+            | NONE => echoModified()
+    end
+    )
+
+
+(* 筆者の解答 *)
+fun echoByAuthor () =
+    let
+        fun loop () =
+            (print "? ";
+            if TextIO.endOfStream TextIO.stdIn then ()
+            else
+                case TextIO.inputLine TextIO.stdIn of
+                SOME string => (print string; loop ())
+                | NONE => loop()
+            )
+    in
+        loop()
+    end
+(* 回答者の振り返り:
+local宣言の中で`inputLine`を使うのはあんまりお行儀よくないかもしれない。というのも、それが作られるのは関数のなかだから。
+isSomeは使わない方がいい。Dummyの型変数が導入されることになる。(理由はよくわからない)
+*)
