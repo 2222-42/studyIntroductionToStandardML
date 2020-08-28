@@ -108,8 +108,24 @@ fun cat infList outf =
         (map (copySub outs) infList; closeOut outs)
     end;
 
-val fileList = ["E:/SMLProject/studyIntroductionToStandardML/chapter15/test.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test2.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test3.txt"] 
-(* cat fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy.txt" *)
+(* 筆者の解答:まとめてオープンして、それを出力先にcopyStreamして、まとめてcloseする方針。
+回答者の回答は1つずつ実施している。
+*)
+fun catByAuthor L out =
+    let
+        val sources = map openIn L
+        val sink = openOut out
+    in
+        (foldl (fn (x,_) => copyStream x sink) () sources;
+        map closeIn sources;
+        closeOut sink)
+    end
+
+val fileList = ["E:/SMLProject/studyIntroductionToStandardML/chapter15/test1.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test2.txt", "E:/SMLProject/studyIntroductionToStandardML/chapter15/test3.txt"] 
+(* 
+cat fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy1.txt" 
+catByAuthor fileList "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy1.txt" 
+*)
 
 (* Q15.2 *)
 fun wc inf =
@@ -129,8 +145,80 @@ fun wc inf =
             closeIn ins
     )
     end;
+(* これだと、改行文字も文字数に含めてしまう。
+-> あくまでもchar型に含まれるから、数えていいか。
+*)
 
-(* wc "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml";  *)
+(* wc "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy.txt";  *)
+
+   local
+     open TextIO
+   in
+     fun wcByAuthor file =
+        let
+          val ins = openIn file
+          fun count (l,c) =
+             if endOfStream ins then (l,c)
+             else case input1 ins of
+                SOME #"\n" => count (l+1, c+1)
+              | SOME _ => count (l, c+1)
+              | NONE => (l,c)
+          val (l,c) = count (0,0)
+          val _ = print (Int.toString l ^ " ")
+          val _ = print (Int.toString c ^ "\n")
+          val _ = closeIn ins
+        in
+          ()
+        end
+   end;
+(* 筆者の解答だと、行数が1つすくなく数えられてしまう。改行文字が見つからないから。
+-> 回答者の回答も、改行が2回以上続くと、行数を1つ少なく数えてしまう。
+*)
+wcByAuthor "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt";
+
+local
+    open TextIO
+in
+    fun wcModifiedWithLine file =
+    let
+        val ins = openIn file
+        fun count (l,c) =
+            if endOfStream ins then (l,c)
+            else case inputLine(ins) of
+                    SOME v => count(l+1, c+(size v))
+                    | NONE => (l,c)
+        val (l,c) = count (0,0)
+        val _ = print (Int.toString l ^ " ")
+        val _ = print (Int.toString c ^ "\n")
+        val _ = closeIn ins
+    in
+        ()
+    end
+end;
+wcModifiedWithLine "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt";
+
+(* local
+    open TextIO
+in
+    fun wcModifiedWithInput1 file =
+    let
+        val ins = openIn file
+        fun count (l,c) =
+            if endOfStream ins then (l,c)
+            else case input1 ins of
+                SOME #"\n" => count (l+1, c+1)
+                | SOME #"\f" => count (l+1, c+1)
+                | SOME _ => count (l, c+1)
+                | NONE => (l,c)
+        val (l,c) = count (0,0)
+        val _ = print (Int.toString l ^ " ")
+        val _ = print (Int.toString c ^ "\n")
+        val _ = closeIn ins
+    in
+        ()
+    end
+end;
+wcModifiedWithInput1 "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt"; *)
 
 fun filterStream f ins outs = 
     if endOfStream ins then ()
@@ -145,21 +233,21 @@ fun filterFile f inf outf =
     end
 
 (* Q15.3 *)
-fun isUpper c = #"A" <= c andalso c <= #"Z"
+(* fun isUpper c = #"A" <= c andalso c <= #"Z"
 
 fun toLower c =
     if isUpper c
     then chr (ord #"a" + (ord c - ord #"A"))
-    else c;
+    else c; *)
 
-fun lowerFile inf outf = filterFile toLower inf outf;
+fun lowerFile inf outf = filterFile Char.toLower inf outf;
 
 (* lowerFile "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml" ;  *)
 
 (* Q15.4 *)
 
 fun echo() = (
-    print("?");
+    print("? ");
     let 
         val inputData = inputLine stdIn
     in
@@ -169,3 +257,43 @@ fun echo() = (
 )
 (* stdIn:1.2-1.8 Warning: type vars not generalized because of
    value restriction are instantiated to dummy types (X1,X2,...) *)
+
+fun echoModified() = 
+    (print("? ");
+    if endOfStream stdIn then ()
+    else
+        case inputLine stdIn of
+            SOME string => (print string;echoModified())
+            | NONE => echoModified())
+(* これだとWarningが出ない *)
+
+fun echoModified2() = 
+    (print("? ");
+    let 
+        val inputData = inputLine stdIn
+    in
+        case inputLine stdIn of
+            SOME string => (print string;echoModified())
+            | NONE => echoModified()
+    end
+    )
+
+
+(* 筆者の解答 *)
+fun echoByAuthor () =
+    let
+        fun loop () =
+            (print "? ";
+            if TextIO.endOfStream TextIO.stdIn then ()
+            else
+                case TextIO.inputLine TextIO.stdIn of
+                SOME string => (print string; loop ())
+                | NONE => loop()
+            )
+    in
+        loop()
+    end
+(* 回答者の振り返り:
+local宣言の中で`inputLine`を使うのはあんまりお行儀よくないかもしれない。というのも、それが作られるのは関数のなかだから。
+isSomeは使わない方がいい。Dummyの型変数が導入されることになる。(理由はよくわからない)
+*)
