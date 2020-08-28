@@ -145,8 +145,80 @@ fun wc inf =
             closeIn ins
     )
     end;
+(* これだと、改行文字も文字数に含めてしまう。
+-> あくまでもchar型に含まれるから、数えていいか。
+*)
 
-(* wc "E:/SMLProject/studyIntroductionToStandardML/header_pattern.sml";  *)
+(* wc "E:/SMLProject/studyIntroductionToStandardML/chapter15/newCopy.txt";  *)
+
+   local
+     open TextIO
+   in
+     fun wcByAuthor file =
+        let
+          val ins = openIn file
+          fun count (l,c) =
+             if endOfStream ins then (l,c)
+             else case input1 ins of
+                SOME #"\n" => count (l+1, c+1)
+              | SOME _ => count (l, c+1)
+              | NONE => (l,c)
+          val (l,c) = count (0,0)
+          val _ = print (Int.toString l ^ " ")
+          val _ = print (Int.toString c ^ "\n")
+          val _ = closeIn ins
+        in
+          ()
+        end
+   end;
+(* 筆者の解答だと、行数が1つすくなく数えられてしまう。改行文字が見つからないから。
+-> 回答者の回答も、改行が2回以上続くと、行数を1つ少なく数えてしまう。
+*)
+wcByAuthor "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt";
+
+local
+    open TextIO
+in
+    fun wcModifiedWithLine file =
+    let
+        val ins = openIn file
+        fun count (l,c) =
+            if endOfStream ins then (l,c)
+            else case inputLine(ins) of
+                    SOME v => count(l+1, c+(size v))
+                    | NONE => (l,c)
+        val (l,c) = count (0,0)
+        val _ = print (Int.toString l ^ " ")
+        val _ = print (Int.toString c ^ "\n")
+        val _ = closeIn ins
+    in
+        ()
+    end
+end;
+wcModifiedWithLine "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt";
+
+(* local
+    open TextIO
+in
+    fun wcModifiedWithInput1 file =
+    let
+        val ins = openIn file
+        fun count (l,c) =
+            if endOfStream ins then (l,c)
+            else case input1 ins of
+                SOME #"\n" => count (l+1, c+1)
+                | SOME #"\f" => count (l+1, c+1)
+                | SOME _ => count (l, c+1)
+                | NONE => (l,c)
+        val (l,c) = count (0,0)
+        val _ = print (Int.toString l ^ " ")
+        val _ = print (Int.toString c ^ "\n")
+        val _ = closeIn ins
+    in
+        ()
+    end
+end;
+wcModifiedWithInput1 "E:/SMLProject/studyIntroductionToStandardML/chapter15/1letter.txt"; *)
 
 fun filterStream f ins outs = 
     if endOfStream ins then ()
