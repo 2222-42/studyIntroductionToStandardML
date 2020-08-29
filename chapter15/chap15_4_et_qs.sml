@@ -129,3 +129,48 @@ fun getNum ins =
         | _ => s
   in DIGITS(getRest "")
   end
+(* end of Q15.5 *)
+
+fun lex ins = 
+  (skipSpaces ins;
+   if T.endOfStream ins then EOF
+   else 
+    let val c = valOf (T.lookahead ins)
+    in
+      if Char.isDigit c then getNum ins
+      else if Char.isAlpha c then getID ins
+      else case valOf (T.input1 ins) of
+        #"!" => BANG
+      | #""" => DOUBLEQUOTE
+      | #"#" => HASH
+      | #"$" => DOLLAR
+      | #"%" => PERCENT
+      | #"&" => AMPERSAND
+      | #"'" => QUOTE
+      | #"(" => LPAREN
+      | #")" => RPAREN
+      | #"~" => TILDE
+      | #"=" => EQUALSYM
+      | #"-" => HYPHEN
+      | #"^" => HAT
+      | #"_" => UNDERBAR
+      | #"\" => SLASH
+      | #"_" => BAR
+      | #"@" => AT
+      | #"`" => BACKQUOTE
+      | #"[" => LBRACKET
+      | #"{" => LBRACE
+      | #";" => SEMICOLON
+      | #"+" => PLUS
+      | #":" => COLON
+      | #"*" => ASTERISK
+      | #"]" => RBRACKET
+      | #"}" => RBRACE
+      | #"," => COMMA
+      | #"<" => LANGLE
+      | #"." => PERIOD
+      | #">" => RANGLE
+      | #"/" => BACKSLASH
+      | #"?" => QUESTION
+      | _ => SPECIAL c
+    end)
