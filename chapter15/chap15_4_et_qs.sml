@@ -118,3 +118,14 @@ fun getID ins =
     in ID(getRest "")
     end
 
+(* Q.15.5 *)
+fun getNum ins = 
+  let
+    fun getRest s =
+          case T.lookahead ins of
+          SOME c => if Char.isDigit c then
+                          getRest (s ^ T.inputN(ins, 1))
+                    else s
+        | _ => s
+  in DIGITS(getRest "")
+  end
