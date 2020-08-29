@@ -141,7 +141,7 @@ fun lex ins =
       else if Char.isAlpha c then getID ins
       else case valOf (T.input1 ins) of
         #"!" => BANG
-      | #""" => DOUBLEQUOTE
+      | #"\"" => DOUBLEQUOTE
       | #"#" => HASH
       | #"$" => DOLLAR
       | #"%" => PERCENT
@@ -154,8 +154,8 @@ fun lex ins =
       | #"-" => HYPHEN
       | #"^" => HAT
       | #"_" => UNDERBAR
-      | #"\" => SLASH
-      | #"_" => BAR
+      | #"\\" => SLASH
+      | #"|" => BAR
       | #"@" => AT
       | #"`" => BACKQUOTE
       | #"[" => LBRACKET
@@ -174,3 +174,50 @@ fun lex ins =
       | #"?" => QUESTION
       | _ => SPECIAL c
     end)
+
+(* Q15.6 *)
+fun testLex() = 
+  let 
+    val token = lex TextIO.stdIn
+    fun toString t = 
+      case t of
+        ID(s) => s
+      | DIGITS(s) => s
+      | BANG => str(#"!")
+      | DOUBLEQUOTE => str(#"\"")
+      | HASH => str(#"#")
+      | DOLLAR => str(#"$")
+      | PERCENT => str(#"%")
+      | AMPERSAND => str(#"&")
+      | QUOTE => str(#"'")
+      | LPAREN => str(#"(")
+      | RPAREN => str(#")")
+      | TILDE => str(#"~")
+      | EQUALSYM => str(#"=")
+      | HYPHEN => str(#"-")
+      | HAT => str(#"^")
+      | UNDERBAR => str(#"_")
+      | SLASH => str(#"\\")
+      | BAR => str(#"|")
+      | AT => str(#"@")
+      | BACKQUOTE => str(#"`")
+      | LBRACKET => str(#"[")
+      | LBRACE => str(#"{")
+      | SEMICOLON => str(#";")
+      | PLUS => str(#"+")
+      | COLON => str(#":")
+      | ASTERISK => str(#"*")
+      | RBRACKET => str(#"]")
+      | RBRACE => str(#"}")
+      | COMMA => str(#",")
+      | LANGLE => str(#"<")
+      | PERIOD => str(#".")
+      | RANGLE => str(#">")
+      | BACKSLASH => str(#"/")
+      | QUESTION => str(#"?")
+      | SPECIAL c => str(c)
+  in case token of 
+        EOF => ()
+      | _ => (print (toString token ^ "\n");testLex())
+  end
+(* end Q15.6 *)
