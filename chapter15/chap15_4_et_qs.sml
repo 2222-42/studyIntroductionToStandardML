@@ -131,6 +131,7 @@ fun getNum ins =
   end
 (* end of Q15.5 *)
 
+(* Q15.7 *)
 fun lex ins = 
   (skipSpaces ins;
    if T.endOfStream ins then EOF
