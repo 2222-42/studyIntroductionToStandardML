@@ -222,3 +222,102 @@ fun testLex() =
       | _ => (print (toString token ^ "\n");testLex())
   end
 (* end Q15.6 *)
+
+(* Q15.7 *)
+(* 
+use temp.txt
+ID(use)
+ID(temp)
+PERIOD
+ID(txt)
+
+方針:
+> use fileName
+とある。
+読み込む
+`use`がまず入る。
+skipSpaceする。
+`fileName`が入る。
+  ファイル名の形式は？
+  -> token だとダメ。
+  -> ファイル名には空白が含まれることがあるから、ダブルクォーテーションとかでくくっている必要がある
+    -> テキストでその指定はない。
+    ・文の末尾まで見るか -> とりあえずこれで。
+      ・改行記号を含めてはならない 
+    ・ダブルクォーテーションを要求するか
+  cf: http://web.mit.edu/~firebird/arch/sun4x_59/bin/sml/cm/entity/description.sml
+そのファイル名のファイルを開く。
+そのファイルの中身をプリントする。
+閉じる。
+後を続ける。
+*)
+
+
+fun toString t = 
+  case t of
+    ID(s) => "ID("^s^")"
+  | DIGITS(s) => "DIGITS("^s^")"
+  | BANG => "BANG"
+  | DOUBLEQUOTE => "DOUBLEQUOTE"
+  | HASH => "HASH"
+  | DOLLAR => "DOLLAR"
+  | PERCENT => "PERCENT"
+  | AMPERSAND => "AMPERSAND"
+  | QUOTE => "QUOTE"
+  | LPAREN => "LPAREN"
+  | RPAREN => "RPAREN"
+  | TILDE => "TILDE"
+  | EQUALSYM => "EQUALSYM"
+  | HYPHEN => "HYPHEN"
+  | HAT => "HAT"
+  | UNDERBAR => "UNDERBAR"
+  | SLASH => "SLASH"
+  | BAR => "BAR"
+  | AT => "AT"
+  | BACKQUOTE => "BACKQUOTE"
+  | LBRACKET => "LBRACKET"
+  | LBRACE => "LBRACE"
+  | SEMICOLON => "SEMICOLON"
+  | PLUS => "PLUS"
+  | COLON => "COLON"
+  | ASTERISK => "ASTERISK"
+  | RBRACKET => "RBRACKET"
+  | RBRACE => "RBRACE"
+  | COMMA => "COMMA"
+  | LANGLE => "LANGLE"
+  | PERIOD => "PERIOD"
+  | RANGLE => "RANGLE"
+  | BACKSLASH => "BACKSLASH"
+  | QUESTION => "QUESTION"
+  | SPECIAL c => "SPECIAL("^str(c)^")";
+
+fun testSub ins =
+    let
+      val token = lex ins
+      fun getFileName ins string = 
+            case T.input1 ins of
+                SOME #"\n" => string
+              | SOME s => getFileName ins (string^str(s))
+              | NONE => string
+          (* case T.inputLine ins of
+            SOME string => string
+          | NONE => "" *)
+    in
+      case token of
+          EOF => ()
+        | ID "use" =>
+            let
+              val fileName = (skipSpaces ins; getFileName ins "")
+              val newIns = T.openIn fileName
+            in
+              (testSub newIns; T.closeIn newIns; testSub ins)
+            end
+        | _ => (print (toString token ^ "\n");
+                testSub ins)
+    end
+fun testLexWithUse () = testSub T.stdIn;
+
+testLexWithUse ();
+
+(* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/temp.txt *)
+(* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/nest.txt *)
