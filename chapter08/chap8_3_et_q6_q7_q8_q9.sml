@@ -65,10 +65,18 @@ dataDlist (leftDlist test);
 (* Q8.7 *)
 fun deleteDlist dlist =
     case dlist of
+        (* Not good because of using of comparing of values:
         ref (CELL {right=r as ref (CELL{left=l1,...}), left=l as ref (CELL {right=r2,...}),...}) 
-            => if !l = !dlist then dlist := NIL
+            => if l = dlist then dlist := NIL
                else (dlist := !r; r2 := !r; l1 := !l)
-      | ref NIL => ();
+      | ref NIL => (); *)
+        ref NIL => ()
+      | ref (CELL{left=l1 as ref (CELL{right=r2,left=l2,...}),
+                   right=r1 as ref (CELL{right=r3,left=l3,...}),
+                   ...}) => 
+            if l1 = l2 then dlist := NIL
+            else (dlist := !r1; r2 := !r1; l3 := !l1);
+
 (* 
 以下は消す方針での実装
         ref (CELL {right=r1 as ref (CELL{data=a,right=r2,left=l2}),...}) =>
@@ -105,25 +113,6 @@ fun deleteDlist dlist =
       | ref NIL => ();
 これだと、空にならない。
 
-val test = singletonDlist 0;
-insertDlist 1 test;
-val r1 = rightDlist test;
-test = r1;
-deleteDlist test;
-val r1 = rightDlist test;
-test = r1;
-deleteDlist test;
-
-val test = singletonDlist 0;
-insertDlist 0 test;
-val r1 = rightDlist test;
-val l1 = leftDlist test;
-test = r1;
-test = l1;
-r1 = l1;
-!test = !r1;
-!test = !l1;
-!r1 = !l1;
 *)
 
 test;
