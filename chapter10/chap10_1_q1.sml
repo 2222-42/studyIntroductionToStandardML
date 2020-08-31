@@ -31,10 +31,12 @@ structure ImperativeIntQueue = struct
       | leftDlist (ref NIL) = raise EmptyQueue
     fun deleteDlist dlist =
         case dlist of
-            ref (CELL {right=r as ref (CELL{left=l1,...}), left=l as ref (CELL {right=r2,...}),...}) 
-                => if !l = !dlist then (dlist := NIL)
-                else (dlist := !r; r2 := !r; l1 := !l)
-          | ref NIL => raise EmptyQueue
+          ref NIL => raise EmptyQueue
+        | ref (CELL{left=l1 as ref (CELL{right=r2,left=l2,...}),
+                    right=r1 as ref (CELL{right=r3,left=l3,...}),
+                    ...}) => 
+              if l1 = l2 then dlist := NIL
+              else (dlist := !r1; r2 := !r1; l3 := !l1);
     (* 待ち行列の先頭の要素を取り除き、その要素を返す。 *)
     fun dequeue queue =
         let 
