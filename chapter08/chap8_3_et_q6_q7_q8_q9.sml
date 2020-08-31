@@ -126,6 +126,10 @@ test;
 
 (* fromListToDlist : 'a list -> 'a dlist*)
 fun fromListToDlist list = foldr (fn (h, R) => (insertDlist h R; R)) (ref NIL) list;
+
+(* 筆者の解答:*)
+fun fromListToDlistByAuthor L = foldl (fn (x,y) => (insertDlist x y;y)) (ref NIL) L;
+(* これだと、リストの先頭から付け加えられてしまうから、後の dlistToList と結果が一致しなくなってしまう *)
 (* 
 - fun fromListToDlist list = foldl (fn (h, R) => insertDlist h R) (ref NIL) list;
 stdIn:18.28-18.79 Error: operator and operand do not agree [tycon mismatch]
@@ -309,6 +313,12 @@ fun dlistToList L =
         else (dataDlist l)::(f (rightDlist l) (l::visited))
     in f (rightDlist (leftDlist L)) nil 
     end;
+
+val testList = [1,2,3]
+val listTest1 = fromListToDlist testList
+val listTest2 = fromListToDlistByAuthor testList;
+(dlistToList listTest1) = testList;
+(dlistToList listTest2) = testList;
 
 (* 問8.9 *)
 fun copyDlist DL = 
