@@ -11,7 +11,7 @@ https://smlfamily.github.io/Basis/integer.html#section:0
 
 signature Math = MATH;
 
-fun convBase f r (x: real) = f x / f r;
+fun convBase (f: real -> real) r x = f x / f r;
 
 (* 筆者の解答 : 同じだったからこれでOK*)
 (* fun convBase f b x = f x / f b *)
@@ -29,12 +29,15 @@ Math ストラクチャを利用していないのだが、大丈夫だろうか
 あと、型が
 val convBase = fn : ('a -> real) -> 'a -> 'a -> real
 となっており、教科書に記載されているものと異なる？
+-> 教科書の記述が誤植
 
 教科書の記述もおかしいし、保留で。
 -> x についての情報がないので、型変数になってしまう。real 型を与えたいならば、それを明示する。
 これにより、
 val convBase = fn : (real -> real) -> real -> real -> real
 と、正しい型になる。
+
+SML#だと`/`がオーバーロードされているから、型変数が残ってしまうので、`f`に型を明示的に与える必要がある。
 *)
 
 (* Q12.2 *)
