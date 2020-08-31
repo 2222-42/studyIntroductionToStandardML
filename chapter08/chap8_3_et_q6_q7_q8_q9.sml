@@ -65,10 +65,18 @@ dataDlist (leftDlist test);
 (* Q8.7 *)
 fun deleteDlist dlist =
     case dlist of
+        (* Not good because of using of comparing of values:
         ref (CELL {right=r as ref (CELL{left=l1,...}), left=l as ref (CELL {right=r2,...}),...}) 
-            => if !l = !dlist then dlist := NIL
+            => if l = dlist then dlist := NIL
                else (dlist := !r; r2 := !r; l1 := !l)
-      | ref NIL => ();
+      | ref NIL => (); *)
+        ref NIL => ()
+      | ref (CELL{left=l1 as ref (CELL{right=r2,left=l2,...}),
+                   right=r1 as ref (CELL{right=r3,left=l3,...}),
+                   ...}) => 
+            if l1 = l2 then dlist := NIL
+            else (dlist := !r1; r2 := !r1; l3 := !l1);
+
 (* 
 以下は消す方針での実装
         ref (CELL {right=r1 as ref (CELL{data=a,right=r2,left=l2}),...}) =>
@@ -105,25 +113,6 @@ fun deleteDlist dlist =
       | ref NIL => ();
 これだと、空にならない。
 
-val test = singletonDlist 0;
-insertDlist 1 test;
-val r1 = rightDlist test;
-test = r1;
-deleteDlist test;
-val r1 = rightDlist test;
-test = r1;
-deleteDlist test;
-
-val test = singletonDlist 0;
-insertDlist 0 test;
-val r1 = rightDlist test;
-val l1 = leftDlist test;
-test = r1;
-test = l1;
-r1 = l1;
-!test = !r1;
-!test = !l1;
-!r1 = !l1;
 *)
 
 test;
@@ -137,6 +126,10 @@ test;
 
 (* fromListToDlist : 'a list -> 'a dlist*)
 fun fromListToDlist list = foldr (fn (h, R) => (insertDlist h R; R)) (ref NIL) list;
+
+(* 筆者の解答:*)
+fun fromListToDlistByAuthor L = foldl (fn (x,y) => (insertDlist x y;y)) (ref NIL) L;
+(* これだと、リストの先頭から付け加えられてしまうから、後の dlistToList と結果が一致しなくなってしまう *)
 (* 
 - fun fromListToDlist list = foldl (fn (h, R) => insertDlist h R) (ref NIL) list;
 stdIn:18.28-18.79 Error: operator and operand do not agree [tycon mismatch]
@@ -321,6 +314,12 @@ fun dlistToList L =
     in f (rightDlist (leftDlist L)) nil 
     end;
 
+val testList = [1,2,3]
+val listTest1 = fromListToDlist testList
+val listTest2 = fromListToDlistByAuthor testList;
+(dlistToList listTest1) = testList;
+(dlistToList listTest2) = testList;
+
 (* 問8.9 *)
 fun copyDlist DL = 
     let val list = dlistToList DL
@@ -365,6 +364,10 @@ fun mapDlist f d =
         | newElem x ((h,newH)::t) =
             if x = h then SOME newH
             else newElem x t
+        (* コメント:
+        （元の参照、新しい参照）の組を記録することによって与えられた参照構造と同じ構造をつくっている
+        与えられた参照が外部の参照の場合、その構造もコピーしたほうがよいことも満たしている。
+         *)
         fun copy l copied =
             case l of
             ref NIL => ref NIL
@@ -386,11 +389,14 @@ fun mapDlist f d =
     in
         (* 以下のように、最初の要素の重複を避けるためにリンク内のポインタからスタートするようにしていないのはなぜだろうか？
             copy (rightDlist (leftDlist d)) nil
+            A: （元の参照、新しい参照）の組を記録することによって与えられた参照構造と同じ構造をつくっているので、
+            CELL内部のポインタから始めるという処理はいらない
         *)
         copy d nil
     end;
 (* なんでこれが思いつくのかが全く分からない。
 筋は通っている。
+-> 参照の変更処理はMLには向いていない。これを使うのだったら、システム全体の構造を変えるのが良い。
 *)
 
 val test = fromListToDlist [1,2,3];
