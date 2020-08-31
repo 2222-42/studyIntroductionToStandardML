@@ -364,6 +364,10 @@ fun mapDlist f d =
         | newElem x ((h,newH)::t) =
             if x = h then SOME newH
             else newElem x t
+        (* コメント:
+        （元の参照、新しい参照）の組を記録することによって与えられた参照構造と同じ構造をつくっている
+        与えられた参照が外部の参照の場合、その構造もコピーしたほうがよいことも満たしている。
+         *)
         fun copy l copied =
             case l of
             ref NIL => ref NIL
@@ -385,11 +389,14 @@ fun mapDlist f d =
     in
         (* 以下のように、最初の要素の重複を避けるためにリンク内のポインタからスタートするようにしていないのはなぜだろうか？
             copy (rightDlist (leftDlist d)) nil
+            A: （元の参照、新しい参照）の組を記録することによって与えられた参照構造と同じ構造をつくっているので、
+            CELL内部のポインタから始めるという処理はいらない
         *)
         copy d nil
     end;
 (* なんでこれが思いつくのかが全く分からない。
 筋は通っている。
+-> 参照の変更処理はMLには向いていない。これを使うのだったら、システム全体の構造を変えるのが良い。
 *)
 
 val test = fromListToDlist [1,2,3];
