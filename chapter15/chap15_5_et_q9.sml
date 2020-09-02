@@ -33,3 +33,12 @@ end
 
 uncaught exception Io [Io: openIn failed on "E:/SMLProject/studyIntroductionToStandardML/header_patterns.sml", Win32TextPrimIO.openRd: failed]
   raised at: Basis/Implementation/IO/text-io-fn.sml:792.25-792.71 *)
+
+(* 
+- lowerFile "E:/SMLProject/studyIntroductionToStandardML/header_patterns.sml" "E:/SMLProject/studyIntroductionToStandardML/chapter15/header_pattern.sml"
+= ;
+IO Error : openIn failed. Win32TextPrimIO.openRd: failed: E:/SMLProject/studyIntroductionToStandardML/header_patterns.sml
+val it = () : unit
+
+これだとファイルが作られてしまうので、いまいち
+*)
