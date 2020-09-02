@@ -111,3 +111,29 @@ val g = readInt "123 abc 456";
 val it = SOME 123 : int option
 - g ();
 val it = NONE : int option *)
+
+(* Q16.3 *)
+
+val realScan = Real.scan Substring.getc;
+fun readReal str = 
+    let 
+        val s = ref (Substring.full str)
+    in
+        fn () => case (realScan (!s)) of
+            SOME (i, r) => (s := r ;SOME i)
+          | NONE => NONE
+    end;
+val rf = readReal "1.23 4.56 1 abc";
+val rg = readReal "1.23 abc 1 4.56";
+
+val boolScan = Bool.scan Substring.getc;
+fun readBool str = 
+    let 
+        val s = ref (Substring.full str)
+    in
+        fn () => case (boolScan (!s)) of
+            SOME (i, r) => (s := r ;SOME i)
+          | NONE => NONE
+    end;
+val bf = readBool "true false 1 abc";
+val bg = readBool "false true abc 4.56";
