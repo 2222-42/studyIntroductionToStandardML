@@ -235,6 +235,11 @@ fun testLex() =
         EOF => ()
       | _ => (print (toString token ^ "\n");testLex())
   end
+
+(* 筆者の解答ではChar.toStringを使っている
+         | SPECIAL c => "SPECIAL" ^ Char.toString c ^ ")"
+本質的な違いはなし
+*)
 (* end Q15.6 *)
 
 (* Q15.7 *)
