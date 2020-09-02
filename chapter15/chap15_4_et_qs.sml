@@ -337,6 +337,7 @@ fun testSub ins =
 fun testLexWithUse () = testSub T.stdIn;
 
 (* testLexWithUse (); *)
+(* Ctrl+cで抜けたときにエラーが起きる。 *)
 
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/temp.txt *)
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/nest.txt *)
