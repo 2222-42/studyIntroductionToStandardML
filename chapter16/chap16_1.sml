@@ -72,3 +72,40 @@ Substring.string trimmedR3;
 
 val subFromSubString1 = Substring.slice (subAll,2,SOME 2);
 Substring.string subFromSubString1;
+
+val (a1,b1) = Substring.position test subFromSubString1;
+Substring.string a1;
+Substring.string b1;
+
+val (a2,b2) = Substring.position "34" subAll;
+Substring.string a2;
+Substring.string b2;
+
+val a3 = Substring.span(subAll, subFromSubString1);
+Substring.string a3;
+
+(* 
+signature STRING_CVT =
+  sig
+    datatype radix = BIN | DEC | HEX | OCT
+    datatype realfmt
+      = EXACT | FIX of int option | GEN of int option | SCI of int option
+    type('a,'b) reader = 'b -> ('a * 'b) option
+    val padLeft : char -> int -> string -> string
+    val padRight : char -> int -> string -> string
+    val splitl : (char -> bool) -> (char,'a) reader -> 'a -> string * 'a
+    val takel : (char -> bool) -> (char,'a) reader -> 'a -> string
+    val dropl : (char -> bool) -> (char,'a) reader -> 'a -> 'a
+    val skipWS : (char,'a) reader -> 'a -> 'a
+    type cs
+    val
+        scanString : ((char,cs) reader -> ('a,cs) reader)
+                      -> string -> 'a option
+  end
+*)
+
+
+val paddedTest = StringCvt.padLeft #"!" 20 test;
+
+val g1 = StringCvt.GEN(SOME 5);
+Real.fmt g1 Math.pi;
