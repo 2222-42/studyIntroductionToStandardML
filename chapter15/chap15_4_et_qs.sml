@@ -129,6 +129,20 @@ fun getNum ins =
         | _ => s
   in DIGITS(getRest "")
   end
+
+(* 筆者の解答 *)
+   fun getNumByAuthor ins =
+     let
+       fun getRest s =
+           case T.lookahead ins of
+             NONE => s
+           | SOME c =>
+             if Char.isDigit c then
+               getRest (s ^ T.inputN(ins,1))
+             else s
+     in
+       DIGITS (getRest "")
+     end
 (* end of Q15.5 *)
 
 (* Q15.7 *)
@@ -317,7 +331,7 @@ fun testSub ins =
     end
 fun testLexWithUse () = testSub T.stdIn;
 
-testLexWithUse ();
+(* testLexWithUse (); *)
 
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/temp.txt *)
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/nest.txt *)
