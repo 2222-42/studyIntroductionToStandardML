@@ -329,7 +329,9 @@ fun testSub ins =
               val fileName = (skipSpaces ins; getFileName ins "")
               val newIns = T.openIn fileName
             in
-              (testSub newIns; T.closeIn newIns; testSub ins)
+              (print ("[opening file \""^fileName^"\"]\n");
+                testSub newIns; T.closeIn newIns; 
+              print ("[closing file \""^fileName^"\"]\n");testSub ins)
             end
         | _ => (print (toString token ^ "\n");
                 testSub ins)
@@ -337,7 +339,7 @@ fun testSub ins =
 fun testLexWithUse () = testSub T.stdIn;
 
 (* testLexWithUse (); *)
-(* Ctrl+cで抜けたときにエラーが起きる。 *)
+(* Ctrl+cで抜けたときにエラーが起きる。-> 起きなくなった。 *)
 
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/temp.txt *)
 (* E:/SMLProject/studyIntroductionToStandardML/chapter15/Q15_8_testfile/nest.txt *)
