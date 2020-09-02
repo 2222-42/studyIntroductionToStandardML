@@ -84,3 +84,30 @@ fun isNum c = c >= #"0" andalso c <= #"9";
 val (c2, rest2) = StringCvt.splitl isAlpha Substring.getc sub1;
 val (c3, rest3) = StringCvt.splitl isNum Substring.getc sub1;
 (* --end Q16.1 *)
+
+fun decScan x = Int.scan StringCvt.DEC x;
+val intScan = decScan Substring.getc;
+val s = Substring.full "123 abc";
+intScan s;
+
+(* Q16.2 *)
+fun readInt str = 
+    let 
+        val s = ref (Substring.full str)
+    in
+        fn () => case (intScan (!s)) of
+            SOME (i, r) => (s := r ;SOME i)
+          | NONE => NONE
+    end;
+
+val f = readInt "123 456 abc";
+(* val it = SOME 123 : int option
+- f();
+val it = SOME 456 : int option
+- f();
+val it = NONE : int option *)
+val g = readInt "123 abc 456";
+(* - g ();
+val it = SOME 123 : int option
+- g ();
+val it = NONE : int option *)
