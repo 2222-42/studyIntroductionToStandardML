@@ -137,3 +137,15 @@ fun readBool str =
     end;
 val bf = readBool "true false 1 abc";
 val bg = readBool "false true abc 4.56";
+
+(* Q16.4 *)
+
+fun genericReadInt reader inputData = 
+    let 
+        val s = ref inputData
+        val modifiedReader = Int.scan StringCvt.DEC reader
+    in
+        fn () => case (modifiedReader (!s)) of
+            SOME (i, r) => (s := r ;SOME i)
+          | NONE => NONE
+    end;
