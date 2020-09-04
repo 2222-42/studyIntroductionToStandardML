@@ -149,3 +149,36 @@ fun genericReadInt reader inputData =
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
     end;
+
+(* - genericReadInt;
+val it = fn : (char,'a) StringCvt.reader -> 'a -> unit -> int option *)
+
+(* Q16.5 *)
+(* 
+TextIO > StreamIO
+val input1 : instream -> (elem * instream) option 
+*)
+fun readIntFromStream ins = 
+  let 
+    (* TextIO.stream -> StreamIO.stream *)
+    val s = TextIO.getInstream ins
+  in
+    genericReadInt TextIO.StreamIO.input1 s
+  end;
+(* - readIntFromStream;
+val it = fn : TextIO.instream -> unit -> int option *)
+
+
+fun readIntFromFile inf = 
+  let 
+    val ins = TextIO.openIn inf
+    val reader = readIntFromStream ins
+    fun loop L = 
+      case reader () of 
+        SOME i => loop(L@[i])
+      | NONE => L
+  in
+    loop nil before TextIO.closeIn ins
+  end;
+
+(* readIntFromFile "E:/SMLProject/studyIntroductionToStandardML/chapter16/testChar.txt"; *)
