@@ -194,14 +194,12 @@ signature PARSE_URL = sig
   val parseUrl : string -> url
 end;
 
+fun isUpper c = #"A" <= c andalso c <= #"Z"
+
 fun toLower c =
-    let
-        val dif = (ord #"a") - (ord #"A")
-    in
-        if isUpper c then
-            chr((ord c) + dif) 
-        else c
-    end;
+    if isUpper c
+    then chr (ord #"a" + (ord c - ord #"A"))
+    else c;
 fun lower s = implode (map toLower (explode s));
 
 structure Url:PARSE_URL = struct
@@ -211,32 +209,35 @@ structure Url:PARSE_URL = struct
       HTTP of {host: string list, path: string list option, anchor: string option}
     | FILE of {path: string list, anchor: string option}
     | RELATIVE of {path: string list, anchor: string option}
+  fun neq c x = not (x = c)
+  fun eq c x = c = x
   fun parseHttp s = 
     let
       val s = if SS.isPrefix "://"  s then
                 SS.triml 3 s
               else raise urlFormat
-      fun neq c x = not (x = c)
-      fun eq c x = c = x
       val (host, body) = SS.splitl (neq #"/") s
       val domain = map SS.string (SS.tokens (eq #".") host)
       val (path, anchor) =
         if SS.isEmpty body then (NONE, NONE)
         else 
           let val (p, a) = SS.splitl(neq #"#") body
-          in (SOME (map SS.setring (SS.tokens (eq #"/") p)),
+          in (SOME (map SS.string (SS.tokens (eq #"/") p)),
               if SS.isEmpty a then NONE
               else SOME(SS.string(SS.triml 1 a)))
           end
     in {host=domain, path=path, anchor=anchor}
     end
-  (* fun parseFile s = 
+  fun parseFile s = 
     let 
+      val s = if SS.isPrefix ":/"  s then
+          SS.triml 2 s
+        else raise urlFormat
       val (path, anchor) =
-        if SS.isEmpty s then (NONE, NONE)
+        if SS.isEmpty s then ([""], NONE)
         else 
           let val (p, a) = SS.splitl(neq #"#") s
-          in (SOME (map SS.setring (SS.tokens (eq #"/") p)),
+          in ((map SS.string (SS.tokens (eq #"/") p)),
               if SS.isEmpty a then NONE
               else SOME(SS.string(SS.triml 1 a)))
           end
@@ -245,19 +246,19 @@ structure Url:PARSE_URL = struct
   fun parseRelative s = 
     let 
       val (path, anchor) =
-        if SS.isEmpty s then (NONE, NONE)
+        if SS.isEmpty s then ([""], NONE)
         else 
           let val (p, a) = SS.splitl(neq #"#") s
-          in (SOME (map SS.setring (SS.tokens (eq #"/") p)),
+          in ((map SS.string (SS.tokens (eq #"/") p)),
               if SS.isEmpty a then NONE
               else SOME(SS.string(SS.triml 1 a)))
           end
     in {path=path, anchor=anchor}
-    end *)
-  fun parse Url s = 
+    end
+  fun parseUrl s = 
     let 
-      val s = SS.all s 
-      val (scheme, body) = SS.splitl(fn x => c <> #":") s
+      val s = SS.full s 
+      val (scheme, body) = SS.splitl(fn c => c <> #":") s
     in
       if SS.isEmpty body then
         RELATIVE (parseRelative scheme)
@@ -268,3 +269,31 @@ structure Url:PARSE_URL = struct
         | _ => raise urlFormat
     end
 end
+
+Url.parseUrl "http://www.google.com/user/#1/show"; 
+(* 
+val it =
+  HTTP {anchor=SOME "1/show",host=["www","google","com"],path=SOME ["user"]}
+  : Url.url 
+
+- Url.parseUrl "http://www.google.com/search";
+val it = HTTP {anchor=NONE,host=["www","google","com"],path=SOME ["search"]}
+  : Url.url
+- Url.parseUrl "http://www.google.com/user/1/show";
+val it =
+  HTTP {anchor=NONE,host=["www","google","com"],path=SOME ["user","1","show"]}
+  : Url.url
+*)
+
+Url.parseUrl "file://E:/SMLProject/studyIntroductionToStandardML";
+(* 
+val it =
+  FILE {anchor=NONE,path=["E:","SMLProject","studyIntroductionToStandardML"]}
+  : Url.url
+*)
+
+Url.parseUrl "chapter16/chap16_2_et_qs.sml";
+(* 
+val it = RELATIVE {anchor=NONE,path=["chapter16","chap16_2_et_qs.sml"]}
+  : Url.url
+*)
