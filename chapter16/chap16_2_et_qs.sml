@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap16.1
+* Chap16.2
 *)
 
 (* 
@@ -202,6 +202,7 @@ fun toLower c =
     else c;
 fun lower s = implode (map toLower (explode s));
 
+(* Q16.6 *)
 structure Url:PARSE_URL = struct
   structure SS = Substring
   exception urlFormat
