@@ -112,3 +112,16 @@ fun parse s =
     end
     
   end
+
+fun format s L = 
+  let
+    val FL = parse (SS.full s)
+    fun traverse (h::t) L =
+      (case h of
+         LITERAL s => s ^ traverse t L
+       | SPEC fmt => (formatData fmt (List.hd L)
+                      ^ (traverse t (List.tl L))))
+    | traverse nil l = ""
+  in
+    (traverse FL L)
+  end
