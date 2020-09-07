@@ -140,7 +140,7 @@ fun readReal str =
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
     end
-val rf = readReal "1.23 4.56 1 abc";
+val rf = readReal "1.23 3E10  1 abc";
 val rg = readReal "1.23 abc 1 4.56";
 
 val boolScan = Bool.scan Substring.getc;
@@ -189,6 +189,10 @@ fun genericReadInt reader inputData =
 
 (* - genericReadInt;
 val it = fn : (char,'a) StringCvt.reader -> 'a -> unit -> int option *)
+
+(* 筆者の解答: 同じなので省略 *)
+
+(* --end of Q16.4 *)
 
 (* Q16.5 *)
 (* 
