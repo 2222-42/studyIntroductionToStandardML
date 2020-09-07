@@ -2,7 +2,17 @@
 * Q16.6
 *)
 
-   structure ParseURL =
+signature PARSE_URL = sig
+  exception urlFormat
+  datatype url = 
+      HTTP of {host: string list, path: string list option, anchor: string option}
+    | FILE of {path: string list, anchor: string option}
+    | FTP of {host : string list, path : string list}
+    | RELATIVE of {path : string list, anchor : string option, root : url option ref}
+  val parseUrl : string -> url
+end
+
+   structure Url:PARSE_URL =
    struct
    local
      structure SS = Substring
