@@ -100,7 +100,7 @@ fun readInt str =
         fn () => case (intScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 
 val f = readInt "123 456 abc";
 (* val it = SOME 123 : int option
@@ -114,6 +114,21 @@ val it = SOME 123 : int option
 - g ();
 val it = NONE : int option *)
 
+(* 筆者の解答:
+回答者の解答と大きな違いはない *)
+fun readIntByAuthor string =
+  let
+    val stream = ref (Substring.full string)
+  in
+    fn () =>
+      case intScan (!stream) of
+        SOME (i, substring) =>
+        SOME i before stream := substring
+      | NONE => NONE
+  end
+
+(* --end of Q16.2 *)
+
 (* Q16.3 *)
 
 val realScan = Real.scan Substring.getc;
@@ -124,7 +139,7 @@ fun readReal str =
         fn () => case (realScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 val rf = readReal "1.23 4.56 1 abc";
 val rg = readReal "1.23 abc 1 4.56";
 
@@ -136,7 +151,7 @@ fun readBool str =
         fn () => case (boolScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 val bf = readBool "true false 1 abc";
 val bg = readBool "false true abc 4.56";
 
@@ -150,7 +165,7 @@ fun genericReadInt reader inputData =
         fn () => case (modifiedReader (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 
 (* - genericReadInt;
 val it = fn : (char,'a) StringCvt.reader -> 'a -> unit -> int option *)
@@ -166,7 +181,7 @@ fun readIntFromStream ins =
     val s = TextIO.getInstream ins
   in
     genericReadInt TextIO.StreamIO.input1 s
-  end;
+  end
 (* - readIntFromStream;
 val it = fn : TextIO.instream -> unit -> int option *)
 
@@ -181,7 +196,7 @@ fun readIntFromFile inf =
       | NONE => L
   in
     loop nil before TextIO.closeIn ins
-  end;
+  end
 
 (* readIntFromFile "E:/SMLProject/studyIntroductionToStandardML/chapter16/testChar.txt"; *)
 
@@ -194,7 +209,7 @@ signature PARSE_URL = sig
     | FILE of {path: string list, anchor: string option}
     | RELATIVE of {path: string list, anchor: string option}
   val parseUrl : string -> url
-end;
+end
 
 fun isUpper c = #"A" <= c andalso c <= #"Z"
 
@@ -202,7 +217,7 @@ fun toLower c =
     if isUpper c
     then chr (ord #"a" + (ord c - ord #"A"))
     else c;
-fun lower s = implode (map toLower (explode s));
+fun lower s = implode (map toLower (explode s))
 
 (* Q16.6 *)
 structure Url:PARSE_URL = struct
@@ -271,7 +286,7 @@ structure Url:PARSE_URL = struct
         | "file" => FILE (parseFile body)
         | _ => raise urlFormat
     end
-end
+end;
 
 Url.parseUrl "http://www.google.com/user/#1/show"; 
 (* 
