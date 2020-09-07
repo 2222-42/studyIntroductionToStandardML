@@ -73,6 +73,8 @@ getc が(char, substring) reader型を持つことの確認
 - val getc : substring -> (char * substring) option
 - type('a,'b) reader = 'b -> ('a * 'b) option
 
+よって、substring -> (char * substring) optionは、 (char, substring) readerである。
+
 さらに確認するならば、getc を引数とする関数を用いて、型エラーが起きないことでも確認することができる。
 *)
 
