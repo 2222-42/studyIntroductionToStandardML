@@ -2,8 +2,6 @@
 * Q16.11
 *)
 
-
-
 fun timeRun f x =
     let 
         val timer = Timer.startCPUTimer()
@@ -38,19 +36,6 @@ fun checkTime n =
 
 use "./chapter16/chap16_3_q9.sml";
 
-fun padString str = 
-  if String.size(str) < 20 then 
-    let
-      val length = 20 - String.size(str)
-      fun addEmp (length, string) = 
-        if length <= 0 then string
-        else addEmp(length - 1, " "^string)
-    in
-      addEmp(length, str)
-    end
-  else str;
-
-fun formatReal r = (Real.fmt (StringCvt.FIX (SOME 8)) r)
 fun printLine (i1, i2, r) =
   Format.printf "%20d%20d%20f\n" [Format.I i1, Format.I i2, Format.R r];
 
