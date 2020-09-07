@@ -19,11 +19,13 @@ fun genArray n = Array.tabulate(n, randomInt);
 
 use "./chapter13/chap13_2_q4.sml";
 
-fun convBase f r (x: real) = f x / f r;
-
 (* Q14.2 *)
 fun nlogn n = 
-  (Real.fromInt n) * (convBase Math.log10 2.0 (Real.fromInt n));
+  let
+    fun convBase f r (x: real) = f x / f r
+  in
+    (Real.fromInt n) * (convBase Math.log10 2.0 (Real.fromInt n))
+  end
 
 fun checkTime n = 
   let 
@@ -36,11 +38,10 @@ fun checkTime n =
 
 use "./chapter16/chap16_3_q9.sml";
 
-fun printLine (i1, i2, r) =
-  Format.printf "%20d%20d%20f\n" [Format.I i1, Format.I i2, Format.R r];
-
 fun evalSort list = 
   let 
+    fun printLine (i1, i2, r) =
+      Format.printf "%20d%20d%20f\n" [Format.I i1, Format.I i2, Format.R r]
     val results = map checkTime list
     val average = (foldr(fn ((a,b,c),R) => c+R ) 0.0 results)/Real.fromInt(length list)
   in
