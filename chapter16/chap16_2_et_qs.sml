@@ -173,6 +173,10 @@ val bg = readBool "false true abc 4.56";
    val readRealByAuthor = makeRead Real.scan
    val readBoolByAuthor = makeRead Bool.scan
 
+(* 回答者のコメント:
+高階の関数を定義したほうがいいのは確かなので、今後は、同型の関数だったらそうしよう。
+*)
+
 (* --end of Q16.3 *)
 
 (* Q16.4 *)
