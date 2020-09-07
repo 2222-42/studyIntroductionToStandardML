@@ -155,6 +155,26 @@ fun readBool str =
 val bf = readBool "true false 1 abc";
 val bg = readBool "false true abc 4.56";
 
+(* 筆者の解答:
+これら関数はすべて同型であるため、以下の例では、 高階の関数を定義し、それを各型のscan関数に適用している
+*)
+
+   fun makeRead scan string =
+     let
+       val reader = scan Substring.getc
+       val stream = ref (Substring.full string)
+     in
+       fn () =>
+         case reader (!stream) of
+           SOME (i, substring) =>
+           SOME i before stream := substring
+         | NONE => NONE
+    end
+   val readRealByAuthor = makeRead Real.scan
+   val readBoolByAuthor = makeRead Bool.scan
+
+(* --end of Q16.3 *)
+
 (* Q16.4 *)
 
 fun genericReadInt reader inputData = 
