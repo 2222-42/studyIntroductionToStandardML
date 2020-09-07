@@ -224,6 +224,22 @@ fun readIntFromFile inf =
 
 (* readIntFromFile "E:/SMLProject/studyIntroductionToStandardML/chapter16/testChar.txt"; *)
 
+(* 筆者の解答は以下の通りである。 *)
+   fun readIntFromFile file =
+     let
+       val ins = TextIO.openIn file
+       val reader = readIntFromStream ins
+       fun loop L =
+           case  reader () of
+             SOME i => loop (L @ [i])
+           | NONE =>  L
+     in
+       loop nil
+     end
+(* 回答者のコメント:
+closeInしていないので、それだけ直す必要がある。
+*)
+
 (* --end Q16.5 *)
 
 signature PARSE_URL = sig
