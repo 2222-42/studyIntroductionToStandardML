@@ -324,6 +324,14 @@ val listTest2 = fromListToDlistByAuthor testList;
 (dlistToList listTest2) = testList;
 
 (* otherAnswer 循環リストを順にたどり、その逆順のリストを構成 *)
+  fun toList L =
+    let
+      fun loop (l,A) visited =
+        if member l visited then A
+        else loop (leftDlist l, dataDlist l::A) (l::visited)
+    in loop (leftDlist L, nil) nil
+    end
+
   fun toListL L =
     let 
       fun loop (l,A) visited =
@@ -335,7 +343,7 @@ val listTest2 = fromListToDlistByAuthor testList;
 val testList = [1,2,3]
 val listTest1 = fromListModified testList
 val listTest2 = fromListL testList;
-(dlistToList listTest1) = testList;
+(toList listTest1) = testList;
 (toListL listTest2) = testList;
 
 (* 問8.9 *)
