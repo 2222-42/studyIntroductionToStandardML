@@ -143,6 +143,9 @@ insertDlistの返り値はunit。
 singletonDlist の実装を参考にしてみよう。
 *)
 
+  fun fromList (L:int list) = foldr (fn (x,y) => (insertDlist x y;y)) (ref NIL) L
+  fun fromListL (L:int list) = foldl (fn (x,y) => (insertDlist x y;y)) (ref NIL) L
+  fun fromListModified (L:int list) = foldl (fn (x,y) => (insertDlist x y;y)) (ref NIL) (rev L)
 
 val listTest = fromListToDlist [1,2,3];
 dataDlist listTest; 
@@ -319,6 +322,29 @@ val listTest1 = fromListToDlist testList
 val listTest2 = fromListToDlistByAuthor testList;
 (dlistToList listTest1) = testList;
 (dlistToList listTest2) = testList;
+
+(* otherAnswer 循環リストを順にたどり、その逆順のリストを構成 *)
+  fun toList L =
+    let
+      fun loop (l,A) visited =
+        if member l visited then A
+        else loop (leftDlist l, dataDlist l::A) (l::visited)
+    in loop (leftDlist L, nil) nil
+    end
+
+  fun toListL L =
+    let 
+      fun loop (l,A) visited =
+        if member l visited then A
+        else loop (rightDlist l, dataDlist l::A) (l::visited)
+    in loop (rightDlist (leftDlist L), nil) nil
+    end;
+
+val testList = [1,2,3]
+val listTest1 = fromListModified testList
+val listTest2 = fromListL testList;
+(toList listTest1) = testList;
+(toListL listTest2) = testList;
 
 (* 問8.9 *)
 fun copyDlist DL = 
