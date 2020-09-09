@@ -106,6 +106,26 @@ fun scanInt ss =
      NONE => (NONE, ss)
    | SOME(n, sss) => (SOME n, sss);
 
+(* 筆者の解答: 変数については束縛範囲があるから、大丈夫そう *)
+   fun scanIntByAuthor s =
+       case intScan s of
+         SOME (i,s) => (SOME i, s)
+       | NONE => (NONE, s)
+
+val test = "1234567890"; 
+val sub1 = Substring.extract (test,2,SOME 2);
+val (o1, s1) = scanInt sub1;
+val (o2, s2) = scanIntByAuthor sub1;
+Substring.string s1;
+Substring.string s2;
+val test2 = "abcdefghijk"; 
+val sub2 = Substring.extract (test2,2,SOME 2);
+val (o3, s3) = scanInt sub2;
+val (o4, s4) = scanIntByAuthor sub2;
+Substring.string s3;
+Substring.string s4;
+(* --end of Q16.8 *)
+
 fun oneFormat s =
   let
     val s = SS.triml 1 s
