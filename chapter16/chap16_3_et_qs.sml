@@ -36,6 +36,7 @@ fun formatData {kind, width, align} data =
                       | RIGHT => StringCvt.padLeft #" " w body)
     end
 
+(* Q16.7 *)
 fun printTriple (str1, str2, str3) listOfTupleOfInt =
     let
       val DefaultWidth = 10
@@ -58,6 +59,40 @@ fun printTriple (str1, str2, str3) listOfTupleOfInt =
     end;
 
 printTriple ("first", "second", "third") [(1,2,3), (4,5,6)];
+
+(* 筆者の解答だが、formatDataを使っていない *)
+   fun printTripleByAuthor (s1, s2, s3) L =
+       let
+         fun pr s = print (StringCvt.padLeft #" " 10 s)
+         fun printLine (a,b,c) =
+             (pr (Int.toString a);
+              pr (Int.toString a);
+              pr (Int.toString b);
+              print "\n"
+             )
+       in
+         pr s1;
+         pr s2;
+         pr s3;
+         print "\n";
+         map printLine L
+       end
+
+fun printTripleModified (str1, str2, str3) L =
+    let
+      val DefaultWidth = 10
+      fun prS s = print(formatData {kind=STRING, width=SOME DefaultWidth, align=RIGHT} (S s))
+      fun prI i = print(formatData {kind=INT StringCvt.DEC, width=SOME DefaultWidth, align=RIGHT} (I i))
+      fun printLine (i1,i2,i3) = (prI i1; prI i2; prI i3; print "\n")
+    in
+      prS str1;
+      prS str2;
+      prS str3;
+      print "\n";
+      map printLine L
+    end;
+
+printTripleModified ("first", "second", "third") [(1,2,3), (4,5,6)];
 
 datatype format = SPEC of formatSpec | LITERAL of string
 
