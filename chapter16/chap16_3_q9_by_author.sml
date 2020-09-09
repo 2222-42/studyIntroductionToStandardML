@@ -55,11 +55,6 @@ structure Format : FORMAT =
          in case r of NONE => (NONE,s)
                     | SOME(n,s) => (SOME n,s)
          end
-     fun scanAlign s =
-         let val r= Int.scan StringCvt.DEC S.getc s
-         in case r of NONE => (NONE,s)
-                    | SOME(n,s) => (SOME n,s)
-         end
      fun oneFormat s =
          let val s = S.triml 1 s
          in if S.isPrefix "%" s then (LITERAL "%",S.triml 1 s)
@@ -83,7 +78,7 @@ structure Format : FORMAT =
          end
      fun parse s =
          let
-           val (s1,s) = StringCvt.splitl (fn c => c <> #"%") S.getc s
+           val (s1,s) = split s
            val prefix = if s1 = "" then nil
                         else [LITERAL s1]
          in if S.isEmpty s then prefix
