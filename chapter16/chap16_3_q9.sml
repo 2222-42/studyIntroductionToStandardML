@@ -122,6 +122,8 @@ struct
 end;
 
 (* Format.printf "%10s\n" [Format.S "first"];
+(Format.printf "%10s" [Format.S "first"];Format.printf "%10s\n" [Format.S "first"]);
+(Format.printf "%-10s" [Format.S "first"];Format.printf "%-10s\n" [Format.S "first"]);
 
 fun printTriple (str1, str2, str3) listOfTupleOfInt =
     let
@@ -133,4 +135,8 @@ fun printTriple (str1, str2, str3) listOfTupleOfInt =
     in
       (Format.printf "%10s%10s%10s\n" [Format.S str1, Format.S str2, Format.S str2]);
       loop listOfTupleOfInt
-    end *)
+    end;
+
+printTriple ("first", "second", "third") [(1,2,3), (4,5,6)];
+
+ *)

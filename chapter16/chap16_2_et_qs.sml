@@ -73,6 +73,8 @@ getc が(char, substring) reader型を持つことの確認
 - val getc : substring -> (char * substring) option
 - type('a,'b) reader = 'b -> ('a * 'b) option
 
+よって、substring -> (char * substring) optionは、 (char, substring) readerである。
+
 さらに確認するならば、getc を引数とする関数を用いて、型エラーが起きないことでも確認することができる。
 *)
 
@@ -98,7 +100,7 @@ fun readInt str =
         fn () => case (intScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 
 val f = readInt "123 456 abc";
 (* val it = SOME 123 : int option
@@ -112,6 +114,21 @@ val it = SOME 123 : int option
 - g ();
 val it = NONE : int option *)
 
+(* 筆者の解答:
+回答者の解答と大きな違いはない *)
+fun readIntByAuthor string =
+  let
+    val stream = ref (Substring.full string)
+  in
+    fn () =>
+      case intScan (!stream) of
+        SOME (i, substring) =>
+        SOME i before stream := substring
+      | NONE => NONE
+  end
+
+(* --end of Q16.2 *)
+
 (* Q16.3 *)
 
 val realScan = Real.scan Substring.getc;
@@ -122,8 +139,8 @@ fun readReal str =
         fn () => case (realScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
-val rf = readReal "1.23 4.56 1 abc";
+    end
+val rf = readReal "1.23 3E10  1 abc";
 val rg = readReal "1.23 abc 1 4.56";
 
 val boolScan = Bool.scan Substring.getc;
@@ -134,9 +151,33 @@ fun readBool str =
         fn () => case (boolScan (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 val bf = readBool "true false 1 abc";
 val bg = readBool "false true abc 4.56";
+
+(* 筆者の解答:
+これら関数はすべて同型であるため、以下の例では、 高階の関数を定義し、それを各型のscan関数に適用している
+*)
+
+   fun makeRead scan string =
+     let
+       val reader = scan Substring.getc
+       val stream = ref (Substring.full string)
+     in
+       fn () =>
+         case reader (!stream) of
+           SOME (i, substring) =>
+           SOME i before stream := substring
+         | NONE => NONE
+    end
+   val readRealByAuthor = makeRead Real.scan
+   val readBoolByAuthor = makeRead Bool.scan
+
+(* 回答者のコメント:
+高階の関数を定義したほうがいいのは確かなので、今後は、同型の関数だったらそうしよう。
+*)
+
+(* --end of Q16.3 *)
 
 (* Q16.4 *)
 
@@ -148,10 +189,14 @@ fun genericReadInt reader inputData =
         fn () => case (modifiedReader (!s)) of
             SOME (i, r) => (s := r ;SOME i)
           | NONE => NONE
-    end;
+    end
 
 (* - genericReadInt;
 val it = fn : (char,'a) StringCvt.reader -> 'a -> unit -> int option *)
+
+(* 筆者の解答: 同じなので省略 *)
+
+(* --end of Q16.4 *)
 
 (* Q16.5 *)
 (* 
@@ -164,7 +209,7 @@ fun readIntFromStream ins =
     val s = TextIO.getInstream ins
   in
     genericReadInt TextIO.StreamIO.input1 s
-  end;
+  end
 (* - readIntFromStream;
 val it = fn : TextIO.instream -> unit -> int option *)
 
@@ -179,9 +224,25 @@ fun readIntFromFile inf =
       | NONE => L
   in
     loop nil before TextIO.closeIn ins
-  end;
+  end
 
 (* readIntFromFile "E:/SMLProject/studyIntroductionToStandardML/chapter16/testChar.txt"; *)
+
+(* 筆者の解答は以下の通りである。 *)
+   fun readIntFromFile file =
+     let
+       val ins = TextIO.openIn file
+       val reader = readIntFromStream ins
+       fun loop L =
+           case  reader () of
+             SOME i => loop (L @ [i])
+           | NONE =>  L
+     in
+       loop nil
+     end
+(* 回答者のコメント:
+closeInしていないので、それだけ直す必要がある。
+*)
 
 (* --end Q16.5 *)
 
@@ -192,7 +253,7 @@ signature PARSE_URL = sig
     | FILE of {path: string list, anchor: string option}
     | RELATIVE of {path: string list, anchor: string option}
   val parseUrl : string -> url
-end;
+end
 
 fun isUpper c = #"A" <= c andalso c <= #"Z"
 
@@ -200,7 +261,7 @@ fun toLower c =
     if isUpper c
     then chr (ord #"a" + (ord c - ord #"A"))
     else c;
-fun lower s = implode (map toLower (explode s));
+fun lower s = implode (map toLower (explode s))
 
 (* Q16.6 *)
 structure Url:PARSE_URL = struct
@@ -269,7 +330,7 @@ structure Url:PARSE_URL = struct
         | "file" => FILE (parseFile body)
         | _ => raise urlFormat
     end
-end
+end;
 
 Url.parseUrl "http://www.google.com/user/#1/show"; 
 (* 

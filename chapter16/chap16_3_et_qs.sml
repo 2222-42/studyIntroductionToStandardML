@@ -36,6 +36,7 @@ fun formatData {kind, width, align} data =
                       | RIGHT => StringCvt.padLeft #" " w body)
     end
 
+(* Q16.7 *)
 fun printTriple (str1, str2, str3) listOfTupleOfInt =
     let
       val DefaultWidth = 10
@@ -59,6 +60,40 @@ fun printTriple (str1, str2, str3) listOfTupleOfInt =
 
 printTriple ("first", "second", "third") [(1,2,3), (4,5,6)];
 
+(* 筆者の解答だが、formatDataを使っていない *)
+   fun printTripleByAuthor (s1, s2, s3) L =
+       let
+         fun pr s = print (StringCvt.padLeft #" " 10 s)
+         fun printLine (a,b,c) =
+             (pr (Int.toString a);
+              pr (Int.toString a);
+              pr (Int.toString b);
+              print "\n"
+             )
+       in
+         pr s1;
+         pr s2;
+         pr s3;
+         print "\n";
+         map printLine L
+       end
+
+fun printTripleModified (str1, str2, str3) L =
+    let
+      val DefaultWidth = 10
+      fun prS s = print(formatData {kind=STRING, width=SOME DefaultWidth, align=RIGHT} (S s))
+      fun prI i = print(formatData {kind=INT StringCvt.DEC, width=SOME DefaultWidth, align=RIGHT} (I i))
+      fun printLine (i1,i2,i3) = (prI i1; prI i2; prI i3; print "\n")
+    in
+      prS str1;
+      prS str2;
+      prS str3;
+      print "\n";
+      map printLine L
+    end;
+
+printTripleModified ("first", "second", "third") [(1,2,3), (4,5,6)];
+
 datatype format = SPEC of formatSpec | LITERAL of string
 
 structure SS = Substring
@@ -70,6 +105,26 @@ fun scanInt ss =
   case intScan ss of
      NONE => (NONE, ss)
    | SOME(n, sss) => (SOME n, sss);
+
+(* 筆者の解答: 変数については束縛範囲があるから、大丈夫そう *)
+   fun scanIntByAuthor s =
+       case intScan s of
+         SOME (i,s) => (SOME i, s)
+       | NONE => (NONE, s)
+
+val test = "1234567890"; 
+val sub1 = Substring.extract (test,2,SOME 2);
+val (o1, s1) = scanInt sub1;
+val (o2, s2) = scanIntByAuthor sub1;
+Substring.string s1;
+Substring.string s2;
+val test2 = "abcdefghijk"; 
+val sub2 = Substring.extract (test2,2,SOME 2);
+val (o3, s3) = scanInt sub2;
+val (o4, s4) = scanIntByAuthor sub2;
+Substring.string s3;
+Substring.string s4;
+(* --end of Q16.8 *)
 
 fun oneFormat s =
   let

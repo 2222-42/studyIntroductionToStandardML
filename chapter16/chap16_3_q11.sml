@@ -53,3 +53,19 @@ fun evalSort list =
 
 val test_list = [500000,1000000,5000000];
 evalSort test_list;
+
+   fun evalSortByAuthor L =
+       let
+         val L' = map checkTime L
+         val av = (foldr (fn ((_,_,x),y) => y+x) 0.0 L')/(Real.fromInt (List.length L'))
+         fun printLine (n,a,c) =
+             Format.printf  "%20d%20d%20f\n" [Format.I n, Format.I a, Format.R c]
+        in
+          (Format.printf
+             "%20s%20s%20s\n"
+              [Format.S "array size", Format.S "milli-sec.", Format.S "micro s./nlogn"];
+           map printLine L';
+           print "------------------------------------------------------------\n";
+           Format.printf "%40s%20f\n" [Format.S "avarage", Format.R av]
+         )
+       end

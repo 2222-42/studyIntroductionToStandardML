@@ -83,13 +83,18 @@ struct
     fun string24Hour time = 
       StringCvt.padLeft #"0" 2 (Int.toString (Date.hour (Date.fromTimeLocal time)))
     fun string12Hour time = 
-      StringCvt.padLeft #"0" 2 (Int.toString ((Date.hour (Date.fromTimeLocal time)) mod 12))
+      StringCvt.padLeft #"0" 2 (Int.toString (
+        let val h = (Date.hour (Date.fromTimeLocal time)) mod 12
+        in
+          if h = 0 then 12
+          else h
+        end))
     fun stringHour time = 
       Int.toString (Date.hour (Date.fromTimeLocal time))
     fun stringMinutes time = 
-      StringCvt.padLeft #"0" 2 (Int.toString (Date.minute (Date.fromTimeLocal time)))
+      (Int.toString (Date.minute (Date.fromTimeLocal time)))
     fun stringSeconds time = 
-      StringCvt.padLeft #"0" 2 (Int.toString (Date.second (Date.fromTimeLocal time)))
+      (Int.toString (Date.second (Date.fromTimeLocal time)))
     fun stringDay time = 
       StringCvt.padLeft #"0" 2 (Int.toString (Date.day (Date.fromTimeLocal time)))
     fun stringMonth time = 
@@ -174,9 +179,9 @@ struct
     end
 
   fun showTime s = print (format s)
-end
+end;
 
 
 (* Q16.10 *)
 
-ShowTime.showTime "The time is %H hour %M minutes on %m/%d/%Y.\n";
+(* ShowTime.showTime "The time is %H hour %M minutes on %m/%d/%Y.\n"; *)
