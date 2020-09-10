@@ -164,12 +164,17 @@
            | _ => (print (toString token ^ "\n");
                    testLex ())
          end *)
-      fun getFileName ins string = 
-          case T.input1 ins of
-              SOME #"\n" => string
-            | SOME s => getFileName ins (string^str(s))
-            | NONE => string
-      fun testMain ins =
+         (* 補足: 「ファイル名は空白以外の任意の文字列とし、use sp* fileNameがトークン列のどこに現れてもよい」との仕様に相当 *)
+      fun getFileName ins =
+          let fun getRest s = 
+                  case (T.lookahead ins) of
+                    SOME c => 
+                if Char.isSpace c then s
+                    else getRest (s ^ T.inputN(ins,1))
+                  | NONE => s
+          in getRest ""
+          end
+    fun testMain ins =
         let
           val token = lex ins
         in
@@ -177,19 +182,15 @@
              EOF => ()
            | ID "use" =>
                let
-                 val fileName = (skipSpaces ins; getFileName ins "")
+                 val fileName = (skipSpaces ins; getFileName ins)
                  val newIns = TextIO.openIn fileName
                in
-                 (print ("[opening file \""^fileName^"\"]\n");
-                   testMain newIns;
-                   TextIO.closeIn newIns;
-                   print ("[closing file \""^fileName^"\"]\n");
-                    testMain ins)
+                 (testMain newIns; testMain ins)
                end
             | _ => (print (toString token ^ "\n");
                     testMain ins)
         end
     fun testLex () = testMain TextIO.stdIn
-   end
+   end;
 
 Lex.testLex();
