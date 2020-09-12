@@ -47,3 +47,18 @@ val filePath = F.realPath "../chapter17/test.txt";
 val fullPath = F.fullPath "../chapter17/test.txt";
 (* F.realPath "../chapter17/test2.txt";
 F.fullPath "../chapter17/test2.txt"; *)
+
+fun ls () =
+  let
+    val d = F.openDir (F.getDir())
+    fun printRest() = 
+      let
+        val f = F.readDir d
+      in
+        case f of
+           NONE => ()
+         | SOME v => (print (v^"\n"); printRest())
+      end
+  in
+    printRest()
+  end
