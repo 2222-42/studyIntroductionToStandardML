@@ -48,17 +48,41 @@ val fullPath = F.fullPath "../chapter17/test.txt";
 (* F.realPath "../chapter17/test2.txt";
 F.fullPath "../chapter17/test2.txt"; *)
 
+(* Q17.1 *)
+use "../chapter16/chap16_3_q9.sml";
 fun ls () =
   let
     val d = F.openDir (F.getDir())
+    val defaultFormat = "%5s%20s%20s%20s\n"
+    val defaultFormat2 = "%5s%20d%20s%20s\n"
     fun printRest() = 
       let
         val f = F.readDir d
+        fun getAccessModeStr fileName = 
+          (if F.access (fileName, [F.A_READ]) then "r" else "-") ^
+          (if F.access (fileName, [F.A_WRITE]) then "w" else "-") ^
+          (if F.access (fileName, [F.A_EXEC]) then "x" else "-")
+        fun getModeStr fileName = 
+          (if F.isDir fileName then "d" else "-")^
+          (if F.isLink fileName then "l" else "-") ^
+          (getAccessModeStr fileName)
+        fun getSize fileName =
+          Int64.toInt (F.fileSize fileName)
+          handle _ => 0
+        fun getTime fileName = 
+            Date.fmt "%b %d %H:%M:%S" (Date.fromTimeLocal(F.modTime fileName))
+            handle _ => ""
       in
         case f of
            NONE => ()
-         | SOME v => (print (v^"\n"); printRest())
+         | SOME v => Format.printf defaultFormat2 
+                                    [Format.S (getModeStr v), 
+                                     Format.I (getSize v), 
+                                     Format.S (getTime v),
+                                     Format.S v];
+                      printRest()
       end
   in
+    Format.printf defaultFormat [Format.S "dlrwx", Format.S "file size", Format.S "last modified", Format.S "file name"];
     printRest()
   end
