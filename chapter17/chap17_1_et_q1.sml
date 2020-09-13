@@ -86,3 +86,57 @@ fun ls () =
     Format.printf defaultFormat [Format.S "dlrwx", Format.S "file size", Format.S "last modified", Format.S "file name"];
     printRest()
   end
+
+(* signature OS_PATH =     
+  sig
+    exception Path      
+    exception InvalidArc
+    val parentArc : string
+    val currentArc : string
+    val fromString : string -> {arcs:string list, isAbs:bool, vol:string}
+    val toString : {arcs:string list, isAbs:bool, vol:string} -> string
+    val validVolume : {isAbs:bool, vol:string} -> bool
+    val getVolume : string -> string
+    val getParent : string -> string
+    val splitDirFile : string -> {dir:string, file:string}
+    val joinDirFile : {dir:string, file:string} -> string
+    val dir : string -> string
+    val file : string -> string
+    val splitBaseExt : string -> {base:string, ext:string option}
+    val joinBaseExt : {base:string, ext:string option} -> string
+    val base : string -> string
+    val ext : string -> string option
+    val mkCanonical : string -> string
+    val isCanonical : string -> bool
+    val mkAbsolute : {path:string, relativeTo:string} -> string
+    val mkRelative : {path:string, relativeTo:string} -> string
+    val isAbsolute : string -> bool
+    val isRelative : string -> bool
+    val isRoot : string -> bool
+    val concat : string * string -> string
+    val fromUnixPath : string -> string
+    val toUnixPath : string -> string
+  end *)
+
+structure P = OS.Path;
+P.isAbsolute "../chapter17/test.txt";
+P.isAbsolute fullPath;
+P.isRelative "../chapter17/test.txt";
+P.isRelative "../chapter17/test.txt";
+P.validVolume {isAbs=true, vol=fullPath};
+val pathStrRecords = P.fromString fullPath;
+P.toString pathStrRecords;
+P.getVolume fullPath;
+P.getParent fullPath;
+val splitExt = P.splitBaseExt fullPath;
+P.isCanonical(#base splitExt);
+P.mkCanonical(fullPath);
+
+val currentDir = F.getDir();
+val currentPath = P.fromString(currentDir);
+val currentPathStr = P.toString(currentPath);
+val parentPath = P.getParent(currentPathStr);
+val splitedDirFile = P.splitDirFile parentPath;
+val joinedDirFile = P.joinDirFile splitedDirFile;
+val path = P.concat(joinedDirFile, "chapter_17_sample");
+P.mkRelative{path=path, relativeTo=P.getParent(nowDirStr)};
