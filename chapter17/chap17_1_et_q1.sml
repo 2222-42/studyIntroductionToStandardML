@@ -57,7 +57,6 @@ fun ls () =
     val defaultFormat2 = "%5s%20d%20s%20s\n"
     fun printRest() = 
       let
-        val f = F.readDir d
         fun getAccessModeStr fileName = 
           (if F.access (fileName, [F.A_READ]) then "r" else "-") ^
           (if F.access (fileName, [F.A_WRITE]) then "w" else "-") ^
@@ -73,7 +72,7 @@ fun ls () =
             Date.fmt "%b %d %H:%M:%S" (Date.fromTimeLocal(F.modTime fileName))
             handle _ => ""
       in
-        case f of
+        case F.readDir d of
            NONE => ()
          | SOME v => Format.printf defaultFormat2 
                                     [Format.S (getModeStr v), 
@@ -84,7 +83,8 @@ fun ls () =
       end
   in
     Format.printf defaultFormat [Format.S "dlrwx", Format.S "file size", Format.S "last modified", Format.S "file name"];
-    printRest()
+    printRest();
+    F.closeDir d
   end
 
 (* signature OS_PATH =     
