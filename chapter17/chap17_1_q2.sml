@@ -85,7 +85,7 @@ end
 
 fun copy a b = 
     if not (F.isDir a) then
-        copyFile a b
+        (copyFile a b; F.setTime (b, SOME (F.modTime a)))
     else
         let val d = F.openDir a
             fun copyDirStream d b =
@@ -97,7 +97,7 @@ fun copy a b =
                     val from = P.concat(a,valOf(item))
                     val to = P.concat(b,valOf(item))
                   in
-                    (copy from to; copyDirStream d b)
+                    (copy from to; F.setTime (to, SOME (F.modTime from)); copyDirStream d b)
                   end
                 end
         in 
@@ -107,5 +107,5 @@ fun copy a b =
 val nowDirStr = F.getDir();
 val newDir = F.openDir(nowDirStr^"/chapter17");
 F.chDir (nowDirStr^"/chapter17");
-copy "test.txt" "copied.txt";
-copy "folder" "copiedFolder";
+(* copy "test.txt" "copied.txt";
+copy "folder" "copiedFolder"; *)
