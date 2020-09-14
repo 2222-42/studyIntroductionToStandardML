@@ -73,18 +73,17 @@ fun ls () =
             handle _ => ""
       in
         case F.readDir d of
-           NONE => ()
-         | SOME v => Format.printf defaultFormat2 
+           NONE => F.closeDir d
+         | SOME v => (Format.printf defaultFormat2 
                                     [Format.S (getModeStr v), 
                                      Format.I (getSize v), 
                                      Format.S (getTime v),
                                      Format.S v];
-                      printRest()
+                      printRest())
       end
   in
     Format.printf defaultFormat [Format.S "dlrwx", Format.S "file size", Format.S "last modified", Format.S "file name"];
-    printRest();
-    F.closeDir d
+    printRest()
   end
 
 (* signature OS_PATH =     
