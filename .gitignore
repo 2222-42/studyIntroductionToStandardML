@@ -1,2 +1,3 @@
 *.x86-linux
 *.out
+*.amd64-linux
