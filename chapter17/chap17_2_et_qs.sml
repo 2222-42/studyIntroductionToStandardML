@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap17.2
+* Chap17.2 Q17.3
 * This file is able to be runned on UNIX machine.
 *)
 
@@ -58,3 +58,11 @@ fun useCommand c args ins outs =
     (loop(); Unix.reap p;())
   end
 
+(* Q17.3 *)
+fun processFile inf com outf = 
+  let
+    val ins = TextIO.openIn inf
+    val outs = TextIO.openOut outf
+  in
+    (useCommand com [] ins outs; TextIO.closeIn ins; TextIO.closeOut outs)
+  end
