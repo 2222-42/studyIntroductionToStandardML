@@ -130,7 +130,7 @@ printer test;
 (* 
 val test = "30 15 67 74 41 51 34 70 67 46 46 19 6 37 69 30 3 31 52 25 44 38 12 30 61 32 12 8 64 60 53 67 43 48 40 67 51 62 49 46 35 18 16 4 65 70 35 18 48 60";
 *)
-use "./chapter17/lexer.sml"
+use "./chapter17/lexer.sml";
 fun makeInttListFromFile inf = 
   let
     exception NotDigits
