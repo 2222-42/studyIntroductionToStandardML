@@ -131,7 +131,7 @@ printer test;
 val test = "30 15 67 74 41 51 34 70 67 46 46 19 6 37 69 30 3 31 52 25 44 38 12 30 61 32 12 8 64 60 53 67 43 48 40 67 51 62 49 46 35 18 16 4 65 70 35 18 48 60";
 *)
 use "./chapter17/lexer.sml";
-fun makeInttListFromFile inf = 
+fun makeIntListFromFile inf = 
   let
     exception NotDigits
     val ins = TextIO.openIn inf;
@@ -145,11 +145,30 @@ fun makeInttListFromFile inf =
        | NONE => (getIntList ins L))
        handle NotDigits => L
   in
-    getIntList ins []
-  end
+    getIntList ins [] before TextIO.closeIn ins
+  end;
 
-(* fun sort (x, [inf, ouf]) = 
-ArrayQuickSortOpt.sort
-val target2 = Array.fromList [10,100];
+use "./chapter16/chap16_3_q9.sml";
+fun makeSorttedOutputFile inf outf = 
+  let
+    val intArray = Array.fromList(makeIntListFromFile inf)
+    fun copyArrayToOut array outf = 
+      let
+        val outs = TextIO.openOut outf
+        val str = Array.foldr (fn (h, R) => Int.toString(h)^" "^R) "" array
+      in
+        TextIO.output (outs, str); TextIO.closeOut outs
+      end
+  in
+    (Format.printf "Input file %s contains %d records.\n Now sorting ...." [Format.S inf, Format.I (Array.length(intArray))];
+    ArrayQuickSortOpt.sort (intArray, Int.compare);
+    copyArrayToOut intArray outf;
+    Format.printf "done.\n" [])
+  end
+(*
 ArrayQuickSortOpt.sort(target2, Int.compare);
-target2; *)
+val intArray = Array.fromList(makeIntListFromFile "./chapter17/test.txt");
+fun toStringFromArray array = 
+  Array.foldr (fn (h, R) => Int.toString(h)^" "^R) "" array;
+makeSorttedOutputFile "./chapter17/test.txt" "./chapter17/outs.txt"
+*)
