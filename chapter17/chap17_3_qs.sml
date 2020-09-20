@@ -1,5 +1,5 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Chap17.1 Q17.2
+* Q17.5 Q17.6 Q17.7
 *)
 
 signature SORT = sig
