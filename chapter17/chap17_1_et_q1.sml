@@ -86,6 +86,46 @@ fun ls () =
     printRest()
   end
 
+(* 筆者の回答 *)
+   fun lsByAuthor () =
+       let
+         val d = F.openDir (F.getDir())
+         fun printRest () =
+             case F.readDir d of
+               NONE => () (* close処理をやったほうがいい？ *)
+             | SOME f =>
+               let
+              val size = Int64.toInt (F.fileSize f)
+          handle _ => 0
+              val time = Date.toString (Date.fromTimeLocal (F.modTime f))
+                 val modString = implode
+                                   [if F.isDir f then #"d" else #"-",
+                                    if F.isLink f then #"l" else #"-",
+                                    if F.access (f, [F.A_READ]) then #"r" else #"-",
+                                    if F.access (f, [F.A_WRITE]) then #"w" else #"-",
+                                    if F.access (f, [F.A_EXEC]) then #"x" else #"-"]
+            in
+                 (Format.printf
+                    "%10s%15d%30s%30s\n"
+                    [Format.S modString,
+                     Format.I size,
+                     Format.S time,
+                     Format.S f
+                    ];
+               printRest())
+            end
+       in
+         (Format.printf
+            "%10s%15s%30s%30s\n"
+            [Format.S "dlrwx",
+             Format.S "file size",
+             Format.S "last modified",
+             Format.S "file name"
+            ];
+          printRest()
+         )
+       end
+
 (* signature OS_PATH =     
   sig
     exception Path      
