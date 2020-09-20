@@ -92,7 +92,7 @@ fun ls () =
          val d = F.openDir (F.getDir())
          fun printRest () =
              case F.readDir d of
-               NONE => () (* close処理をやったほうがいい？ *)
+               NONE => F.closeDir d
              | SOME f =>
                let
               val size = Int64.toInt (F.fileSize f)
