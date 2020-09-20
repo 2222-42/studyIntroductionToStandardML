@@ -172,3 +172,13 @@ fun toStringFromArray array =
   Array.foldr (fn (h, R) => Int.toString(h)^" "^R) "" array;
 makeSorttedOutputFile "./chapter17/test.txt" "./chapter17/outs.txt"
 *)
+
+(* Q17.6 *)
+fun sort (x, [inf, outf]) = 
+  (print(x^"\n");
+   makeSorttedOutputFile inf outf;
+   OS.Process.success)
+
+(* SMLofNJ.exportFn("sort", sort); *)
+
+(* sml @SMLload=sort.amd64-linux "./chapter17/test.txt" "outs.txt"  *)
