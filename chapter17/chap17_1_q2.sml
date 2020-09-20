@@ -104,6 +104,26 @@ fun copy a b =
             (F.mkDir b; copyDirStream d b)
         end;
 
+(* 筆者の回答 *)
+   fun copyByAuthor a b =
+       if not (F.isDir a) then
+         (copyFile a b;
+          F.setTime (b,SOME (F.modTime a)))
+       else
+         let val d = F.openDir a
+             fun copyDirStream d b =
+                 case F.readDir d of
+                   NONE => F.closeDir d
+                 | SOME item =>
+                   let val from = P.concat (a,item)
+                       val to = P.concat (b,item)
+                   in (copy from to;copyDirStream d b)
+                   end
+         in
+           (F.mkDir b;
+            copyDirStream d b;
+            F.setTime (b,SOME (F.modTime a)))
+         end;
 val nowDirStr = F.getDir();
 val newDir = F.openDir(nowDirStr^"/chapter17");
 F.chDir (nowDirStr^"/chapter17");
