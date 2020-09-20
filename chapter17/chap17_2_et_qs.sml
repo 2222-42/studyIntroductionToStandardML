@@ -142,6 +142,7 @@ fun processFile inf com outf =
   in
     (useCommand com [] ins outs; TextIO.closeIn ins; TextIO.closeOut outs)
   end
+  (* processFile "testInts.txt" "./test.sh" "out.txt"; *)
 
 (* Q17.4 *)
 fun pipe cmd1 cmd2 ins outs = 
