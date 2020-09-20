@@ -182,3 +182,54 @@ fun sort (x, [inf, outf]) =
 (* SMLofNJ.exportFn("sort", sort); *)
 
 (* sml @SMLload=sort.amd64-linux "./chapter17/test.txt" "outs.txt"  *)
+
+(* Q17.7 *)
+
+local val seed = (Random.rand(0,1))
+in fun randomNat n = Random.randNat seed
+end;
+
+fun genArray n = Array.tabulate(n, randomNat);
+
+fun generateRandomInt n outf = 
+      let
+        val outs = TextIO.openOut outf
+        val array = genArray n
+        val str = Array.foldr (fn (h, R) => Int.toString(h)^"\n"^R) "" array
+      in
+        TextIO.output (outs, str); TextIO.closeOut outs
+      end
+
+fun generate (x, [n, outf]) = 
+  (print(x^"\n");
+   (case Int.fromString n of
+      SOME v => (generateRandomInt v outf;OS.Process.success)
+    | NONE => OS.Process.failure)
+  )
+(* SMLofNJ.exportFn("generate", generate); *)
+
+(* sml @SMLload=generate.amd64-linux 100 "testInts.txt"  *)
+
+fun checkSorted inf = 
+  let
+    val intList = makeIntListFromFile inf
+    fun compare L = foldl (fn (x, (i, b)) => (x, (x >= i) andalso b) ) (~1, true) L
+    fun printResult L = 
+      case (compare L) of
+         (_, true) => print "Sorted!\n"
+        | _ => print "not sorted...\n"
+  in
+    (Format.printf "Input file %s contains %d records.\n Now checkin ....\n" [Format.S inf, Format.I (List.length(intList))];
+    printResult intList
+    )
+  end
+
+fun check (x, [inf]) = 
+  (print(x^"\n");
+   checkSorted inf;
+   OS.Process.success
+  )
+
+(* SMLofNJ.exportFn("check", check); *)
+
+(* sml @SMLload=check.amd64-linux  "testOuts.txt"  *)
