@@ -112,7 +112,13 @@ fun execCommand c args =
 
 fun useCommand c args ins outs = 
   let
-    val p = Unix.execute("/bin/bash", "-c"::[splice(c::args, "/")])
+    val p = (Unix.execute("/bin/bash", "-c"::[splice(c::args, "/")]) : (TextIO.instream, TextIO.outstream) Unix.proc)
+        (* - Unix.execute;
+        val it = fn : string * string list -> ('a,'b) Unix.proc *)
+        (* - Unix.streamsOf;
+        val it = fn
+          : (TextIO.instream,TextIO.outstream) Unix.proc
+            -> TextIO.instream * TextIO.outstream *)
     val (ins',outs') = Unix.streamsOf p
     val endOfIns = ref false
     fun send () = 
@@ -129,10 +135,15 @@ fun useCommand c args ins outs =
       if TextIO.endOfStream ins' then ()
       else (TextIO.output(outs, TextIO.inputN(ins', 1));
             receiveRest())
-    fun loop () = (if !endOfIns then receiveRest else (send(); receive(); loop()))
+    fun loop () = (if !endOfIns then receiveRest() else (send(); receive(); loop()))
   in
     (loop(); Unix.reap p;())
   end
+  (* val c = "./test.sh";
+  val args = [];
+  val ins = TextIO.openIn "testInts.txt"; 
+  val outs = TextIO.openOut "outs.txt";
+   *)
 
 (* Q17.3 *)
 fun processFile inf com outf = 
