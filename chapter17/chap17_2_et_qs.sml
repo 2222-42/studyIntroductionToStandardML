@@ -167,40 +167,46 @@ fun pipeModified cmd1 cmd2 ins outs =
     val (ins1,outs1) = Unix.streamsOf p1
     val (ins2,outs2) = Unix.streamsOf p2
     val endOfIns = ref false
+    val endOfInsSub = ref false
 
     fun send1 () = 
       if TextIO.endOfStream ins
-        then (endOfIns := true; TextIO.closeOut outs1)
+        then (endOfIns := true; print "ins is end\n";TextIO.closeOut outs1)
       else (TextIO.output(outs1, TextIO.inputN(ins, 1));
             TextIO.flushOut outs1)
+    (* closeOutしたらcloseInされる？ *)
     fun send2 () = 
       if TextIO.endOfStream ins1
-        then (endOfIns := true; TextIO.closeOut outs2)
+        then (endOfInsSub := true;  print "ins1 is end\n";TextIO.closeOut outs2)
       else (TextIO.output(outs2, TextIO.inputN(ins1, 1));
             TextIO.flushOut outs2)
 
     fun receive1() = 
       case TextIO.canInput(ins1, 1) of
          SOME 1 => (TextIO.output(outs2, TextIO.inputN(ins1, 1));
-                    print "present\n";
                     TextIO.flushOut outs2)
-       | _ => (print "not present\n";())     
+       | _ => (print "receive none: 1\n") 
     fun receive2() = 
       case TextIO.canInput(ins2, 1) of
          SOME 1 => (TextIO.output(outs, TextIO.inputN(ins2, 1));
                     TextIO.flushOut outs)
-       | _ => ()
+       | _ => (print "receive none: 2\n")
 
 
     fun receiveSub () = 
-      if TextIO.endOfStream ins1 then ()
+      if TextIO.endOfStream ins1 
+      then (endOfInsSub := true;  print "ins1 is end\n";TextIO.closeOut outs2)
       else (TextIO.output(outs2, TextIO.inputN(ins1, 1));
+            TextIO.flushOut outs2;
+            print "receive sub: 1\n";
             receiveSub())
     fun receiveRest () = 
-      if TextIO.endOfStream ins2 then ()
+      if TextIO.endOfStream ins2 then (print "ins2 is end of Stream\n")
       else (TextIO.output(outs, TextIO.inputN(ins2, 1));
+            TextIO.flushOut outs;
+            print "receive sub: 2\n";
             receiveRest())
-    fun loop () = (if !endOfIns then (receiveSub();receiveRest()) else (send1(); receive1(); send2(); receive2(); loop()))
+    fun loop () = (if !endOfIns then (receiveSub();receiveRest()) else (send1(); receive1(); loop()))
   in
     (loop(); Unix.reap p1; Unix.reap p2;())
   end
@@ -249,7 +255,7 @@ fun pipeFile cmd1 cmd2 inf outf =
     val outs = TextIO.openOut outf
   in
     pipe cmd1 cmd2 ins outs
-  end
+  end;
 (* pipeFileModified "./test.sh" "./test2.sh" "testInts.txt" "out2.txt";
 val cmd1 = "./test.sh" 
 val cmd2 = "./test2.sh"
@@ -257,3 +263,4 @@ val inf = "testInts.txt"
 val outf = "out2.txt";
 splice([splice(cmd1::[], "/"),splice(cmd2::[], "/")], " | ")
  *)
+pipeFileModified "./test.sh" "./test2.sh" "testInts.txt" "out2.txt";
