@@ -126,6 +126,7 @@ fun useCommand c args ins outs =
         then (endOfIns := true; TextIO.closeOut outs')
       else (TextIO.output(outs', TextIO.inputN(ins, 1));
             TextIO.flushOut outs')
+    (* このreceiveが機能していない説がある。 *)
     fun receive() = 
       case TextIO.canInput(ins', 1) of
          SOME 1 => (TextIO.output(outs, TextIO.inputN(ins', 1));
@@ -156,5 +157,103 @@ fun processFile inf com outf =
   (* processFile "testInts.txt" "./test.sh" "out.txt"; *)
 
 (* Q17.4 *)
+(* fun pipe cmd1 cmd2 ins outs = 
+  (useCommand cmd1 [] ins outs; useCommand cmd2 [] ins outs) *)
+
+fun pipeModified cmd1 cmd2 ins outs = 
+  let
+    val p1 = (Unix.execute("/bin/bash", "-c"::[splice(cmd1::[], "/")]) : (TextIO.instream, TextIO.outstream) Unix.proc)
+    val p2 = (Unix.execute("/bin/bash", "-c"::[splice(cmd2::[], "/")]) : (TextIO.instream, TextIO.outstream) Unix.proc)
+    val (ins1,outs1) = Unix.streamsOf p1
+    val (ins2,outs2) = Unix.streamsOf p2
+    val endOfIns = ref false
+
+    fun send1 () = 
+      if TextIO.endOfStream ins
+        then (endOfIns := true; TextIO.closeOut outs1)
+      else (TextIO.output(outs1, TextIO.inputN(ins, 1));
+            TextIO.flushOut outs1)
+    fun send2 () = 
+      if TextIO.endOfStream ins1
+        then (endOfIns := true; TextIO.closeOut outs2)
+      else (TextIO.output(outs2, TextIO.inputN(ins1, 1));
+            TextIO.flushOut outs2)
+
+    fun receive1() = 
+      case TextIO.canInput(ins1, 1) of
+         SOME 1 => (TextIO.output(outs2, TextIO.inputN(ins1, 1));
+                    print "present\n";
+                    TextIO.flushOut outs2)
+       | _ => (print "not present\n";())     
+    fun receive2() = 
+      case TextIO.canInput(ins2, 1) of
+         SOME 1 => (TextIO.output(outs, TextIO.inputN(ins2, 1));
+                    TextIO.flushOut outs)
+       | _ => ()
+
+
+    fun receiveSub () = 
+      if TextIO.endOfStream ins1 then ()
+      else (TextIO.output(outs2, TextIO.inputN(ins1, 1));
+            receiveSub())
+    fun receiveRest () = 
+      if TextIO.endOfStream ins2 then ()
+      else (TextIO.output(outs, TextIO.inputN(ins2, 1));
+            receiveRest())
+    fun loop () = (if !endOfIns then (receiveSub();receiveRest()) else (send1(); receive1(); send2(); receive2(); loop()))
+  in
+    (loop(); Unix.reap p1; Unix.reap p2;())
+  end
+fun pipeFileModified cmd1 cmd2 inf outf = 
+  let
+    val ins = TextIO.openIn inf
+    val outs = TextIO.openOut outf
+  in
+    pipeModified cmd1 cmd2 ins outs
+  end
+(* pipeFileModified "./test.sh" "./test2.sh" "testInts.txt" "out2.txt";
+val cmd1 = "./test.sh" 
+val cmd2 = "./test2.sh"
+val inf = "testInts.txt" 
+val outf = "out2.txt";
+splice([splice(cmd1::[], "/"),splice(cmd2::[], "/")], " | ")
+ *)
+
 fun pipe cmd1 cmd2 ins outs = 
-  (useCommand cmd1 [] ins outs; useCommand cmd2 [] ins outs)
+  let
+    val p = (Unix.execute("/bin/bash", "-c"::[splice([splice(cmd1::[], "/"),splice(cmd2::[], "/")], " | ")]) : (TextIO.instream, TextIO.outstream) Unix.proc)
+    val (ins',outs') = Unix.streamsOf p
+    val endOfIns = ref false
+    fun send () = 
+      if TextIO.endOfStream ins
+        then (endOfIns := true; TextIO.closeOut outs')
+      else (TextIO.output(outs', TextIO.inputN(ins, 1));
+            TextIO.flushOut outs')
+    fun receive() = 
+      case TextIO.canInput(ins', 1) of
+         SOME 1 => (TextIO.output(outs, TextIO.inputN(ins', 1));
+                    TextIO.flushOut outs)
+       | _ => ()
+    fun receiveRest () = 
+      if TextIO.endOfStream ins' then ()
+      else (TextIO.output(outs, TextIO.inputN(ins', 1));
+            receiveRest())
+    fun loop () = (if !endOfIns then receiveRest() else (send(); receive(); loop()))
+  in
+    (loop(); Unix.reap p;())
+  end
+
+fun pipeFile cmd1 cmd2 inf outf = 
+  let
+    val ins = TextIO.openIn inf
+    val outs = TextIO.openOut outf
+  in
+    pipe cmd1 cmd2 ins outs
+  end
+(* pipeFileModified "./test.sh" "./test2.sh" "testInts.txt" "out2.txt";
+val cmd1 = "./test.sh" 
+val cmd2 = "./test2.sh"
+val inf = "testInts.txt" 
+val outf = "out2.txt";
+splice([splice(cmd1::[], "/"),splice(cmd2::[], "/")], " | ")
+ *)
