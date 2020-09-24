@@ -1,7 +1,8 @@
 (* SML source file. Copyright (c) by 2222-42 2020.
-* Q18.2
+* Chap18.2 Chap18.3 
 *)
 
+(* Chap 18.2 *)
 structure Types = struct 
   datatype expr = 
       STREXP of string 
@@ -37,4 +38,14 @@ struct
   val firstLinePrompt = ref "->"
   val secondLinePrompt = ref ">>"
   val doFirstLinePrompt = ref true
+end
+
+(* Chap 18.3 *)
+structure Websh =
+struct
+  local
+    open Types Control
+  in
+    
+  end
 end
