@@ -135,14 +135,14 @@ struct
                  (* Parseは未定義 *)
       in
         (case s of
-           EXPR e  => 
-         | VAL (id, e) => 
-         | COPY (e, e') => 
-         | CD e => 
-         | PRINT e => 
-         | USE f => 
-         | HELP => 
-         | ENV =>
+           EXPR e  => Eval(* 式の評価 *)
+         | VAL (id, e) => (* 変数の束縛 *)
+         | COPY (e, e') => (* URLのコピー*)
+         | CD e => (* ディレクトリの変更 *)
+         | PRINT e => (* ページの印字 *)
+         | USE f => (* ファイルの実行 *)
+         | HELP => (* ヘルプメッセージの印字 *)
+         | ENV => (* 現在の環境の印字 *)
          ;
         topLoop source env) 
       end
@@ -153,6 +153,6 @@ struct
        handle endOfInput => ()
       ) *)
   end
-end
+end;
 
 Websh.currentPath();
