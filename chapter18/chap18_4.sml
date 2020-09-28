@@ -109,6 +109,7 @@
     fun lex source =
       let
         fun getStream ({stream, ...}: source) = stream
+        fun getPrompt ({promptMode, ...}: source) = promptMode
         val ins = getStream source
       in
         case currentToken of
