@@ -3,6 +3,7 @@
 *)
 
 use "./Control.sml";
+use "./chapter16/chap16_3_q9.sml";
 signature LEX = sig
 type instream
 type source = {stream: instream, promptMode:bool}
@@ -116,16 +117,14 @@ end
        end
     (* TODO: implment initToken *)
     fun initToken source = ()
-    (* TODO: implment nextToken *)
-
 
     fun lex source =
       let
         val ins = getStream source
       in
-        case currentToken of
-          ref (SOME tk) => tk
-        | ref NONE =>
+        case !currentToken of
+          (SOME tk) => tk
+        | NONE =>
          (skipSpaces (ins, getPrompt source);
           if T.endOfStream ins then EOF
           else
@@ -208,10 +207,11 @@ end
         | RANGLE => "RANGLE"
         | BACKSLASH => "BACKSLASH"
         | QUESTION => "QUESTION"
+
     fun nextToken source = 
-      case currentToken of
-         ref (SOME tk) => tk
-       | ref NONE => 
+      case !currentToken of
+         (SOME tk) => tk
+       | NONE => 
          let
           val newToken = lex source
          in
@@ -229,8 +229,11 @@ end
                   | NONE => s
           in getRest ""
           end
+    (* これだと無限に読み込んでしまう *)
     fun testMain source =
+       (if (getPrompt source) then printPromt() else ();
         let
+          val ahead = nextToken source
           val token = lex source
           val ins = getStream source
         in
@@ -243,10 +246,19 @@ end
                in
                  (testMain newSource; testMain source)
                end
-           | _ => (print (toString token ^ "\n");
-                    testMain source)
-        end
+           | _ => (print ("lookahead: " ^ toString ahead ^ "\n");
+                   print ("lex: " ^ toString token ^ "\n" );
+                   testMain source)
+        end)
     fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
+    (* fun testLex () = 
+      let
+        val source = {stream=TextIO.stdIn, promptMode=true}
+      in
+        Format.printf "lookahead: %s\n" [Format.S (toString (nextToken source))];
+        Format.printf "lex: %s\n" [Format.S (toString (lex source))];
+        testLex()
+      end *)
    end
 
 (* 
