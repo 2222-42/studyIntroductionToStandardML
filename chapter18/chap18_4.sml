@@ -61,6 +61,24 @@
                      then (T.input1 ins;skipSpaces ins)
                      else ()
          | _ => ()
+    fun getString ins = 
+      let 
+        fun getRest (s, i) = 
+          if i = 0 then s
+          else 
+            case T.lookahead ins of
+              SOME c => if #"\"" = c 
+                        then (T.inputN(ins,1); getRest (s, i - 1))
+                        else getRest (s ^ T.inputN(ins,1), i)
+            | NONE => s
+      in
+        STRING(getRest ("", 2))
+      end
+      (* 
+      structure T = TextIO
+      val ins = T.openIn "test.txt"
+      getString ins;
+       *)
     fun getID ins =
          let fun getRest s =
              case T.lookahead ins of
@@ -97,7 +115,8 @@
            let
              val c = valOf (T.lookahead ins)
            in
-             if Char.isDigit c then getNum ins
+             if #"\"" = c then getString ins
+             else if Char.isDigit c then getNum ins
              else if Char.isAlpha c then getID ins
              else case valOf (T.input1 ins) of
                #"!" => BANG
