@@ -28,6 +28,7 @@
      val lex : source -> token
      val initToken : source -> unit
      val nextToken : source -> token
+     val currentToken : token option ref
    end
 
   structure Lex : LEX =
@@ -55,6 +56,8 @@
       | COMMA           (* , *)      | LANGLE          (* < *)
       | PERIOD          (* . *)      | RANGLE          (* > *)
       | BACKSLASH       (* / *)      | QUESTION        (* ? *)
+    val currentToken = (ref NONE : token option ref)
+    
     fun skipSpaces ins =
          case T.lookahead ins of
            SOME c => if Char.isSpace c
@@ -103,12 +106,14 @@
     (* TODO: implment initToken *)
     fun initToken source = ()
     (* TODO: implment nextToken *)
-    fun nextToken source = EOF
     fun lex source =
       let
         fun getStream ({stream, ...}: source) = stream
         val ins = getStream source
       in
+        case currentToken of
+          ref (SOME tk) => tk
+        | ref NONE =>
          (skipSpaces ins;
           if T.endOfStream ins then EOF
           else
@@ -135,7 +140,7 @@
              | #"\\" => SLASH
              | #"|" => BAR
              | #"@" => AT
-             | #"`" =>  BACKQUOTE
+             | #"`" => BACKQUOTE
              | #"[" => LBRACKET
              | #"{" => LBRACE
              | #";" => SEMICOLON
@@ -153,6 +158,16 @@
              | _ => SPECIAL c
            end)
       end
+    fun nextToken source = 
+      case currentToken of
+         ref (SOME tk) => tk
+       | ref NONE => 
+         let
+          val newToken = lex source
+         in
+          currentToken := SOME newToken; newToken
+         end
+       
 
          (* 補足: 「ファイル名は空白以外の任意の文字列とし、use sp* fileNameがトークン列のどこに現れてもよい」との仕様に相当 *)
       fun getFileName ins =
