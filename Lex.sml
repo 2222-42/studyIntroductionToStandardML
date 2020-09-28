@@ -60,11 +60,20 @@ end
       | BACKSLASH       (* / *)      | QUESTION        (* ? *)
     val currentToken = (ref NONE : token option ref)
     
-    fun skipSpaces ins =
+    fun getStream ({stream, ...}: source) = stream
+    fun getPrompt ({promptMode, ...}: source) = promptMode
+    fun printPromt () = 
+      if (!(Control.doFirstLinePrompt))
+      then print (! Control.firstLinePrompt)
+      else print (! Control.secondLinePrompt)
+
+    fun skipSpaces (ins, mode) =
          case T.lookahead ins of
-           SOME c => if Char.isSpace c
-                     then (T.input1 ins;skipSpaces ins)
-                     else ()
+           SOME c => if c = #"\n" 
+                     then (T.input1 ins; if mode then printPromt() else ();skipSpaces (ins, mode))
+                     else if Char.isSpace c
+                          then (T.input1 ins;skipSpaces (ins, mode))
+                          else ()
          | _ => ()
     fun getString ins = 
       let 
@@ -108,8 +117,8 @@ end
     (* TODO: implment initToken *)
     fun initToken source = ()
     (* TODO: implment nextToken *)
-    fun getStream ({stream, ...}: source) = stream
-    fun getPrompt ({promptMode, ...}: source) = promptMode
+
+
     fun lex source =
       let
         val ins = getStream source
@@ -117,7 +126,7 @@ end
         case currentToken of
           ref (SOME tk) => tk
         | ref NONE =>
-         (skipSpaces ins;
+         (skipSpaces (ins, getPrompt source);
           if T.endOfStream ins then EOF
           else
            let
@@ -229,15 +238,18 @@ end
              EOF => ()
            | ID "use" =>
                let
-                 val fileName = (skipSpaces ins; getFileName ins)
-                 val newSource = {stream=TextIO.openIn fileName, promptMode=false}
+                 val fileName = (skipSpaces (ins, getPrompt source); getFileName ins)
+                 val newSource = {stream=TextIO.openIn fileName, promptMode=(getPrompt source)}
                in
                  (testMain newSource; testMain source)
                end
            | _ => (print (toString token ^ "\n");
                     testMain source)
         end
-    fun testLex () = testMain {stream=TextIO.stdIn, promptMode=false}
+    fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
    end
 
-(* Lex.testLex () *)
+(* 
+Lex.testLex ();
+use test.txt
+ *)
