@@ -35,18 +35,22 @@ struct
                    "link" => (* read link formula *)
                       let
                         val _ = L.lex source
+                        val _ = check L.LPAREN
                         val e = parseExpr ()
+                        val _ = check L.RPAREN
                       in
                         LINKEXP e
                       end
                  | "follow" => (* read follow formula*)
                       let
                         val _ = L.lex source
+                        val _ = check L.LPAREN
                         val e = parseExpr ()
                         val _ = check L.COMMA
                         val i = case L.lex source of
                                     L.DIGITS n => valOf(Int.fromString n)
                                   | _ => syntaxError()
+                        val _ = check L.RPAREN
                       in
                         FOLLOWEXP(e, i)
                       end
@@ -70,12 +74,67 @@ struct
                             VAL(id,e)
                           end
          | L.ID("cd") => (* read cd sentence *)
+                          let
+                            val _ = L.lex source
+                            val e = parseExpr ()
+                            val _ = check L.SEMICOLON
+                          in
+                            CD e
+                          end
          | L.ID("use") => (* read use sentence *)
+                          let
+                            val _ = L.lex source
+                            val id = case L.lex source of
+                                        L.ID s => s
+                                      | _ => syntaxError()
+                            val _ = check L.SEMICOLON
+                          in
+                            USE id
+                          end
          | L.ID("print") => (* read print sentence *)
+                          let
+                            val _ = L.lex source
+                            val e = parseExpr ()
+                            val _ = check L.SEMICOLON
+                          in
+                            PRINT e
+                          end
          | L.ID("copy") => (* read copy sentence *)
+                          let
+                            val _ = L.lex source
+                            val e1 = parseExpr ()
+                            val _ = check (L.ID "to")
+                            val e2 = parseExpr ()
+                            val _ = check L.SEMICOLON
+                          in
+                            COPY (e1,e2)
+                          end
          | L.ID("help") => (* read help sentence *)
+                          let
+                            val _ = L.lex source
+                            val _ = check L.SEMICOLON
+                          in
+                            HELP
+                          end
          | L.ID("env") => (* read env sentence *)
+                          let
+                            val _ = L.lex source
+                            val _ = check L.SEMICOLON
+                          in
+                            ENV
+                          end
          | _ => EXPR (parseExpr () before check L.SEMICOLON)
       end
   end
 end
+
+(* 
+val ins = (TextIO.openIn "test.txt");
+val source = ({stream=ins, promptMode=true}:Lex.source);
+Parse.parse source;
+
+    structure L = Lex
+    L.testLex()
+val source = ({stream=TextIO.stdIn, promptMode=true}:Lex.source);
+Parse.parse source;
+*)
