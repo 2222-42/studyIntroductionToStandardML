@@ -119,12 +119,12 @@ end
     fun initToken source = ()
 
     fun lex source =
-      let
-        val ins = getStream source
-      in
-        case !currentToken of
-          (SOME tk) => tk
-        | NONE =>
+      case currentToken of
+        ref (SOME tk) => tk
+      | ref NONE =>
+        let
+          val ins = getStream source
+        in
          (skipSpaces (ins, getPrompt source);
           if T.endOfStream ins then EOF
           else
@@ -209,13 +209,14 @@ end
         | QUESTION => "QUESTION"
 
     fun nextToken source = 
-      case !currentToken of
-         (SOME tk) => tk
-       | NONE => 
+      case currentToken of
+         ref (SOME tk) => tk
+       | ref NONE => 
          let
           val newToken = lex source
          in
-          currentToken := SOME newToken; newToken
+          currentToken := SOME newToken;
+          newToken
          end
        
 
@@ -229,9 +230,11 @@ end
                   | NONE => s
           in getRest ""
           end
-    (* これだと無限に読み込んでしまう *)
+    (* これだと無限に読み込んでしまう
+        -> sourceのstreamの内容が更新されていない *)
     fun testMain source =
        (if (getPrompt source) then printPromt() else ();
+        currentToken := NONE;
         let
           val ahead = nextToken source
           val token = lex source
@@ -239,19 +242,20 @@ end
         in
           case token of
              EOF => ()
+           (* useで次の中身を見るために、nextTokenが更新されないためダメ *)
            | ID "use" =>
                let
-                 val fileName = (skipSpaces (ins, getPrompt source); getFileName ins)
+                 val fileName = (skipSpaces (ins, getPrompt source); getFileName (ins))
                  val newSource = {stream=TextIO.openIn fileName, promptMode=(getPrompt source)}
                in
                  (testMain newSource; testMain source)
                end
            | _ => (print ("lookahead: " ^ toString ahead ^ "\n");
-                   print ("lex: " ^ toString token ^ "\n" );
+                   print ("lex: " ^ toString (lex source) ^ "\n" );
                    testMain source)
         end)
     fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
-    (* fun testLex () = 
+    (* fun testLex () =
       let
         val source = {stream=TextIO.stdIn, promptMode=true}
       in
@@ -263,5 +267,6 @@ end
 
 (* 
 Lex.testLex ();
+123
 use test.txt
  *)
