@@ -32,6 +32,7 @@ datatype token
     val nextToken : source -> token
     val currentToken : token option ref
     val testLex : unit -> unit
+    (* val getStream : source -> instream *)
 end
 
   structure Lex : LEX =
