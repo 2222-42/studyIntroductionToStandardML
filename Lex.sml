@@ -116,8 +116,8 @@ end
        in
          DIGITS (getRest "")
        end
-    (* TODO: implment initToken *)
-    fun initToken source = ()
+
+    fun initToken source = (currentToken := NONE)
 
     fun lex source =
       case currentToken of
@@ -235,7 +235,7 @@ end
         -> sourceのstreamの内容が更新されていない *)
     fun testMain source =
        (if (getPrompt source) then printPromt() else ();
-        currentToken := NONE;
+        initToken source;
         let
           val ahead = nextToken source
           val token = lex source
