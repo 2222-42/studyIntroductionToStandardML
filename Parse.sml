@@ -30,10 +30,26 @@ struct
 
         fun parseExpr () = 
           case L.lex source of
-             L.ID(S) =>
+             L.ID(s) =>
                 (case s of
                    "link" => (* read link formula *)
+                      let
+                        val _ = L.lex source
+                        val e = parseExpr ()
+                      in
+                        LINKEXP e
+                      end
                  | "follow" => (* read follow formula*)
+                      let
+                        val _ = L.lex source
+                        val e = parseExpr ()
+                        val _ = check L.COMMA
+                        val i = case L.lex source of
+                                    L.DIGITS n => valOf(Int.fromString n)
+                                  | _ => syntaxError()
+                      in
+                        FOLLOWEXP(e, i)
+                      end
                  | _ => IDEXP s)
            | L.STRING s => STREXP s
            | _ => syntaxError()
