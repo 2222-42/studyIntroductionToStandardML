@@ -18,6 +18,7 @@ struct
         fun syntaxError () = (* report Error *)
           (skip(); raise Syntax)
 
+        (* TODO:この関数を呼び出すどこかでエラーが起きているのを修正 *)
         fun check tk = (* check whether tk or not *)
           if L.nextToken(source) = tk
           then ()
