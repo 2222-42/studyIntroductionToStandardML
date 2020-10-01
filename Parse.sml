@@ -22,7 +22,10 @@ struct
         fun check tk = (* check whether tk or not *)
           if L.nextToken(source) = tk
           then ()
-          else (skip();raise Syntax)
+          else (skip();
+          (* 以下の一行はテスト用のため *)
+          print (L.toString(L.nextToken(source)));
+          raise Syntax)
 
         fun getInt () = (* read data whose type is int *)
            case L.nextToken(source) of
@@ -59,21 +62,24 @@ struct
            | L.STRING s => STREXP s
            | _ => syntaxError()
       in
+        (* 改行時の問題修正 *)
+        L.initToken(source);
         case L.nextToken source of
            L.SEMICOLON => (L.lex source;
                            Control.doFirstLinePrompt := true;
                            parse source)
-         | L.ID("val") => let
+         | L.ID("val") => (let
                             val _ = L.lex source
                             val id = case L.lex source of
                                         L.ID s => s
                                       | _ => syntaxError()
-                            val _ = check L.EQUALSYM
+                            (* TODO:ここでSEMICOLONを読み込んでいる問題の処理 *)
+                            val _ = (print "checkEQ"; check L.EQUALSYM)
                             val e = parseExpr ()
-                            val _ = check L.SEMICOLON
+                            val _ = (print "checkSEMIC";check L.SEMICOLON)
                           in
                             VAL(id,e)
-                          end
+                          end before print "checkID")
          | L.ID("cd") => (* read cd sentence *)
                           let
                             val _ = L.lex source
@@ -133,6 +139,10 @@ end
 val ins = (TextIO.openIn "test.txt");
 val source = ({stream=ins, promptMode=true}:Lex.source);
 Parse.parse source;
+
+->checkEQSEMICOLON
+uncaught exception Syntax
+  raised at: Parse.sml:25.70-25.76
 
     structure L = Lex
     L.testLex()

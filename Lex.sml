@@ -32,6 +32,8 @@ datatype token
     val nextToken : source -> token
     val currentToken : token option ref
     val testLex : unit -> unit
+    (* 以下はテスト用のため *)
+    val toString : token -> string
     (* val getStream : source -> instream *)
 end
 
@@ -222,15 +224,15 @@ end
        
 
          (* 補足: 「ファイル名は空白以外の任意の文字列とし、use sp* fileNameがトークン列のどこに現れてもよい」との仕様に相当 *)
-      fun getFileName ins =
-          let fun getRest s = 
-                  case (T.lookahead ins) of
-                    SOME c => 
-                if Char.isSpace c then s
-                    else getRest (s ^ T.inputN(ins,1))
-                  | NONE => s
-          in getRest ""
-          end
+    fun getFileName ins =
+        let fun getRest s = 
+                case (T.lookahead ins) of
+                  SOME c => 
+              if Char.isSpace c then s
+                  else getRest (s ^ T.inputN(ins,1))
+                | NONE => s
+        in getRest ""
+        end
     (* これだと無限に読み込んでしまう
         -> sourceのstreamの内容が更新されていない *)
     fun testMain source =
