@@ -33,35 +33,41 @@ struct
              | _ => raise Syntax
 
         fun parseExpr () = 
-          case L.lex source of
-             L.ID(s) =>
-                (case s of
-                   "link" => (* read link formula *)
-                      let
-                        val _ = L.lex source
-                        val _ = check L.LPAREN
-                        val e = parseExpr ()
-                        val _ = check L.RPAREN
-                      in
-                        LINKEXP e
-                      end
-                 | "follow" => (* read follow formula*)
-                      let
-                        val _ = L.lex source
-                        val _ = check L.LPAREN
-                        val e = parseExpr ()
-                        val _ = check L.COMMA
-                        val i = case L.lex source of
-                                    L.DIGITS n => valOf(Int.fromString n)
-                                  | _ => syntaxError()
-                        val _ = check L.RPAREN
-                      in
-                        FOLLOWEXP(e, i)
-                      end
-                 | _ => IDEXP s)
-           | L.STRING s => STREXP s
-           | _ => (print "parse Error\n";
-                   syntaxError())
+          (* 以下のlet in endでくくってテストに表示させるようにする *)
+          let
+            val exp = L.lex source
+          in
+            print (L.toString exp);
+            case exp of
+              L.ID(s) =>
+                  (case s of
+                    "link" => (* read link formula *)
+                        let
+                          val _ = L.lex source
+                          val _ = check L.LPAREN
+                          val e = parseExpr ()
+                          val _ = check L.RPAREN
+                        in
+                          LINKEXP e
+                        end
+                  | "follow" => (* read follow formula*)
+                        let
+                          val _ = L.lex source
+                          val _ = check L.LPAREN
+                          val e = parseExpr ()
+                          val _ = check L.COMMA
+                          val i = case L.lex source of
+                                      L.DIGITS n => valOf(Int.fromString n)
+                                    | _ => syntaxError()
+                          val _ = check L.RPAREN
+                        in
+                          FOLLOWEXP(e, i)
+                        end
+                  | _ => IDEXP s)
+            | L.STRING s => STREXP s
+            | _ => (print "parse Error\n";
+                    syntaxError())
+        end
       in
         (* 改行時の問題修正 *)
         (* L.initToken(source); *)
@@ -78,6 +84,7 @@ struct
                             (* TODO:ここでSEMICOLONを読み込んでいる問題の処理 *)
                             val _ = (print "checkEQ\n";
                                      check L.EQUALSYM)
+                            val _ = L.lex source
                             val e = (print "parseExpr\n";
                                      parseExpr ())
                             val _ = (print "checkSEMIC\n";
