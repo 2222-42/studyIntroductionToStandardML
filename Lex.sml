@@ -119,7 +119,7 @@ end
          DIGITS (getRest "")
        end
 
-    fun initToken source = (print "init\n"; currentToken := NONE)
+    fun initToken source = currentToken := NONE
 
     fun lex source =
       case currentToken of
