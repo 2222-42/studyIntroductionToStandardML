@@ -238,7 +238,6 @@ end
         -> sourceのstreamの内容が更新されていない *)
     fun testMain source =
        (if (getPrompt source) then printPromt() else ();
-        initToken source;
         let
           val ahead = nextToken source
           val token = lex source
@@ -274,7 +273,7 @@ Lex.testLex ();
 123 *)
 
 (*  Lex.testLex ();     
-->init
+-> val id = "test";
 val id = "test";
 init
 lookahead: ID(val)
