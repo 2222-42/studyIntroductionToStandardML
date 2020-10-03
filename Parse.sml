@@ -36,7 +36,7 @@ struct
           let
             val exp = L.lex source
           in
-            (* print (L.toString exp); *)
+            (* print (L.toString exp ^ "\n"); *)
             case exp of
               L.ID(s) =>
                   (case s of
@@ -117,6 +117,7 @@ struct
                             val _ = L.lex source
                             val e1 = parseExpr ()
                             val _ = check (L.ID "to")
+                            val _ = L.lex source
                             val e2 = parseExpr ()
                             val _ = check L.SEMICOLON
                           in
