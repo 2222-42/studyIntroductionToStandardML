@@ -23,9 +23,9 @@ struct
           if L.nextToken(source) = tk
           then ()
           else (skip();
-          (* 以下の一行はテスト用のため *)
-          print (L.toString(L.nextToken(source)));
-          raise Syntax)
+                (* 以下の一行はテスト用のため *)
+                print ("token is different: " ^ L.toString(L.nextToken(source)));
+                raise Syntax)
 
         fun getInt () = (* read data whose type is int *)
            case L.nextToken(source) of
@@ -60,10 +60,11 @@ struct
                       end
                  | _ => IDEXP s)
            | L.STRING s => STREXP s
-           | _ => syntaxError()
+           | _ => (print "parse Error\n";
+                   syntaxError())
       in
         (* 改行時の問題修正 *)
-        L.initToken(source);
+        (* L.initToken(source); *)
         case L.nextToken source of
            L.SEMICOLON => (L.lex source;
                            Control.doFirstLinePrompt := true;
@@ -71,12 +72,16 @@ struct
          | L.ID("val") => (let
                             val _ = L.lex source
                             val id = case L.lex source of
-                                        L.ID s => s
+                                        L.ID s => (print (s^"\n");
+                                                   s)
                                       | _ => syntaxError()
                             (* TODO:ここでSEMICOLONを読み込んでいる問題の処理 *)
-                            val _ = (print "checkEQ"; check L.EQUALSYM)
-                            val e = parseExpr ()
-                            val _ = (print "checkSEMIC";check L.SEMICOLON)
+                            val _ = (print "checkEQ\n";
+                                     check L.EQUALSYM)
+                            val e = (print "parseExpr\n";
+                                     parseExpr ())
+                            val _ = (print "checkSEMIC\n";
+                                     check L.SEMICOLON)
                           in
                             VAL(id,e)
                           end before print "checkID")
