@@ -119,11 +119,11 @@ end
          DIGITS (getRest "")
        end
 
-    fun initToken source = (currentToken := NONE)
+    fun initToken source = (print "init\n"; currentToken := NONE)
 
     fun lex source =
       case currentToken of
-        ref (SOME tk) => tk
+        ref (SOME tk) => tk before (initToken source)
       | ref NONE =>
         let
           val ins = getStream source
@@ -171,7 +171,8 @@ end
              | #"?" => QUESTION
              | _ => SPECIAL c
            end)
-      end
+      end 
+
     fun toString tok =
       case tok of
           STRING s => "STRING\"" ^ s ^"\""
@@ -254,7 +255,7 @@ end
                  (testMain newSource; testMain source)
                end
            | _ => (print ("lookahead: " ^ toString ahead ^ "\n");
-                   print ("lex: " ^ toString (lex source) ^ "\n" );
+                   print ("lex: " ^ toString token ^ "\n" );
                    testMain source)
         end)
     fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
@@ -268,8 +269,30 @@ end
       end *)
    end
 
-(* 
+(* ;
 Lex.testLex ();
-123
-use test.txt
- *)
+123 *)
+
+(*  Lex.testLex ();     
+->init
+val id = "test";
+init
+lookahead: ID(val)
+lex: ID(val)
+->init
+init
+lookahead: ID(id)
+lex: ID(id)
+->init
+init
+lookahead: EQUALSYM
+lex: EQUALSYM
+->init
+init
+lookahead: STRING"test"
+lex: STRING"test"
+->init
+init
+lookahead: SEMICOLON
+lex: SEMICOLON
+->init *)
