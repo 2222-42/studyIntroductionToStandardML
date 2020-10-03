@@ -18,7 +18,6 @@ struct
         fun syntaxError () = (* report Error *)
           (skip(); raise Syntax)
 
-        (* TODO:この関数を呼び出すどこかでエラーが起きているのを修正 *)
         fun check tk = (* check whether tk or not *)
           if L.nextToken(source) = tk
           then ()
@@ -37,7 +36,7 @@ struct
           let
             val exp = L.lex source
           in
-            print (L.toString exp);
+            (* print (L.toString exp); *)
             case exp of
               L.ID(s) =>
                   (case s of
@@ -75,23 +74,18 @@ struct
            L.SEMICOLON => (L.lex source;
                            Control.doFirstLinePrompt := true;
                            parse source)
-         | L.ID("val") => (let
+         | L.ID("val") => let
                             val _ = L.lex source
                             val id = case L.lex source of
-                                        L.ID s => (print (s^"\n");
-                                                   s)
+                                        L.ID s => s
                                       | _ => syntaxError()
-                            (* TODO:ここでSEMICOLONを読み込んでいる問題の処理 *)
-                            val _ = (print "checkEQ\n";
-                                     check L.EQUALSYM)
+                            val _ = check L.EQUALSYM
                             val _ = L.lex source
-                            val e = (print "parseExpr\n";
-                                     parseExpr ())
-                            val _ = (print "checkSEMIC\n";
-                                     check L.SEMICOLON)
+                            val e = parseExpr ()
+                            val _ = check L.SEMICOLON
                           in
                             VAL(id,e)
-                          end before print "checkID")
+                          end
          | L.ID("cd") => (* read cd sentence *)
                           let
                             val _ = L.lex source
