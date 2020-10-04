@@ -78,6 +78,7 @@ end
                           then (T.input1 ins;skipSpaces (ins, mode))
                           else ()
          | _ => ()
+
     fun getString ins = 
       let 
         fun getRest (s, i) = 
