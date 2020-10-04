@@ -3,7 +3,6 @@
 *)
 
 use "./Control.sml";
-use "./chapter16/chap16_3_q9.sml";
 signature LEX = sig
 type instream
 type source = {stream: instream, promptMode:bool}
@@ -258,14 +257,6 @@ end
                    testMain source)
         end)
     fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
-    (* fun testLex () =
-      let
-        val source = {stream=TextIO.stdIn, promptMode=true}
-      in
-        Format.printf "lookahead: %s\n" [Format.S (toString (nextToken source))];
-        Format.printf "lex: %s\n" [Format.S (toString (lex source))];
-        testLex()
-      end *)
    end
 
 (* ;
