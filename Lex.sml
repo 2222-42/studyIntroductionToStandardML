@@ -34,6 +34,7 @@ datatype token
     (* 以下はテスト用のため *)
     val toString : token -> string
     (* val getStream : source -> instream *)
+    val printFirstLine : source -> unit
 end
 
   structure Lex : LEX =
@@ -42,7 +43,7 @@ end
     type instream = T.instream
     type source = {stream: instream, promptMode:bool}
     datatype token
-      =  STRING of string 
+      = STRING of string 
       | EOF                          | ID of string
       | DIGITS of string             | SPECIAL of char
       | BANG            (* ! *)      
@@ -236,8 +237,10 @@ end
         end
     (* これだと無限に読み込んでしまう
         -> sourceのstreamの内容が更新されていない *)
+    fun printFirstLine source =
+      if (getPrompt source) then printPromt() else ()
     fun testMain source =
-       (if (getPrompt source) then printPromt() else ();
+       (printFirstLine source;
         let
           val ahead = nextToken source
           val token = lex source

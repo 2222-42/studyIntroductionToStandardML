@@ -6,7 +6,7 @@ struct
   exception Runtime of string   (* 式評価の失敗 *)
   exception StringSyntax        (* 文字列が閉じていない *)
   exception Syntax              (* 構文エラー *)
-  exception endOfIntput         (* 入力終了 *)
+  exception endOfInput         (* 入力終了 *)
   exception urlFormat           (* URLフォーマットエラー *)
   val firstLinePrompt = ref "->"
   val secondLinePrompt = ref ">>"
@@ -175,12 +175,11 @@ struct
                         end
                   | _ => IDEXP s)
             | L.STRING s => STREXP s
+            | L.EOF => raise endOfInput (* C-dでParseErrorが発生することへの対処 *)
             | _ => (print "parse Error\n";
                     syntaxError())
         end
       in
-        (* 改行時の問題修正 *)
-        (* L.initToken(source); *)
         case L.nextToken source of
            L.SEMICOLON => (L.lex source;
                            Control.doFirstLinePrompt := true;
@@ -316,6 +315,7 @@ struct
     val defaultSource = {stream=TextIO.stdIn, promptMode=true}
     fun websh () = 
       (Lex.initToken defaultSource;
+       Lex.printFirstLine defaultSource;
        topLoop defaultSource (Env.emptyEnv())
        handle endOfInput => ()
       )
