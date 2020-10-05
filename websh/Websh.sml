@@ -267,6 +267,7 @@ signature PRINT =
 sig
   val exprToString : Types.expr -> string
   val statementToString : Types.statement -> string
+  val valueToString: Types.value -> string
 end
 
 structure Print : PRINT =
@@ -292,6 +293,51 @@ struct
        | USE s => F.format "use %s" [F.S s]
        | HELP => F.format "help" []
        | ENV => F.format "env" []
+    fun urlToString url =
+      let
+        fun concatStrList sList = 
+          foldr (fn (x, R) => x^R) "" sList
+      in
+        case url of
+          HTTP {host=host, path=path, anchor=anchor} => 
+            let
+              val pathValue = (if isSome path then valOf path else [])
+              val anchorValue = (if isSome anchor then valOf anchor else "")
+            in
+              F.format 
+                "HTTP {host: %s, path: %s, anchor: %s}"
+                [F.S (concatStrList host), F.S (concatStrList pathValue), F.S(anchorValue)]
+            end
+        | FILE {path=path, anchor=anchor} => 
+            let
+              val anchorValue = (if isSome anchor then valOf anchor else "")
+            in
+              F.format 
+                "FILE {path: %s, anchor: %s}"
+                [F.S (concatStrList path), F.S (anchorValue)]
+            end
+        | RELATIVE {path=path, anchor=anchor, root=root} => 
+            let
+              val anchorValue = (if isSome anchor then valOf anchor else "")
+            in
+              F.format 
+                "RELATIVE {path: %s, anchor: %s, root: %s}"
+                [F.S (concatStrList path), F.S (anchorValue), F.S (urlToString root)]
+            end
+      end
+    fun valueToString v =
+      case v of
+         URL u => urlToString u
+       | PAGE {url=url, links=urlList} => 
+          (* let
+            val linkStr = 
+                F.
+          in
+            body
+          end *)
+          F.format "{page <%s>\n %s}" 
+              [F.S (urlToString url), 
+               F.S (foldr (fn (x, R) => (urlToString x)^R) "" urlList )]
   end
 end
 
@@ -415,7 +461,13 @@ struct
                  Parse.parse source)
       in
         (case s of
-           EXPR e  => print (Print.statementToString s ^ ";\n") (* 式の評価 *)
+           EXPR e  =>  (* 式の評価 *)
+            (* print (Print.statementToString s ^ ";\n") *)
+            let val v = Eval.eval (!root) env e
+            in (Env.bind("it", v, env);
+                Format.printf "val it = %s\n"
+                  [Format.S (Print.valueToString v)])
+            end
          | VAL (id, e) => print (Print.statementToString s ^ ";\n") (* 変数の束縛 *)
          | COPY (e, e') => print (Print.statementToString s ^ ";\n") (* URLのコピー*)
          | CD e => print (Print.statementToString s ^ ";\n") (* ディレクトリの変更 *)
