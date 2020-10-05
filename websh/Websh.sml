@@ -305,7 +305,6 @@ datatype 'a tree = Empty | Node of 'a * 'a tree * 'a tree;
 structure Env : ENV = 
 struct
   type env = (string list * (string * Types.value) tree) ref
-  (* 'a を仮に string とする -> Types.value *)
   fun emptyEnv () = (ref (nil, Empty) : env)
   fun enter (key:string, v, env) = 
     case env of 
@@ -315,59 +314,29 @@ struct
             if key = key' then 
               (keyList, Node((key', v'), L, R))
             else if key > key' then 
-            (*   operator domain: 'Z ref * 'Z
-                 operand:         (string * 'Y) tree * 'X *)
-              (* enter (key, v, R) *)
               let
                 val (newKeyList, newTree) = enter (key, v, (keyList, R))
               in
                 (newKeyList, Node((key', v'), L, newTree))
               end
             else 
-            (* enter (key, v, L) *)
               let
                 val (newKeyList, newTree) = enter (key, v, (keyList, L))
               in
                 (newKeyList, Node((key', v'), newTree, R))
               end
-            
-  (* fun addKey (key, list) =
-    let val newList = foldr (fn (h, R) => if (h = key) then R else R@[h]) [] list
-    in 
-      list := newList
-    end *)
 
-(*   spec:   string * Types.value * ?.Env.env -> unit
-  actual: string * 'a * (string list * 'b) ref -> string list * _ *)
-  (* fun bind (key: string, v:Types.value, ref (keyList, dict): env) = 
-      (addKey (key, keyList); enter(key, v, env); ()) *)
   fun bind (key: string, v:Types.value, env) = 
-    let
-      val newTree = enter(key, v, !env)
-    in
-      env := newTree
-    end
-    (* (enter(key, v, env); ()) *)
+    env := enter(key, v, !env)
 
-(*    expression:  Types.value env -> Types.value
-  result type:  (string * Types.value) tree -> Types.value *)
-  (* fun lookUp (key:string) (ref (_, Empty): Types.value env) = raise Control.NotFound
-    | lookUp key (ref (_, Node((key', v), L, R)): Types.value env) =
-        if key = key' then v
-        else if key > key' then lookUp key R
-        else lookUp key L *)
-  
-  (* val lookUp : string -> env -> Types.value *)
-  fun lookUpSub (key:string) env = 
+  fun lookUp (key: string) (env: env) =
+    (* Types.URL (Types.HTTP {host=[], path=NONE, anchor=NONE}) *)
     case env of
-       (_, Empty) => raise Control.NotFound
-     | (keyList, Node((key', v), L, R)) => 
+       ref (_, Empty) => raise Control.NotFound
+     | ref (keyList, Node((key', v), L, R)) => 
         if key = key' then v
-        else if key > key' then lookUpSub key (keyList,R)
-        else lookUpSub key (keyList,L)
-  
-  fun lookup (key: string) (env:env) =
-    lookUpSub key (!env)
+        else if key > key' then lookUp key (ref (keyList,R):env)
+        else lookUp key (ref (keyList,L):env)
 
   fun domain env =
     case !env of
