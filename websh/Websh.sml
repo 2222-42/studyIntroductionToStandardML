@@ -38,6 +38,11 @@ structure Types = struct
     | PAGE of {url: url, links: url list}
 end
 
+(* signature URL = sig
+  val parseUrl : string -> url
+  val baseUrl : Types.url -> Types.url
+end *)
+
 fun isUpper c = #"A" <= c andalso c <= #"Z"
 
 fun toLower c =
@@ -98,7 +103,7 @@ structure Url = struct
             end
       in {path=path, anchor=anchor, root=root}
       end
-    fun parseUrl (s, root) = 
+    fun parseUrl root s = 
       let 
         val s = SS.full s 
         val (scheme, body) = SS.splitl(fn c => c <> #":") s
@@ -111,6 +116,11 @@ structure Url = struct
           | "file" => FILE (parseFile body)
           | _ => raise urlFormat
       end
+    fun baseUrl url = 
+      case url of
+         HTTP {host=host, path=path, anchor=anchor} => HTTP {host=tl(host), path=path, anchor=anchor}
+       | FILE {path=path, anchor=anchor} => FILE {path=tl(path), anchor=anchor}
+       | RELATIVE {path=path, anchor=anchor, root=root} => FILE {path=tl(path), anchor=anchor, root=root}
   end
 end
 
@@ -285,11 +295,6 @@ struct
   end
 end
 
-signature EVAL =
-sig
-  type env
-  val eval : Types.url -> env -> Types.expr -> Types.value
-end
 
 signature ENV =
 sig
@@ -345,12 +350,14 @@ struct
 
 end
 
+
+
 structure Websh =
 struct
   local
     open Types Control
   in
-    fun currentPath() = Url.parseUrl("file:/"^OS.FileSys.getDir(), OS.FileSys.getDir())
+    fun currentPath() = Url.parseUrl OS.FileSys.getDir() "file:/"^OS.FileSys.getDir()
     val root = ref (currentPath())
     fun topLoop source env = 
       let
