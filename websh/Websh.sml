@@ -39,7 +39,7 @@ structure Types = struct
 end
 
 (* signature URL = sig
-  val parseUrl : string -> url
+  val parseUrl : Types.url -> string -> Types.value
   val baseUrl : Types.url -> Types.url
 end *)
 
@@ -109,7 +109,7 @@ structure Url = struct
         val (scheme, body) = SS.splitl(fn c => c <> #":") s
       in
         if SS.isEmpty body then
-          RELATIVE (parseRelative scheme (FILE{path=[], anchor=NONE}))
+          RELATIVE (parseRelative scheme root)
         else
           case lower (SS.string scheme) of
             "http" => HTTP (parseHttp body)
@@ -120,7 +120,7 @@ structure Url = struct
       case url of
          HTTP {host=host, path=path, anchor=anchor} => HTTP {host=tl(host), path=path, anchor=anchor}
        | FILE {path=path, anchor=anchor} => FILE {path=tl(path), anchor=anchor}
-       | RELATIVE {path=path, anchor=anchor, root=root} => FILE {path=tl(path), anchor=anchor, root=root}
+       | RELATIVE {path=path, anchor=anchor, root=root} => RELATIVE {path=tl(path), anchor=anchor, root=root}
   end
 end
 
@@ -350,6 +350,20 @@ struct
 
 end
 
+signature PARSEHTML =
+sig
+  val parseHtml : Types.url -> Types.url -> Types.value
+end
+
+structure ParseHtml =
+struct
+local open Types
+in
+  fun parseHtml url1 url2 =
+    PAGE{url=url2, links=nil}
+end
+end
+
 
 
 structure Websh =
@@ -357,7 +371,7 @@ struct
   local
     open Types Control
   in
-    fun currentPath() = Url.parseUrl OS.FileSys.getDir() "file:/"^OS.FileSys.getDir()
+    fun currentPath() = Url.parseUrl (FILE{path=[], anchor=NONE}) ("file:/"^OS.FileSys.getDir())
     val root = ref (currentPath())
     fun topLoop source env = 
       let
