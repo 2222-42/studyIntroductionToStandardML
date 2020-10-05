@@ -329,18 +329,31 @@ struct
       case v of
          URL u => urlToString u
        | PAGE {url=url, links=urlList} => 
-          (* let
-            val linkStr = 
-                F.
+          let
+            fun makeIntList (0) = nil
+              | makeIntList (n) = makeIntList(n-1) @ [n]
+            fun makeFormattedStrList url links =
+              let
+                val intList = makeIntList(length links)
+                fun generateListStr [] [] = ""
+                  | generateListStr intList links = (F.format "%3d. %s\n" [F.I (hd intList), F.S (urlToString(hd links))])
+                                                    ^ (generateListStr (tl intList) (tl links))
+              in
+                (F.format "page <%s>\n" [F.S (urlToString url)]) ^ generateListStr intList links
+                
+              end
           in
-            body
-          end *)
-          F.format "{page <%s>\n %s}" 
-              [F.S (urlToString url), 
-               F.S (foldr (fn (x, R) => (urlToString x)^R) "" urlList )]
+            makeFormattedStrList url urlList
+          end
   end
 end
-
+(* 
+val cp = Websh.currentPath();
+val url2 = Types.FILE{path=["test"], anchor=NONE};
+val page = Types.PAGE {url=cp, links=[cp, cp, url2]};
+Print.valueToString page;
+print it;
+*)
 
 signature ENV =
 sig
