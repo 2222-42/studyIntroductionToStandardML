@@ -296,7 +296,7 @@ struct
     fun urlToString url =
       let
         fun concatStrList sList = 
-          foldr (fn (x, R) => x^R) "" sList
+          foldr (fn (x, R) => "/"^x^R) "" sList
       in
         case url of
           HTTP {host=host, path=path, anchor=anchor} => 
