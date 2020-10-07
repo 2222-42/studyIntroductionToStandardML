@@ -487,7 +487,7 @@ struct
                  Parse.parse source)
       in
         (case s of
-           EXPR e  =>  (* 式の評価 *)
+           Types.EXPR e  =>  (* 式の評価 *)
             (* print (Print.statementToString s ^ ";\n") *)
             let val v = Eval.eval (!root) env e
             in (Env.bind("it", v, env);
@@ -504,12 +504,17 @@ struct
          ;
         topLoop source env) 
       end
+        handle Runtime s => (print (s^"\n"); topLoop source env)
+        handle Syntax => (print "Syntax error.\n"; topLoop source env)
+        handle NotFound => (print "NotFound")
+        handle StringSyntax => print("StringSyntax")
+        handle urlFormat => print("urlFormat")
     val defaultSource = {stream=TextIO.stdIn, promptMode=true}
     fun websh () = 
       (Lex.initToken defaultSource;
        Lex.printFirstLine defaultSource;
        topLoop defaultSource (Env.emptyEnv())
-       handle endOfInput => ()
+       handle endOfInput => (print ("endOfInput"); ())
       )
   end
 end
@@ -532,6 +537,8 @@ val it = fn : Types.statement -> string
 
 (* 
 Websh.websh ();
+link "test"
+
 "a";
 
 copy 
