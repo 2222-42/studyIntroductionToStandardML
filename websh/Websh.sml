@@ -147,19 +147,47 @@ structure Url = struct
        | FILE {path=path, anchor=anchor} => FILE {path=path, anchor=anchor}
        | RELATIVE {path=path, anchor=anchor, root=root} => RELATIVE {path=path, anchor=anchor, root=root}
     fun urlToString url = 
-      case url of 
-        HTTP {host=[s], path=_, anchor=_} => s
-      | _ => "URL"
+      let 
+        fun splice (nil,_) = ""
+          | splice ([x],_) = x
+          | splice ((h::t),s) = h ^ s ^ splice (t,s);
+      in
+        case url of 
+          HTTP {host=host, path=path, anchor=anchor} => 
+            "http://" ^
+            (splice (host, "/")) ^
+            (case path of
+              NONE => ""
+            | SOME li => "/"^splice(li, "/")) ^
+            (case anchor of
+              NONE => ""
+            | SOME s => "#" ^ s)
+        | FILE {path=path, anchor=anchor} => 
+            "file:///" ^
+            (splice (path, "/")) ^
+            (case anchor of
+              NONE => ""
+            | SOME s => "#" ^ s)
+        | RELATIVE {path=path, anchor=anchor, root=root} =>
+            (splice (path, "/")) ^
+            (case anchor of
+              NONE => ""
+            | SOME s => "#" ^ s) ^
+            " [on " ^
+            (urlToString root) ^ "]"
+      end
   end
 end
 
 (* 
-- Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.ac.jp/~ohori";
-val it =
-  HTTP {anchor=NONE,host=["www","jaist","ac","jp"],path=SOME ["~ohori"]}
-  : Types.url
-Url.baseUrl;
-Url.urlToString it;
+val testUrl = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.ac.jp/~ohori";
+Url.urlToString testUrl;
+val testFile = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/";
+Url.urlToString testFile;
+val testRelative = Url.parseUrl testFile "studyingStandardML/Url.sml";
+Url.urlToString testRelative;
+val testRelative2 = Url.parseUrl testFile "/studyingStandardML/Url.sml";
+Url.urlToString testRelative2;
 *)
 
 structure Parse =
@@ -577,4 +605,8 @@ it to
 
 2. C-dでParseErrorが発生すること
 
+*)
+
+(* 
+Websh.currentPath();
 *)
