@@ -38,10 +38,17 @@ structure Types = struct
     | PAGE of {url: url, links: url list}
 end
 
-(* signature URL = sig
+signature URL = sig
   val parseUrl : Types.url -> string -> Types.value
+  val urlToString : Types.url -> string
+  (* val canonicalUrl : Types.url -> Types.url *)
   val baseUrl : Types.url -> Types.url
-end *)
+  (* val nodeUrl : Types.url -> string option
+  val pathUrl : Types.url -> string list
+  val joinUrlFile : Types.url -> string -> Types.url
+  val joinUrlPath : Types.rul -> string list -> Types.url
+  val isRelative: Types.url -> bool *)
+end
 
 fun isUpper c = #"A" <= c andalso c <= #"Z"
 
@@ -94,6 +101,24 @@ structure Url = struct
     fun parseRelative s root = 
       let 
         val (path, anchor) =
+          let val (p, a) = SS.splitl (fn #"#" => false | _ => true) s
+          in (map SS.string 
+                (SS.fields (fn c => c = #"/") p),
+              if SS.isEmpty a then 
+                NONE
+              else SOME (SS.string (SS.triml 1 a))
+          )
+          end
+      in 
+        case path of
+           ("" :: L) => 
+            (case root of
+               HTTP{path,host,...} => HTTP{host=host, path=SOME L, anchor=anchor}
+             | FILE _ => FILE{path=L, anchor=anchor})
+         | _ => RELATIVE {path=path, anchor=anchor, root=root}
+      end
+      (* let 
+        val (path, anchor) =
           if SS.isEmpty s then ([""], NONE)
           else 
             let val (p, a) = SS.splitl(neq #"#") s
@@ -102,19 +127,19 @@ structure Url = struct
                 else SOME(SS.string(SS.triml 1 a)))
             end
       in {path=path, anchor=anchor, root=root}
-      end
+      end *)
     fun parseUrl root s = 
       let 
         val s = SS.full s 
         val (scheme, body) = SS.splitl(fn c => c <> #":") s
       in
         if SS.isEmpty body then
-          RELATIVE (parseRelative scheme root)
+          parseRelative scheme root
         else
           case lower (SS.string scheme) of
             "http" => HTTP (parseHttp body)
           | "file" => FILE (parseFile body)
-          | _ => raise urlFormat
+          | _ => parseRelative scheme root
       end
     fun baseUrl url = 
       case url of
