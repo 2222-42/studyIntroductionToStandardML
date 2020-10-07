@@ -118,11 +118,24 @@ structure Url = struct
       end
     fun baseUrl url = 
       case url of
-         HTTP {host=host, path=path, anchor=anchor} => HTTP {host=tl(host), path=path, anchor=anchor}
-       | FILE {path=path, anchor=anchor} => FILE {path=tl(path), anchor=anchor}
-       | RELATIVE {path=path, anchor=anchor, root=root} => RELATIVE {path=tl(path), anchor=anchor, root=root}
+         HTTP {host=host, path=path, anchor=anchor} => HTTP {host=host, path=path, anchor=anchor}
+       | FILE {path=path, anchor=anchor} => FILE {path=path, anchor=anchor}
+       | RELATIVE {path=path, anchor=anchor, root=root} => RELATIVE {path=path, anchor=anchor, root=root}
+    fun urlToString url = 
+      case url of 
+        HTTP {host=[s], path=_, anchor=_} => s
+      | _ => "URL"
   end
 end
+
+(* 
+- Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.ac.jp/~ohori";
+val it =
+  HTTP {anchor=NONE,host=["www","jaist","ac","jp"],path=SOME ["~ohori"]}
+  : Types.url
+Url.baseUrl;
+Url.urlToString it;
+*)
 
 structure Parse =
 struct
