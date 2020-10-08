@@ -41,7 +41,7 @@ end
 signature URL = sig
   val parseUrl : Types.url -> string -> Types.value
   val urlToString : Types.url -> string
-  (* val canonicalUrl : Types.url -> Types.url *)
+  val canonicalUrl : Types.url -> Types.url
   val baseUrl : Types.url -> Types.url
   (* val nodeUrl : Types.url -> string option
   val pathUrl : Types.url -> string list
@@ -176,6 +176,58 @@ structure Url = struct
             " [on " ^
             (urlToString root) ^ "]"
       end
+    fun canonicalUrl url = 
+      case url of
+         HTTP {host=host, path=path, anchor=anchor} => 
+            let val canonicArcString = OS.Path.fromString(
+              OS.Path.mkCanonical(
+                OS.Path.toString{arcs=host, isAbs=true, vol=""}
+              )
+            )
+            in 
+              (fn {arcs,...} => HTTP{host=arcs, path=path, anchor=anchor})canonicArcString
+            end
+       | FILE {path=path, anchor=anchor} => 
+            let val canonicArcString = OS.Path.fromString(
+              OS.Path.mkCanonical(
+                OS.Path.toString{arcs=path, isAbs=true, vol=""}
+              )
+            )
+            in 
+              (fn {arcs,...} => FILE{path=arcs, anchor=anchor})canonicArcString
+            end
+       | RELATIVE {path=path, anchor=anchor, root=root} => 
+            let 
+              val canonicRootUrl = canonicalUrl root
+              val canonicPathString = OS.Path.fromString(
+                OS.Path.mkCanonical(
+                  OS.Path.toString{arcs=path, isAbs=true, vol=""}
+                )
+              )
+            in
+              case canonicRootUrl of
+                 HTTP {host=hostRoot, path=pathRoot, anchor=anchorRoot} => 
+                  let
+                    val canonicPathString = OS.Path.fromString(
+                      OS.Path.mkCanonical(
+                        OS.Path.toString{arcs=(hostRoot @ path), isAbs=true, vol=""}
+                      )
+                    )
+                  in
+                    (fn {arcs, ...} =>HTTP {host=arcs, path=pathRoot, anchor=anchor}) canonicPathString
+                  end
+               | FILE {path=pathRoot, anchor=anchorRoot} => 
+                  let
+                    val canonicPathString = OS.Path.fromString(
+                      OS.Path.mkCanonical(
+                        OS.Path.toString{arcs=(pathRoot @ path), isAbs=true, vol=""}
+                      )
+                    )
+                  in
+                    (fn {arcs, ...} =>FILE {path=arcs, anchor=anchor}) canonicPathString
+                  end
+            end
+       
   end
 end
 
@@ -184,10 +236,23 @@ val testUrl = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.
 Url.urlToString testUrl;
 val testFile = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/";
 Url.urlToString testFile;
-val testRelative = Url.parseUrl testFile "studyingStandardML/Url.sml";
+val testRelative = Url.parseUrl testFile "./studyingStandardML/Url.sml";
+(  RELATIVE
+    {anchor=NONE,path=[".","studyingStandardML","Url.sml"],
+     root=FILE {anchor=NONE,path=[#,#,#]}} : Types.url)
 Url.urlToString testRelative;
+(val it = "./studyingStandardML/Url.sml [on file:///mnt/e/SMLProject]" : string)
 val testRelative2 = Url.parseUrl testFile "/studyingStandardML/Url.sml";
 Url.urlToString testRelative2;
+
+val url = testRelative;
+val path = (fn Types.RELATIVE{path,...} => path) url;
+
+val url = testUrl;
+val path = (fn Types.HTTP{host,...} => host) url;
+OS.Path.toString{arcs=path, isAbs=true, vol=""};
+OS.Path.mkCanonical it;
+OS.Path.fromString it;
 *)
 
 structure Parse =
