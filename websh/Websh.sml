@@ -141,11 +141,37 @@ structure Url = struct
           | "file" => FILE (parseFile body)
           | _ => parseRelative scheme root
       end
+    fun isFileName string =
+      let
+        fun splitCharsDot chrList = 
+          case chrList of
+             [] => ([], [])
+           | c :: chrList' => 
+              if c = #"." then ([], chrList') 
+              else let val (l, r) = splitCharsDot chrList'
+                   in (c::l, r)
+                   end
+        val (l, r) = splitCharsDot(String.explode (string))
+      in
+        not (length r = 0)
+      end
     fun baseUrl url = 
       case url of
-         HTTP {host=host, path=path, anchor=anchor} => HTTP {host=host, path=path, anchor=anchor}
-       | FILE {path=path, anchor=anchor} => FILE {path=path, anchor=anchor}
-       | RELATIVE {path=path, anchor=anchor, root=root} => RELATIVE {path=path, anchor=anchor, root=root}
+         HTTP {host=host, path=path, anchor=anchor} => 
+            if length host = 0 then HTTP {host=host, path=path, anchor=anchor}
+            else if isFileName (List.last host) then  HTTP {host=List.take(host, length(host) - 1),path=path, anchor=anchor}
+            else  HTTP {host=host, path=path, anchor=anchor}
+         (* HTTP {host=host, path=path, anchor=anchor} *)
+       | FILE {path=path, anchor=anchor} => 
+            if length path = 0 then FILE {path=path, anchor=anchor}
+            else if isFileName (List.last path) then  FILE {path=List.take(path, length(path) - 1), anchor=anchor}
+            else FILE {path=path, anchor=anchor}
+       (* FILE {path=path, anchor=anchor} *)
+       | RELATIVE {path=path, anchor=anchor, root=root} => 
+            if length path = 0 then RELATIVE {path=path, anchor=anchor, root=root}
+            else if isFileName (List.last path) then  RELATIVE {path=List.take(path, length(path) - 1), anchor=anchor, root=root}
+            else  RELATIVE {path=path, anchor=anchor, root=root}
+          (* RELATIVE {path=path, anchor=anchor, root=root} *)
     fun urlToString url = 
       let 
         fun splice (nil,_) = ""
@@ -253,6 +279,12 @@ val path = (fn Types.HTTP{host,...} => host) url;
 OS.Path.toString{arcs=path, isAbs=true, vol=""};
 OS.Path.mkCanonical it;
 OS.Path.fromString it;
+
+Url.canonicalUrl testUrl;
+Url.canonicalUrl testFile;
+Url.canonicalUrl testRelative;
+Url.baseUrl testRelative
+Url.canonicalUrl it;
 *)
 
 structure Parse =
