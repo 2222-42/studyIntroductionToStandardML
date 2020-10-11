@@ -109,12 +109,17 @@ structure Url = struct
               else SOME (SS.string (SS.triml 1 a))
           )
           end
+        fun concatinateOptions listOption list = 
+          case listOption of
+             NONE => SOME list
+           | SOME v => SOME (v @ list)
       in 
         case path of
            ("" :: L) => 
             (case root of
-               HTTP{path,host,...} => HTTP{host=host, path=SOME L, anchor=anchor}
-             | FILE _ => FILE{path=L, anchor=anchor})
+               HTTP{path=existPath,host,...} => HTTP{host=host, path=concatinateOptions existPath L, anchor=anchor}
+             | FILE {path=existPath,...} => FILE{path=existPath@L, anchor=anchor}
+             | RELATIVE {path=existPath,root=originalRoot,...} => RELATIVE {path=existPath@L, anchor=anchor, root=originalRoot})
          | _ => RELATIVE {path=path, anchor=anchor, root=root}
       end
       (* let 
@@ -348,7 +353,21 @@ Url.joinUrlPath testUrl ["..", "testDir", "testSubDir", "testFileName"];
 Url.joinUrlPath testFile ["..", "testDir", "testSubDir", "testFileName"];
 Url.joinUrlPath testRelative ["..", "testDir", "testSubDir", "testFileName"];
 
+val testAnchor = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "#Part1";
+(*result: val testAnchor = FILE {anchor=SOME "Part1",path=[]} : Types.url *)
 
+val testUrlAnchor = Url.parseUrl testUrl "#Part1";
+val it =
+  HTTP {anchor=SOME "Part1",host=["www","jaist","ac","jp"],path=SOME []}
+  : Types.url
+
+val testFileAnchor = Url.parseUrl testFile "#Part1";
+val testFileAnchor = FILE {anchor=SOME "Part1",path=[]} : Types.url
+
+val testRelativeAnchor = Url.parseUrl testRelative "#Part1";
+
+uncaught exception Match [nonexhaustive match failure]
+  raised at: websh/Websh.sml:117.53
 *)
 
 structure Parse =
