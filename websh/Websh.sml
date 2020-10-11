@@ -576,6 +576,8 @@ struct
 end
 (* 
 val cp = Websh.currentPath();
+ Print.valueToString (Types.URL cp);
+ print it;
 val url2 = Types.FILE{path=["test"], anchor=NONE};
 val page = Types.PAGE {url=cp, links=[cp, cp, url2]};
 Print.valueToString page;
