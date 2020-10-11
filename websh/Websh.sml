@@ -43,8 +43,8 @@ signature URL = sig
   val urlToString : Types.url -> string
   val canonicalUrl : Types.url -> Types.url
   val baseUrl : Types.url -> Types.url
-  (* val nodeUrl : Types.url -> string option
-  val pathUrl : Types.url -> string list
+  val nodeUrl : Types.url -> string option
+  (* val pathUrl : Types.url -> string list
   val joinUrlFile : Types.url -> string -> Types.url
   val joinUrlPath : Types.rul -> string list -> Types.url
   val isRelative: Types.url -> bool *)
@@ -172,6 +172,20 @@ structure Url = struct
             else if isFileName (List.last path) then  RELATIVE {path=List.take(path, length(path) - 1), anchor=anchor, root=root}
             else  RELATIVE {path=path, anchor=anchor, root=root}
           (* RELATIVE {path=path, anchor=anchor, root=root} *)
+    fun nodeUrl url = 
+      case url of 
+         HTTP {host=host, path=path, anchor=anchor} => 
+            if length host = 0 then ""
+            else if isFileName (List.last host) then List.last host
+            else ""
+       | FILE {path=path, anchor=anchor} => 
+            if length path = 0 then ""
+            else if isFileName (List.last path) then List.last path
+            else ""
+       | RELATIVE {path=path, anchor=anchor, root=root} => 
+            if length path = 0 then ""
+            else if isFileName (List.last path) then List.last path
+            else ""
     fun urlToString url = 
       let 
         fun splice (nil,_) = ""
