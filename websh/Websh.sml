@@ -159,9 +159,15 @@ structure Url = struct
     fun baseUrl url = 
       case url of
          HTTP {host=host, path=path, anchor=anchor} => 
-            if length host = 0 then HTTP {host=host, path=path, anchor=anchor}
-            else if isFileName (List.last host) then  HTTP {host=List.take(host, length(host) - 1),path=path, anchor=anchor}
-            else  HTTP {host=host, path=path, anchor=anchor}
+            (* case path of
+               NONE =>  *)
+                  if length host = 0 then HTTP {host=host, path=path, anchor=anchor}
+                  else if isFileName (List.last host) then  HTTP {host=List.take(host, length(host) - 1),path=path, anchor=anchor}
+                  else HTTP {host=host, path=path, anchor=anchor}
+             (* | SOME v => 
+                  if length v = 0 then HTTP {host=host, path=path, anchor=anchor}
+                  else if isFileName (List.last v) then  HTTP {host=host,path=SOME(List.take(v, length(v) - 1)), anchor=anchor}
+                  else HTTP {host=host, path=path, anchor=anchor} *)
          (* HTTP {host=host, path=path, anchor=anchor} *)
        | FILE {path=path, anchor=anchor} => 
             if length path = 0 then FILE {path=path, anchor=anchor}
