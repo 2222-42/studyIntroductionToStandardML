@@ -47,7 +47,7 @@ signature URL = sig
   (* val pathUrl : Types.url -> string list *)
   val joinUrlFile : Types.url -> string -> Types.url
   val joinUrlPath : Types.url -> string list -> Types.url
-  (*  val isRelative: Types.url -> bool *)
+  val isRelative: Types.url -> bool
 end
 
 fun isUpper c = #"A" <= c andalso c <= #"Z"
@@ -217,6 +217,11 @@ structure Url = struct
             FILE {path=(addToOrRemoveFromStringList path stringList), anchor=anchor}
        | RELATIVE {path=path, anchor=anchor, root=root} => 
             RELATIVE {path=(addToOrRemoveFromStringList path stringList), anchor=anchor, root=root}
+    fun isRelative url = 
+      case url of
+         HTTP _ => false
+       | FILE _ => false
+       | RELATIVE _ => true
     fun urlToString url = 
       let 
         fun splice (nil,_) = ""
