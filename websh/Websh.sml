@@ -46,8 +46,8 @@ signature URL = sig
   val nodeUrl : Types.url -> string option
   (* val pathUrl : Types.url -> string list *)
   val joinUrlFile : Types.url -> string -> Types.url
-  (* val joinUrlPath : Types.rul -> string list -> Types.url
-  val isRelative: Types.url -> bool *)
+  val joinUrlPath : Types.url -> string list -> Types.url
+  (*  val isRelative: Types.url -> bool *)
 end
 
 fun isUpper c = #"A" <= c andalso c <= #"Z"
@@ -155,6 +155,7 @@ structure Url = struct
       in
         not (length r = 0)
       end
+    (* TODO: HTTPの場合のpathからの取得や削除の修正 *)
     fun baseUrl url = 
       case url of
          HTTP {host=host, path=path, anchor=anchor} => 
@@ -194,7 +195,22 @@ structure Url = struct
             FILE {path=path@[fileName], anchor=anchor}
        | RELATIVE {path=path, anchor=anchor, root=root} => 
             RELATIVE {path=path@[fileName], anchor=anchor, root=root}
-
+    fun addToOrRemoveFromStringList sourceList relativeList = 
+      foldl (fn (x, R) => if x = ".." then List.take(R, length(R) - 1)
+                          else if x = "." then R
+                          else R @ [x]) sourceList relativeList
+    fun addToOrRemoveFromListOption sourceListOption relativeList = 
+      case sourceListOption of
+         SOME v => SOME(addToOrRemoveFromStringList v relativeList)
+       | NONE => SOME(addToOrRemoveFromStringList [] relativeList)
+    fun joinUrlPath url stringList = 
+      case url of
+         HTTP {host=host, path=path, anchor=anchor} => 
+            HTTP {host=host, path=(addToOrRemoveFromListOption path stringList), anchor=anchor}
+       | FILE {path=path, anchor=anchor} => 
+            FILE {path=(addToOrRemoveFromStringList path stringList), anchor=anchor}
+       | RELATIVE {path=path, anchor=anchor, root=root} => 
+            RELATIVE {path=(addToOrRemoveFromStringList path stringList), anchor=anchor, root=root}
     fun urlToString url = 
       let 
         fun splice (nil,_) = ""
@@ -281,7 +297,7 @@ structure Url = struct
 end
 
 (* 
-val testUrl = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.ac.jp/~ohori";
+val testUrl = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "http://www.jaist.ac.jp/~ohori/test";
 Url.urlToString testUrl;
 val testFile = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/";
 Url.urlToString testFile;
@@ -308,6 +324,20 @@ Url.canonicalUrl testFile;
 Url.canonicalUrl testRelative;
 Url.baseUrl testRelative
 Url.canonicalUrl it;
+
+Url.joinUrlPath testUrl ["testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testFile ["testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testRelative ["testDir", "testSubDir", "testFileName"];
+
+Url.joinUrlPath testUrl [".", "testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testFile [".", "testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testRelative [".", "testDir", "testSubDir", "testFileName"];
+
+Url.joinUrlPath testUrl ["..", "testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testFile ["..", "testDir", "testSubDir", "testFileName"];
+Url.joinUrlPath testRelative ["..", "testDir", "testSubDir", "testFileName"];
+
+
 *)
 
 structure Parse =
