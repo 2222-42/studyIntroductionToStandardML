@@ -90,6 +90,9 @@ sig
   val inputN : instream * int -> string
   val output1 : outstream * char -> unit
   val flushOut : outstream -> unit
+  val copyStream : instream -> outstream -> unit
+  (* printだと名前衝突が起きるので *)
+  val printPageOrUrl : Types.url -> unit
 end
 
 structure ExternalIO : EXTERNALIO =
@@ -167,5 +170,13 @@ struct
           end
     val output1 = TextIO.output1
     val flushOut = TextIO.flushOut
+    fun copyStream source outs = 
+      if endOfStream source then ()
+      else case input1 source of
+            SOME c => (output1(outs,c);
+                        copyStream source outs)
+          | NONE => copyStream source outs
+    fun printPageOrUrl url = 
+     print (Print.valueToString (ParseHtml.parseHtml url url))
   end
 end
