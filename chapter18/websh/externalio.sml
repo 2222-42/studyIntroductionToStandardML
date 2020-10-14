@@ -114,10 +114,39 @@ struct
          | RELATIVE _ => 
               raise urlFormat       
       end
+    fun closeIn source =
+      case source of
+         StreamIn s => TextIO.closeIn s
+       | ProcessIn p => 
+          let
+            val (ins, _) = Unix.streamsOf p
+          in
+            TextIO.closeIn ins
+          end
     fun openOut (adrs as FILE {path,...}) =
         TextIO.openOut
           (OS.Path.toString {arcs=path,vol="", isAbs=true})
       | openOut _ = raise urlFormat
+    fun closeOut source =
+       TextIO.closeOut source
+    fun endOfStream source = 
+      case source of
+         StreamIn s => TextIO.endOfStream s
+       | ProcessIn p => 
+          let
+            val (ins, _) = Unix.streamsOf p
+          in
+            TextIO.endOfStream ins
+          end
+    fun lookahead source =
+      case source of
+         StreamIn s => TextIO.lookahead s
+       | ProcessIn p => 
+          let
+            val (ins, _) = Unix.streamsOf p
+          in
+            TextIO.lookahead ins
+          end
     fun input1 source = 
       case source of
          StreamIn s => TextIO.input1 s
@@ -126,6 +155,15 @@ struct
             val (is, _) = Unix.streamsOf p
           in
             TextIO.input1 is
+          end
+    fun inputN (source, n) = 
+      case source of
+         StreamIn s => TextIO.inputN(s, n)
+       | ProcessIn p => 
+          let
+            val (is, _) = Unix.streamsOf p
+          in
+            TextIO.inputN(is, n)
           end
     val output1 = TextIO.output1
     val flushOut = TextIO.flushOut
