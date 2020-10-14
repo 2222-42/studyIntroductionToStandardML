@@ -1,4 +1,4 @@
-use "./chapter16/chap16_3_q9.sml";
+use "../chapter16/chap16_3_q9.sml";
 use "./Lex.sml";
 
 structure Control =

@@ -33,7 +33,7 @@ struct
         handle NotFound => (print "NotFound")
         handle StringSyntax => print("StringSyntax")
         handle urlFormat => print("urlFormat")
-    val defaultSource = {stream=TextIO.stdIn, promptMode=true}
+    val defaultSource = {stream=ExternalIO.StreamIn(TextIO.stdIn), promptMode=true}
     fun websh () = 
       (Lex.initToken defaultSource;
        Lex.printFirstLine defaultSource;

@@ -32,9 +32,9 @@ datatype token
     val printFirstLine : source -> unit
 end
 
-  structure Lex : LEX =
+structure Lex : LEX =
   struct
-    structure T = TextIO
+    structure T = ExternalIO
     type instream = T.instream
     type source = {stream: instream, promptMode:bool}
     datatype token
@@ -243,17 +243,9 @@ end
         in
           case token of
              EOF => ()
-           (* useで次の中身を見るために、nextTokenが更新されないためダメ *)
-           | ID "use" =>
-               let
-                 val fileName = (skipSpaces (ins, getPrompt source); getFileName (ins))
-                 val newSource = {stream=TextIO.openIn fileName, promptMode=(getPrompt source)}
-               in
-                 (testMain newSource; testMain source)
-               end
            | _ => (print ("lookahead: " ^ toString ahead ^ "\n");
                    print ("lex: " ^ toString token ^ "\n" );
                    testMain source)
         end)
-    fun testLex () = testMain {stream=TextIO.stdIn, promptMode=true}
+    fun testLex () = testMain {stream=ExternalIO.StreamIn(TextIO.stdIn), promptMode=true}
    end
