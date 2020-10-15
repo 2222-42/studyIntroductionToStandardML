@@ -1,8 +1,15 @@
 signature PARSEHTML =
 sig
   val parseHtml : Types.url -> Types.url -> Types.value
-  val nextRef : Types.url -> Types.source -> Types.url option
+  val nextRef : Types.url -> Lex.source -> Types.url option
 end
+(* 
+textの記述:
+val nextRef : Types.url -> Types.source -> Types.url option
+
+しかし、sourceはLexで定義されている。
+Typesに追加してもよいが、Lexのままでいいかな。
+*)
 
 fun toLower c =
     if isUpper c
@@ -16,13 +23,18 @@ TODO: 型エラーが起きているのを修正。
   operand:         TextIO.instream
   in expression:
     L.lex source
+
+ExternalIOのinstream はTextIO.instreamで、
+Lexのsource は {stream: instream, promptMode:bool}
+
+つまり、T.lookahead sourceのsourceはTextIO.instream
 *)
 structure ParseHtml =
 struct
 local open Types Control
 in
   structure L = Lex
-  structure T = TextIO
+  structure T = ExternalIO
   fun parseHtml url1 url2 =
     PAGE{url=url2, links=nil}
   fun nextRef root source =
@@ -32,10 +44,13 @@ in
         then L.initToken(source)
         else raise urlFormat
       fun skipUntil tk = 
-        case T.lookahead source of
-           SOME c => if c = #"<" then (T.input1 source; ())
-                     else (T.input1 source;skipUntil tk)
+        let val ins = (fn ({stream, ...}: L.source) => stream) source
+        in
+        case T.lookahead ins of
+           SOME c => if c = #"<" then (T.input1 ins; ())
+                     else (T.input1 ins;skipUntil tk)
          | _ => ()
+        end
     in
       (skipUntil L.LANGLE;
        case (L.lex source, L.lex source) of
