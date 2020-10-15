@@ -125,7 +125,7 @@ structure Lex : LEX =
           val ins = getStream source
         in
          (skipSpaces (ins, getPrompt source);
-          if T.endOfStream ins then EOF
+          if T.endOfStream ins then raise Control.endOfInput
           else
            let
              val c = valOf (T.lookahead ins)
