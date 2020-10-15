@@ -17,18 +17,6 @@ fun toLower c =
     else c;
 fun lower s = implode (map toLower (explode s))
 
-(* 
-TODO: 型エラーが起きているのを修正。
-  operator domain: Lex.source
-  operand:         TextIO.instream
-  in expression:
-    L.lex source
-
-ExternalIOのinstream はTextIO.instreamで、
-Lexのsource は {stream: instream, promptMode:bool}
-
-つまり、T.lookahead sourceのsourceはTextIO.instream
-*)
 structure ParseHtml =
 struct
 local open Types Control
@@ -51,7 +39,6 @@ in
         end
     in
       (skipUntil L.LANGLE;
-       print "nextRef";
        case (L.lex source, L.lex source) of
           (L.ID(s1), L.ID(s2)) => 
             if lower s1 = "a" andalso lower s2 = "href" orelse
@@ -59,17 +46,14 @@ in
                let
                  val s = (check source L.EQUALSYM; L.nextToken source)
                in
-                  print "a or img called \n";
                  (case s of
                     L.STRING s => SOME(L.lex source; Url.parseUrl root s)
                   | _ => nextRef root source)
                   handle urlFormat => nextRef root source
                end
             else nextRef root source
-        | _ => (print ("lookahead: " ^ L.toString (L.lex source) ^ " ");
-                   nextRef root source))
+        | _ => (nextRef root source))
         handle endOfInput => NONE
-        (* lexでEOF tokenの場合の所為がないので、それをやらねばならない *)
     end
   fun parseHtml root url =
     let
