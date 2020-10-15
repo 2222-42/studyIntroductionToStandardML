@@ -35,8 +35,6 @@ local open Types Control
 in
   structure L = Lex
   structure T = ExternalIO
-  fun parseHtml url1 url2 =
-    PAGE{url=url2, links=nil}
   fun nextRef root source =
     let
       fun check source tk = 
@@ -53,6 +51,7 @@ in
         end
     in
       (skipUntil L.LANGLE;
+       print "nextRef\n";
        case (L.lex source, L.lex source) of
           (L.ID(s1), L.ID(s2)) => 
             if lower s1 = "a" andalso lower s2 = "href" orelse
@@ -60,14 +59,35 @@ in
                let
                  val s = (check source L.EQUALSYM; L.nextToken source)
                in
+                  print "a or img called \n";
                  (case s of
                     L.STRING s => SOME(L.lex source; Url.parseUrl root s)
                   | _ => nextRef root source)
                   handle urlFormat => nextRef root source
                end
             else nextRef root source
-        | _ => nextRef root source)
+        | _ => (print ("lookahead: " ^ L.toString (L.lex source) ^ "\n");
+                   nextRef root source))
         handle endOfInput => NONE
+        (* lexでEOF tokenの場合の所為がないので、それをやらねばならない *)
+    end
+  fun parseHtml root url =
+    let
+      val s = (T.openIn url)
+      val source = {stream=s, promptMode=false}
+      fun allRefs L = case nextRef root source of
+                          SOME u => allRefs (L@[u])
+                        | NONE => L
+      val L = allRefs nil
+      val _ = T.closeIn s
+    in
+      PAGE{url=url, links=L}
     end
 end
 end
+
+(*
+val root = Websh.currentPath();
+val url = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/studyIntroductionToStandardML/chapter18/websh/testFiles/index.html";
+ParseHtml.parseHtml root url;
+*)
