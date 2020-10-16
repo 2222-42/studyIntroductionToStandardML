@@ -71,6 +71,7 @@ end
 end
 
 (*
+CM.make "sources.cm";
 val root = Websh.currentPath();
 val url = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/studyIntroductionToStandardML/chapter18/websh/testFiles/index.html";
 ParseHtml.parseHtml root url;
