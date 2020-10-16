@@ -2,7 +2,7 @@ signature LEX = sig
 type instream
 type source = {stream: instream, promptMode:bool}
 datatype token
-    =  STRING of string 
+    = SSTRING of string            | DSTRING of string
     | EOF                          | ID of string
     | DIGITS of string             | SPECIAL of char
     | BANG            (* ! *)     (* | DOUBLEQUOTE     (* " *)  *)
@@ -38,7 +38,7 @@ structure Lex : LEX =
     type instream = T.instream
     type source = {stream: instream, promptMode:bool}
     datatype token
-      = STRING of string 
+      = SSTRING of string            | DSTRING of string
       | EOF                          | ID of string
       | DIGITS of string             | SPECIAL of char
       | BANG            (* ! *)      
@@ -75,7 +75,7 @@ structure Lex : LEX =
                           else ()
          | _ => ()
 
-    fun getString ins = 
+    fun getSString ins = 
       let 
         fun getRest (s, i) = 
           if i = 0 then s
@@ -86,7 +86,20 @@ structure Lex : LEX =
                         else getRest (s ^ T.inputN(ins,1), i)
             | NONE => s
       in
-        STRING(getRest ("", 2))
+        SSTRING(getRest ("", 2))
+      end
+    fun getDString ins = 
+      let 
+        fun getRest (s, i) = 
+          if i = 0 then s
+          else 
+            case T.lookahead ins of
+              SOME c => if #"'" = c 
+                        then (T.inputN(ins,1); getRest (s, i - 1))
+                        else getRest (s ^ T.inputN(ins,1), i)
+            | NONE => s
+      in
+        DSTRING(getRest ("", 2))
       end
       (* 
       structure T = TextIO
@@ -130,7 +143,8 @@ structure Lex : LEX =
            let
              val c = valOf (T.lookahead ins)
            in
-             if #"\"" = c then getString ins
+             if #"\"" = c then getSString ins
+             else if #"'" = c then getDString ins
              else if Char.isDigit c then getNum ins
              else if Char.isAlpha c then getID ins
              else case valOf (T.input1 ins) of
@@ -171,7 +185,8 @@ structure Lex : LEX =
 
     fun toString tok =
       case tok of
-          STRING s => "STRING\"" ^ s ^"\""
+          SSTRING s => "SSTRING\"" ^ s ^"\""
+        | DSTRING s => "DString\"" ^ s ^ "\""
         | EOF => "EOF"
         | ID s => "ID(" ^ s ^ ")"
         | DIGITS s => "DIGITS(" ^ s ^ ")"

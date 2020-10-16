@@ -59,7 +59,8 @@ struct
                           FOLLOWEXP(e, i)
                         end
                   | _ => IDEXP s)
-            | L.STRING s => STREXP s
+            | L.SSTRING s => STREXP s
+            | L.DSTRING s => STREXP s
             | L.EOF => raise endOfInput (* C-dでParseErrorが発生することへの対処 *)
             | _ => (print "parse Error\n";
                     syntaxError())

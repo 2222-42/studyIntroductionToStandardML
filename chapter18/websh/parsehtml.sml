@@ -47,7 +47,8 @@ in
                  val s = (check source L.EQUALSYM; L.nextToken source)
                in
                  (case s of
-                    L.STRING s => SOME(L.lex source; Url.parseUrl root s)
+                    L.SSTRING s => SOME(L.lex source; Url.parseUrl root s)
+                  | L.DSTRING s => SOME(L.lex source; Url.parseUrl root s)
                   | _ => nextRef root source)
                   handle urlFormat => nextRef root source
                end
@@ -71,6 +72,8 @@ end
 end
 
 (*
+Control.Print.printDepth := 20;
+Control.Print.printLength := 100;
 CM.make "sources.cm";
 val root = Websh.currentPath();
 val url = Url.parseUrl (Types.FILE{path=[], anchor=NONE}) "file:///mnt/e/SMLProject/studyIntroductionToStandardML/chapter18/websh/testFiles/index.html";
