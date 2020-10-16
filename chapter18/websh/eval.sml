@@ -21,7 +21,7 @@ in
           val v = eval root env e
           val root = (case v of
              URL u => u
-           | _ => raise Runtime "Not a url data.")
+           | _ => raise Runtime "A url expected.")
         in
           ParseHtml.parseHtml (Url.baseUrl root) root
         end
