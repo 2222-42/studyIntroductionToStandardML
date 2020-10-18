@@ -18,21 +18,34 @@ struct
     in
       List.exists (fn x => x = fileName) (copyDirStream d [])
     end
+  (* Q18.31 *)
   fun touchDir {isAbs, vol, arcs} = 
     let
       val pathString = OS.Path.toString {arcs=arcs, isAbs=isAbs, vol=vol}
       val canonicPathString = OS.Path.mkCanonical(pathString)
       val targetPath = OS.Path.fromString canonicPathString
     in
-      print (OS.Path.toString targetPath)
-      (* TODO: 冗長性が取り除かれているか確認する *)
-      (* TODO: exists 関数で各段階であるかどうかをテストする *)
-      (* TODO: なければ作成する *)
+      print (OS.Path.toString targetPath);
+      (* 冗長性が取り除かれているか確認する -> DONE *)
+      foldl (fn (x, R) => (print R; 
+                          (* exists 関数で各段階でDirectoryあるかどうかをテストする *)
+                           if exists x R then
+                            ()
+                           else
+                            (* なければ作成する *)
+                            OS.FileSys.mkDir (R^"/"^x);
+                           R^"/"^x) ) "/" ((fn {arcs,...} => arcs)targetPath);
+      ()
     end
     
 end
 
 (* 
+FileUtil.exists "mnt" "/";
+
 FileUtil.exists "test.txt" "/mnt/e/SMLProject/studyIntroductionToStandardML/";
+
+FileUtil.touchDir {isAbs=true, vol="", arcs=["mnt", "e", "SMLProject", "studyIntroductionToStandardML", "testDir", "testSubDir", "..", "testSubDir1"]};
+FileUtil.touchDir {isAbs=true, vol="", arcs=["mnt", "e", "SMLProject", "studyIntroductionToStandardML", "testDir", "testSubDir", "..", "testSubDir2"]};
 
 *)
