@@ -34,7 +34,7 @@ struct
                            else
                             (* なければ作成する *)
                             OS.FileSys.mkDir (R^"/"^x);
-                           R^"/"^x) ) "/" ((fn {arcs,...} => arcs)targetPath);
+                           R^"/"^x) ) (if isAbs then "/" else OS.FileSys.getDir()) ((fn {arcs,...} => arcs)targetPath);
       ()
     end
     
@@ -47,5 +47,7 @@ FileUtil.exists "test.txt" "/mnt/e/SMLProject/studyIntroductionToStandardML/";
 
 FileUtil.touchDir {isAbs=true, vol="", arcs=["mnt", "e", "SMLProject", "studyIntroductionToStandardML", "testDir", "testSubDir", "..", "testSubDir1"]};
 FileUtil.touchDir {isAbs=true, vol="", arcs=["mnt", "e", "SMLProject", "studyIntroductionToStandardML", "testDir", "testSubDir", "..", "testSubDir2"]};
-
+FileUtil.touchDir {isAbs=false, vol="", arcs=["testDir", "testSubDir", "..", "testSubDir3"]};
+FileUtil.touchDir {isAbs=false, vol="", arcs=["testDir2", "testSubDir", "..", "testSubDir2"]};
+FileUtil.touchDir {isAbs=false, vol="", arcs=["testDir2", "testSubDir", "..", "testSubDir3"]};
 *)
