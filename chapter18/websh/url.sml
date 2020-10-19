@@ -4,7 +4,7 @@ signature URL = sig
   val canonicalUrl : Types.url -> Types.url
   val baseUrl : Types.url -> Types.url
   val nodeUrl : Types.url -> string option
-  (* val pathUrl : Types.url -> string list *)
+  val pathUrl : Types.url -> string list
   val joinUrlFile : Types.url -> string -> Types.url
   val joinUrlPath : Types.url -> string list -> Types.url
   val isRelative: Types.url -> bool
@@ -158,6 +158,15 @@ structure Url = struct
             if length path = 0 then ""
             else if isFileName (List.last path) then List.last path
             else ""
+    fun pathUrl url = 
+      case url of 
+         HTTP {host=host, path=path, ...} => 
+            if isSome path then host @ valOf(path)
+            else host
+       | FILE {path=path, ...} => 
+            path
+       | RELATIVE {path=path, root=root,...} => 
+            pathUrl root @ path
     fun joinUrlFile url fileName = 
       case url of
          HTTP {host=host, path=path, anchor=anchor} => 
