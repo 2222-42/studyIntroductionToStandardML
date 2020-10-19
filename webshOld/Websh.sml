@@ -341,6 +341,12 @@ Url.canonicalUrl testRelative;
 Url.baseUrl testRelative
 Url.canonicalUrl it;
 
+val testRelativeHigher1 = Url.parseUrl testFile "./studyingStandardML/";
+val testRelativeHigher2 = Url.parseUrl testRelativeHigher1 "./test.txt";
+Url.canonicalUrl testRelativeHigher2;
+ 
+Url.pathUrl it;
+
 Url.joinUrlPath testUrl ["testDir", "testSubDir", "testFileName"];
 Url.joinUrlPath testFile ["testDir", "testSubDir", "testFileName"];
 Url.joinUrlPath testRelative ["testDir", "testSubDir", "testFileName"];
