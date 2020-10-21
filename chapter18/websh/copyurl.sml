@@ -8,14 +8,16 @@ struct
   local
     open Url Types Control
   in
-    fun printMessage fromUrl toUrl = ()
+    fun printMessage (fromUrl, toUrl) = 
+      print ("copy\n    source: "^(urlToString fromUrl)^"\n    target: "^(urlToString toUrl))
     fun guessHtml url =
         case (nodeUrl url) of
             SOME v => 
             ((String.isSuffix ".html" v) orelse (String.isSuffix ".htm" v) orelse
             (String.isSuffix ".shtml" v) orelse (String.isSuffix ".shtm" v))
           | NONE => false
-    fun copyUrl fromUrl = true
+    fun copyUrl fromUrl toUrl = 
+      ()
     fun copy fromUrl toUrlDir =
       let
         fun splitDirFile L = 
@@ -37,7 +39,7 @@ struct
         else
           (printMessage(fromUrl, toUrl);
            FileUtil.touchDir {isAbs=true, arcs=(pathUrl toDir), vol=""};
-           CopyUrl fromUrl' toUrl;
+           copyUrl fromUrl' toUrl;
            if guessHtml toUrl then
              let
                val (PAGE{links,...}) = ParseHtml.parseHtml fromBase toUrl
