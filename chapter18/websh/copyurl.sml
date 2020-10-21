@@ -17,7 +17,12 @@ struct
             (String.isSuffix ".shtml" v) orelse (String.isSuffix ".shtm" v))
           | NONE => false
     fun copyUrl fromUrl toUrl = 
-      ()
+      let
+        val ins = ExternalIO.openIn fromUrl
+        val outs = ExternalIO.openOut toUrl
+      in
+        ExternalIO.copyStream ins outs
+      end
     fun copy fromUrl toUrlDir =
       let
         fun splitDirFile L = 
