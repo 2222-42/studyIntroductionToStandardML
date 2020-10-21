@@ -6,10 +6,15 @@ end
 structure CopyUrl : COPYURL =
 struct
   local
-    open Url
+    open Url Types Control
   in
     fun printMessage fromUrl toUrl = ()
-    fun guessHtml url = true
+    fun guessHtml url =
+        case (nodeUrl url) of
+            SOME v => 
+            ((String.isSuffix ".html" v) orelse (String.isSuffix ".htm" v) orelse
+            (String.isSuffix ".shtml" v) orelse (String.isSuffix ".shtm" v))
+          | NONE => false
     fun copyUrl fromUrl = true
     fun copy fromUrl toUrlDir =
       let

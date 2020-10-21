@@ -147,17 +147,17 @@ structure Url = struct
     fun nodeUrl url = 
       case url of 
          HTTP {host=host, path=path, anchor=anchor} => 
-            if length host = 0 then ""
-            else if isFileName (List.last host) then List.last host
-            else ""
+            if length host = 0 then NONE
+            else if isFileName (List.last host) then SOME(List.last host)
+            else NONE
        | FILE {path=path, anchor=anchor} => 
-            if length path = 0 then ""
-            else if isFileName (List.last path) then List.last path
-            else ""
+            if length path = 0 then NONE
+            else if isFileName (List.last path) then SOME(List.last path)
+            else NONE
        | RELATIVE {path=path, anchor=anchor, root=root} => 
-            if length path = 0 then ""
-            else if isFileName (List.last path) then List.last path
-            else ""
+            if length path = 0 then NONE
+            else if isFileName (List.last path) then SOME(List.last path)
+            else NONE
     fun pathUrl url = 
       case url of 
          HTTP {host=host, path=path, ...} => 
