@@ -67,7 +67,14 @@ struct
                   (ExternalIO.closeIn s; topLoop source env))
             end
          | HELP => print (Print.statementToString s ^ ";\n") (* ヘルプメッセージの印字 *)
-         | ENV => print (Print.statementToString s ^ ";\n") (* 現在の環境の印字 *)
+         | ENV =>  (* 現在の環境の印字 *)
+            let
+              val keys = Env.domain env
+            in
+              print ("Current binding environment.\n");
+              foldl (fn (x, _) => Format.printf "%-10s %s\n"
+               [Format.S(x), Format.S(Print.valueToString (Env.lookUp x env))]) () keys
+            end
          ;
         topLoop source env) 
       end
