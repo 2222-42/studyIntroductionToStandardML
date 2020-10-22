@@ -56,7 +56,14 @@ struct
                   end
                (* | pat2 => body2 *)
             end
-         | PRINT e => print (Print.statementToString s ^ ";\n") (* ページの印字 *)
+         | PRINT e => (* ページの印字 *)
+            let
+              val v = Eval.eval (!root) env e
+            in
+              case v of
+                 URL(x) => ExternalIO.copyStream (ExternalIO.openIn x) (TextIO.stdOut) 
+               | _ => raise Runtime "A url expected."
+            end
          | USE f => (* ファイルの実行 *)
             let
               val s = ExternalIO.openIn (Url.canonicalUrl (Url.parseUrl (!root) f))
