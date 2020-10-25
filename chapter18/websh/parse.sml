@@ -16,10 +16,13 @@ struct
 
         fun check tk = (* check whether tk or not *)
           if L.nextToken(source) = tk
-          then ()
+          then ( 
+            (* print ("token is same. \nexpected: " ^ (L.toString tk) ^ "\nresult:" ^ L.toString(L.nextToken(source)) ^ "\n"); *)
+            ()
+          )
           else (skip();
                 (* 以下の一行はテスト用のため *)
-                print ("token is different: " ^ L.toString(L.nextToken(source)));
+                print ("token is different. \nexpected: " ^ (L.toString tk) ^ "\nresult:" ^ L.toString(L.nextToken(source)) ^ "\n");
                 raise Syntax)
 
         fun getInt () = (* read data whose type is int *)
@@ -35,26 +38,33 @@ struct
             (* print (L.toString exp ^ "\n"); *)
             case exp of
               L.ID(s) =>
-                  (case s of
+                  (
+                    (* print "ID in parseExpr\n"; *)
+                    case s of
                     "link" => (* read link formula *)
                         let
-                          val _ = L.lex source
+                          val _ = L.nextToken source
                           val _ = check L.LPAREN
+                          val _ = L.lex source
                           val e = parseExpr ()
                           val _ = check L.RPAREN
+                          val _ = L.lex source
                         in
                           LINKEXP e
                         end
                   | "follow" => (* read follow formula*)
                         let
-                          val _ = L.lex source
+                          val _ = L.nextToken source
                           val _ = check L.LPAREN
+                          val _ = L.lex source
                           val e = parseExpr ()
                           val _ = check L.COMMA
+                          val _ = L.lex source
                           val i = case L.lex source of
                                       L.DIGITS n => valOf(Int.fromString n)
                                     | _ => syntaxError()
                           val _ = check L.RPAREN
+                          val _ = L.lex source
                         in
                           FOLLOWEXP(e, i)
                         end

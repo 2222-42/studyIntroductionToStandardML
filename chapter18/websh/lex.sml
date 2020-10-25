@@ -143,6 +143,7 @@ structure Lex : LEX =
            let
              val c = valOf (T.lookahead ins)
            in
+            (* print ("read: " ^ Char.toString c ^ "\n"); *)
              if #"\"" = c then getSString ins
              else if #"'" = c then getDString ins
              else if Char.isDigit c then getNum ins
