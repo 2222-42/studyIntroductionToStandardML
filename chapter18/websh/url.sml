@@ -205,7 +205,7 @@ structure Url = struct
         case url of 
           HTTP {host=host, path=path, anchor=anchor} => 
             "http://" ^
-            (splice (host, "/")) ^
+            (splice (host, ".")) ^
             (case path of
               NONE => ""
             | SOME li => "/"^splice(li, "/")) ^
