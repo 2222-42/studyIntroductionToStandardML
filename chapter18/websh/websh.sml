@@ -73,7 +73,16 @@ struct
                 handle endOfInput =>
                   (ExternalIO.closeIn s; topLoop source env))
             end
-         | HELP => print (Print.statementToString s ^ ";\n") (* ヘルプメッセージの印字 *)
+         | HELP =>  (* ヘルプメッセージの印字 *)
+            let
+              val helpFilePath = STREXP "/help/help.txt"
+              val v = Eval.eval (!root) env helpFilePath
+            in
+              Env.bind("help_file_path", v, env);
+              case (Eval.eval (!root) env (IDEXP "help_file_path")) of
+                 URL(x) => ExternalIO.copyStream (ExternalIO.openIn x) (TextIO.stdOut) 
+               | _ => raise Runtime "A url expected."
+            end
          | ENV =>  (* 現在の環境の印字 *)
             let
               val keys = Env.domain env
