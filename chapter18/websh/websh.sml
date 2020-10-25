@@ -109,3 +109,8 @@ struct
   end
 end
 
+(* 
+CM.make "sources.cm";
+SMLofNJ.exportFn ("Websh", 
+  fn (x, argList) => (Websh.websh();OS.Process.success));
+*)
