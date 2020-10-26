@@ -9,7 +9,7 @@ struct
     open Url Types Control
   in
     fun printMessage (fromUrl, toUrl) = 
-      print ("copy\n    source: "^(urlToString fromUrl)^"\n    target: "^(urlToString toUrl))
+      print ("copy\n    source: "^(urlToString fromUrl)^"\n    target: "^(urlToString toUrl)^"\n")
     fun guessHtml url =
         case (nodeUrl url) of
             SOME v => 
