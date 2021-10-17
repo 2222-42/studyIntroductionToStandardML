@@ -8,10 +8,10 @@ fun member L x = foldr (fn (h, R) => ((h = x) orelse R)) false L;
 fun isRelated R (a,b) = member R (a, b);
 
 (* 2 *)
-fun targetOf R a = foldr (fn ((x,y), r) => if x = a then (x,y)::r else r) [] R;
+fun targetOf (R,a) = foldr (fn ((x,y), r) => if x = a then y::r else r) [] R;
 
-targetOf [(1,2), (2,3), (2,4), (3,4)] 1;
-targetOf [(1,2), (2,3), (2,4), (3,4)] 2;
+targetOf ([(1,2), (2,3), (2,4), (3,4)], 1);
+targetOf ([(1,2), (2,3), (2,4), (3,4)], 2);
 
 (* 筆者の解答(なぜかfoldrを使っていない) *)
 fun filter P nil = nil
@@ -20,10 +20,10 @@ fun filter P nil = nil
 fun targetOfByAuthor (R,a) = filter (fn (x,y) => x = a) R;
 
 (* 3 *)
-fun sourceOf R a = foldr (fn ((x,y), r) => if y = a then (x,y)::r else r) [] R;
+fun sourceOf (R,a) = foldr (fn ((x,y), r) => if y = a then x::r else r) [] R;
 
-sourceOf [(1,2), (2,3), (2,4), (3,4)] 4;
-sourceOf [(1,2), (2,3), (2,4), (3,4)] 2;
+sourceOf ([(1,2), (2,3), (2,4), (3,4)], 4);
+sourceOf ([(1,2), (2,3), (2,4), (3,4)], 2);
 
 (* 4 *)
 fun inverseRel R = foldr (fn ((x,y), r) => (y,x)::r) [] R;
