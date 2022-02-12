@@ -1,0 +1,12 @@
+_require "basis.smi"
+
+datatype 'a cell = NIL | CELL of {data: 'a, left: 'a cell ref, right: 'a cell ref}
+type 'a dlist = 'a cell ref;
+exception NilException
+val dataDlist : 'a dlist -> 'a (* 先頭のデータを取り出す *)
+val rightDlist : 'a dlist -> 'a dlist (*ポインタを右にたどる*)
+val leftDlist : 'a dlist -> 'a dlist (*ポインタを左にたどる*)
+val insertDlist : 'a -> 'a dlist -> unit (*要素を追加する*)
+val singleDlist : 'a -> 'a dlist (*要素1つの循環2重リンクリストを作る*)
+val deleteDlist : 'a dlist -> unit (*先頭要素を削除する*)
+val fromListToDlist : 'a list -> 'a dlist (*リストを循環2重リンクリストに変換する*)
