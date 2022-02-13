@@ -10,3 +10,7 @@ val insertDlist : 'a -> 'a dlist -> unit (*要素を追加する*)
 val singleDlist : 'a -> 'a dlist (*要素1つの循環2重リンクリストを作る*)
 val deleteDlist : 'a dlist -> unit (*先頭要素を削除する*)
 val fromListToDlist : 'a list -> 'a dlist (*リストを循環2重リンクリストに変換する*)
+val concatDlist : 'a dlist -> 'a dlist -> unit (* 循環2重リンクリストを連結する関数 *)
+val dlistToList : 'a dlist -> 'a list
+val copyDlist : 'a dlist -> 'a dlist
+val mapDlist : ('a -> 'a) -> 'a dlist -> 'a dlist
