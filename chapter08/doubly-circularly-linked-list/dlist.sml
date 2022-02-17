@@ -62,8 +62,8 @@ fun concatDlist dlist1 dlist2 =
     case (dlist1, dlist2) of
             (ref NIL, _) => (dlist1 := !dlist2)
           | (_, ref NIL) => (dlist2 := !dlist1)
-          | (d1 as ref (CELL {right=r1 as ref (CELL{right=r11,...}), left=l1 as ref (CELL {right=r12,...}),...}),
-            d2 as ref (CELL {right=r2 as ref (CELL{right=r21,...}), left=l2 as ref (CELL {right=r22,...}),...}) )
+          | (d1 as ref (CELL {right=r1 as ref (CELL{right=r11,...}), left=l1, ...}),
+            d2 as ref (CELL {right=r2 as ref (CELL{right=r21,...}), left=l2, ...}))
                 => let
                     val previousL1 = !l1
                     val previousR11 = !r11
